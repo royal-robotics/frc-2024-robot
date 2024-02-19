@@ -10,6 +10,8 @@ public class Climber extends SubsystemBase {
     DoubleSolenoid climbLeft = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 2,6);
     DoubleSolenoid climbRight = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 3, 7);
 
+
+
     public Climber() {
 
     }
