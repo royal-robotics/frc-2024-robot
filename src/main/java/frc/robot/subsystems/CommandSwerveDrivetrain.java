@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import java.util.function.Supplier;
 
+import com.ctre.phoenix6.Orchestra;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
@@ -22,17 +24,30 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
 
-    public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
-        super(driveTrainConstants, OdometryUpdateFrequency, modules);
-        if (Utils.isSimulation()) {
-            startSimThread();
-        }
-    }
+    Orchestra m_orchestra = new Orchestra();
+
+    // public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
+    //     super(driveTrainConstants, OdometryUpdateFrequency, modules);
+    //     if (Utils.isSimulation()) {
+    //         startSimThread();
+    //     }
+    // }
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
         super(driveTrainConstants, modules);
         if (Utils.isSimulation()) {
             startSimThread();
         }
+        // Add a single device to the orchestra
+        m_orchestra.addInstrument(this.Modules[0].getDriveMotor());
+
+        // Attempt to load the chrp
+        StatusCode status = m_orchestra.loadMusic("Kevins Great File.chrp");
+
+        if (!status.isOK()) {
+        // log error
+        }
+
+        m_orchestra.play();
     }
 
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
