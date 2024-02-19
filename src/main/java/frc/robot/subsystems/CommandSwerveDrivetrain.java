@@ -50,6 +50,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         // Add a single device to the orchestra
         m_orchestra.addInstrument(this.Modules[0].getDriveMotor());
         m_orchestra.addInstrument(this.Modules[0].getSteerMotor());
+        m_orchestra.addInstrument(this.Modules[1].getDriveMotor());
+        m_orchestra.addInstrument(this.Modules[1].getSteerMotor());
+        m_orchestra.addInstrument(this.Modules[2].getDriveMotor());
+        m_orchestra.addInstrument(this.Modules[2].getSteerMotor());
+        m_orchestra.addInstrument(this.Modules[3].getDriveMotor());
+        m_orchestra.addInstrument(this.Modules[3].getSteerMotor());
 
         // Attempt to load the chrp
         StatusCode status = m_orchestra.loadMusic("Kevins Great File.chrp");
