@@ -91,10 +91,10 @@ public class Arm extends SubsystemBase {
         // Attempt to load the chrp
         // StatusCode status = m_orchestra.loadMusic("Kevins Great File.chrp"); // Moved to object declaration
 
-        if (!status.isOK()) {
-        // log error
-            System.out.println("error in arm!");
-        }
+        // if (!status.isOK()) {
+        // // log error
+        //    System.out.println("error in arm!");
+        // }
 
         m_orchestra.play();
     }
