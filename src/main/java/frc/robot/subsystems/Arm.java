@@ -44,7 +44,7 @@ public class Arm extends SubsystemBase {
     // create a position closed-loop request, voltage output, slot 0 configs
     final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
 
-    Orchestra m_orchestra = new Orchestra();
+    Orchestra m_orchestra = new Orchestra("Kevins Great File.chrp");
 
     AudioConfigs audioConfigs = new AudioConfigs();
 
@@ -89,7 +89,7 @@ public class Arm extends SubsystemBase {
         m_orchestra.addInstrument(m_wristTop);
         
         // Attempt to load the chrp
-        StatusCode status = m_orchestra.loadMusic("Kevins Great File.chrp");
+        // StatusCode status = m_orchestra.loadMusic("Kevins Great File.chrp"); // Moved to object declaration
 
         if (!status.isOK()) {
         // log error
