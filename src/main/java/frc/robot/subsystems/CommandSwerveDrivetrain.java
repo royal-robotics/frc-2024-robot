@@ -64,10 +64,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         // Attempt to load the chrp
         // StatusCode status = m_orchestra.loadMusic("Kevins Great File.chrp"); // Moved to Object Declaration
 
-        if (!status.isOK()) {
-        // log error
-            System.out.println("error in swerve!");
-        }
+        // if (!status.isOK()) {
+        // // log error
+        //    System.out.println("error in swerve!");
+        // }
 
         audioConfigs.AllowMusicDurDisable = true;
 
