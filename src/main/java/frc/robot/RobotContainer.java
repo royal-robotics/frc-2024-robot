@@ -58,7 +58,8 @@ public class RobotContainer {
 
     joystick.a().whileTrue(Commands.runOnce(() -> arm.motorSetArmPosition(), arm));
     joystick.b().whileTrue(Commands.runOnce(() -> arm.motorSetWristPosition(), arm));
-
+    joystick.y().whileTrue(Commands.runOnce(() -> {arm.requestIntake(); arm.requestShooter();}, arm));
+    
     if (Utils.isSimulation()) {
       drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     }

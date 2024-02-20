@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.AudioConfigs;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
@@ -31,6 +32,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
+
+    AudioConfigs audioConfigs = new AudioConfigs();
 
     Orchestra m_orchestra = new Orchestra();
 
@@ -63,8 +66,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
         if (!status.isOK()) {
         // log error
-            System.out.println("error!");
+            System.out.println("error in swerve!");
         }
+
+        audioConfigs.AllowMusicDurDisable = true;
 
         m_orchestra.play();
 

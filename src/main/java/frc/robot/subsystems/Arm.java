@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.configs.AudioConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -45,8 +46,10 @@ public class Arm extends SubsystemBase {
 
     Orchestra m_orchestra = new Orchestra();
 
+    AudioConfigs audioConfigs = new AudioConfigs();
+
     public Arm() {
-        slot0Configs.kP = 2.4; // An error of 0.5 rotations results in 12 V output
+        slot0Configs.kP = 0.48; // An error of 0.5 rotations results in 12 V output
         slot0Configs.kI = 0; // no output for integrated error
         slot0Configs.kD = 0.0; // A velocity of 1 rps results in 0.1 V output
 
@@ -73,6 +76,8 @@ public class Arm extends SubsystemBase {
         m_armBL.setControl(followOppose); // Back left follows and opposes Front Right
         m_wristBottom.setControl(followWrist); // Bottom wrist follows top
 
+        audioConfigs.AllowMusicDurDisable = true;
+
         m_orchestra.addInstrument(m_armFL);
         System.out.println(m_armFL);
         m_orchestra.addInstrument(m_armFR);
@@ -84,11 +89,11 @@ public class Arm extends SubsystemBase {
         m_orchestra.addInstrument(m_wristTop);
         
         // Attempt to load the chrp
-        StatusCode status = m_orchestra.loadMusic("deploy/Kevins Great File.chrp");
+        StatusCode status = m_orchestra.loadMusic("Kevins Great File.chrp");
 
         if (!status.isOK()) {
         // log error
-            System.out.println("error!");
+            System.out.println("error in arm!");
         }
 
         m_orchestra.play();
@@ -108,7 +113,6 @@ public class Arm extends SubsystemBase {
         m_motorRequest.Output = 0.1;
         m_armFR.setControl(m_motorRequest);
     }
-
     
     public void motorRequestReverse() {
         m_motorRequest.Output = -0.1;
@@ -118,6 +122,16 @@ public class Arm extends SubsystemBase {
     public void motorRequestBrake() {
         m_motorRequest.Output = 0.0;
         m_armFR.setControl(m_motorRequest);
+    }
+
+    public void requestIntake() {
+        m_motorRequest.Output = 0.6;
+        m_intake.setControl(m_motorRequest);
+    }
+
+    public void requestShooter() {
+        m_motorRequest.Output = 0.9;
+        m_shooter.setControl(m_motorRequest);
     }
 
     @Override
