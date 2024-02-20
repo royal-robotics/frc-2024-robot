@@ -50,14 +50,14 @@ public class RobotContainer {
         ));
 
     // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake)); // Bring ack later
-    joystick.b().whileTrue(drivetrain
-        .applyRequest(() -> point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))));
+    // joystick.b().whileTrue(drivetrain
+        // .applyRequest(() -> point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))));
 
     // reset the field-centric heading on left bumper press
     joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
 
-    joystick.a().onTrue(Commands.run(() -> arm.motorRequestForward(), arm).andThen(Commands.run(() -> arm.motorRequestBrake(), arm)));
-    joystick.b().onTrue(Commands.run(() -> arm.motorRequestReverse(), arm).andThen(Commands.run(() -> arm.motorRequestBrake(), arm)));
+    joystick.a().whileTrue(Commands.run(() -> arm.motorRequestForward(), arm).andThen(Commands.run(() -> arm.motorRequestBrake(), arm)));
+    joystick.b().whileTrue(Commands.run(() -> arm.motorRequestReverse(), arm).andThen(Commands.run(() -> arm.motorRequestBrake(), arm)));
 
     if (Utils.isSimulation()) {
       drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
