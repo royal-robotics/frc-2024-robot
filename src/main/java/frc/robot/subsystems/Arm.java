@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.Orchestra;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -40,6 +42,8 @@ public class Arm extends SubsystemBase {
 
     // create a position closed-loop request, voltage output, slot 0 configs
     final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
+
+    Orchestra m_orchestra = new Orchestra();
 
     public Arm() {
         slot0Configs.kP = 2.4; // An error of 0.5 rotations results in 12 V output
