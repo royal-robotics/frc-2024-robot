@@ -68,6 +68,26 @@ public class Arm extends SubsystemBase {
         m_armFL.setControl(followOppose); // Front left follows and opposes Front Right
         m_armBL.setControl(followOppose); // Back left follows and opposes Front Right
         m_wristBottom.setControl(followWrist); // Bottom wrist follows top
+
+        m_orchestra.addInstrument(m_armFL);
+        System.out.println(m_armFL);
+        m_orchestra.addInstrument(m_armFR);
+        m_orchestra.addInstrument(m_armBL);
+        m_orchestra.addInstrument(m_armBR);
+        m_orchestra.addInstrument(m_shooter);
+        m_orchestra.addInstrument(m_intake);
+        m_orchestra.addInstrument(m_wristBottom);
+        m_orchestra.addInstrument(m_wristTop);
+        
+        // Attempt to load the chrp
+        StatusCode status = m_orchestra.loadMusic("deploy/Kevins Great File.chrp");
+
+        if (!status.isOK()) {
+        // log error
+            System.out.println("error!");
+        }
+
+        m_orchestra.play();
     }
 
     public void motorSetArmPosition() {
