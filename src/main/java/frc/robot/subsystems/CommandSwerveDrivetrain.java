@@ -49,6 +49,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         }
         // Add a single device to the orchestra
         m_orchestra.addInstrument(this.Modules[0].getDriveMotor());
+        System.out.println(this.Modules[0].getDriveMotor());
         m_orchestra.addInstrument(this.Modules[0].getSteerMotor());
         m_orchestra.addInstrument(this.Modules[1].getDriveMotor());
         m_orchestra.addInstrument(this.Modules[1].getSteerMotor());
@@ -62,6 +63,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
         if (!status.isOK()) {
         // log error
+            System.out.println("error!");
         }
 
         m_orchestra.play();
