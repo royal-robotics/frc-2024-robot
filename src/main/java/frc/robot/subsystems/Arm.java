@@ -12,6 +12,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -47,6 +48,9 @@ public class Arm extends SubsystemBase {
     Orchestra m_orchestra = new Orchestra();
 
     AudioConfigs audioConfigs = new AudioConfigs();
+
+    public DigitalInput lineBreakSensor = new DigitalInput(0); // Linebreak Sensor on channel 0
+    public DigitalInput armLimitZero = new DigitalInput(1); // Arm limit switch for arm at 0 on channel 1
 
     public Arm() {
         slot0Configs.kP = 0.48; // An error of 0.5 rotations results in 12 V output
