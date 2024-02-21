@@ -16,6 +16,9 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
+
+    OurShuffleboard shuffleboard = new OurShuffleboard(this);
+
   }
 
   @Override
