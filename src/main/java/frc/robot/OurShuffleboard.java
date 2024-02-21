@@ -16,6 +16,7 @@ public class OurShuffleboard {
         ShuffleboardTab competitionTab = Shuffleboard.getTab("Competition");
         competitionTab.addBoolean("Line Break, Note Loaded", () -> arm.lineBreakSensor.get());
         competitionTab.addBoolean("Arm at Zero", () -> arm.armLimitZero.get());
-
+        competitionTab.addDouble("Arm position", () -> arm.armPosition.getValue());
+        competitionTab.addDouble("wrist position", () -> arm.wristPosition.getValue());
     }
 }

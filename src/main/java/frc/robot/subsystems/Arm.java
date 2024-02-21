@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.AudioConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -52,6 +53,10 @@ public class Arm extends SubsystemBase {
     public DigitalInput lineBreakSensor = new DigitalInput(0); // Linebreak Sensor on channel 0
     public DigitalInput armLimitZero = new DigitalInput(1); // Arm limit switch for arm at 0 on channel 1
 
+    public StatusSignal<Double> armPosition;
+    public StatusSignal<Double> wristPosition;
+
+
     public Arm() {
         slot0Configs.kP = 0.48; // An error of 0.5 rotations results in 12 V output
         slot0Configs.kI = 0; // no output for integrated error
@@ -101,7 +106,12 @@ public class Arm extends SubsystemBase {
         // }
 
         m_orchestra.play();
+
+        armPosition = m_armFR.getPosition();
+        wristPosition = m_wristTop.getPosition();
     }
+
+    
 
     public void motorSetArmPosition() {
         // set position to 10 rotations
