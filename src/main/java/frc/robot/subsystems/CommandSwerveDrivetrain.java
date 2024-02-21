@@ -35,7 +35,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     AudioConfigs audioConfigs = new AudioConfigs();
 
-    Orchestra m_orchestra = new Orchestra();
+    Orchestra m_orchestra = new Orchestra("Kevins Great File.chrp");
 
     SwerveRequest.ApplyChassisSpeeds autoRequestChasisSpeed = new SwerveRequest.ApplyChassisSpeeds();
 
@@ -62,12 +62,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         m_orchestra.addInstrument(this.Modules[3].getSteerMotor());
 
         // Attempt to load the chrp
-        StatusCode status = m_orchestra.loadMusic("Kevins Great File.chrp");
+        // StatusCode status = m_orchestra.loadMusic("Kevins Great File.chrp"); // Moved to Object Declaration
 
-        if (!status.isOK()) {
-        // log error
-            System.out.println("error in swerve!");
-        }
+        // if (!status.isOK()) {
+        // // log error
+        //    System.out.println("error in swerve!");
+        // }
 
         audioConfigs.AllowMusicDurDisable = true;
 
