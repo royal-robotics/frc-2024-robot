@@ -69,7 +69,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         //    System.out.println("error in swerve!");
         // }
 
-        audioConfigs.AllowMusicDurDisable = true;
+        audioConfigs.AllowMusicDurDisable = false;
 
         m_orchestra.play();
 

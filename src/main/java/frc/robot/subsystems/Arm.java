@@ -85,7 +85,7 @@ public class Arm extends SubsystemBase {
         m_armBL.setControl(followOppose); // Back left follows and opposes Front Right
         m_wristBottom.setControl(followWrist); // Bottom wrist follows top
 
-        audioConfigs.AllowMusicDurDisable = true;
+        audioConfigs.AllowMusicDurDisable = false;
 
         m_orchestra.addInstrument(m_armFL);
         System.out.println(m_armFL);
