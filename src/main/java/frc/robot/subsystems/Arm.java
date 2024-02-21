@@ -13,6 +13,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -50,7 +51,7 @@ public class Arm extends SubsystemBase {
 
     AudioConfigs audioConfigs = new AudioConfigs();
 
-    public DigitalInput lineBreakSensor = new DigitalInput(0); // Linebreak Sensor on channel 0
+    public AnalogInput lineBreakSensor = new AnalogInput(3); // Linebreak Sensor on channel 3
     public DigitalInput armLimitZero = new DigitalInput(1); // Arm limit switch for arm at 0 on channel 1
 
     public StatusSignal<Double> armPosition;
