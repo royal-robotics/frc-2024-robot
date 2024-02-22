@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class RobotContainer {
@@ -26,10 +27,12 @@ public class RobotContainer {
   private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
 
   /* Setting up bindings for necessary control of the swerve drive platform */
-  private final CommandXboxController joystick = new CommandXboxController(0); // My joystick
+  private final CommandXboxController driver = new CommandXboxController(0); // My joystick for Driver
+  private final CommandXboxController operator  = new CommandXboxController(1); // My joystick for Operator
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
 
   public final Arm arm = new Arm(); // Arm subsystem
+  public final Climber climber = new Climber(); // Climber subsystem
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -43,10 +46,10 @@ public class RobotContainer {
 
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-        drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with
+        drivetrain.applyRequest(() -> drive.withVelocityX(-driver.getLeftY() * MaxSpeed) // Drive forward with
                                                                                            // negative Y (forward)
-            .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-            .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+            .withVelocityY(-driver.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+            .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
         ));
 
     // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake)); // Bring ack later
@@ -54,11 +57,13 @@ public class RobotContainer {
         // .applyRequest(() -> point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))));
 
     // reset the field-centric heading on left bumper press
-    joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
+    driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
 
-    joystick.a().whileTrue(Commands.runOnce(() -> arm.motorSetArmPosition(), arm));
-    joystick.b().whileTrue(Commands.runOnce(() -> arm.motorSetWristPosition(), arm));
-    joystick.y().whileTrue(Commands.runOnce(() -> {arm.requestIntake(); arm.requestShooter();}, arm));
+    driver.a().whileTrue(Commands.runOnce(() -> arm.motorSetArmPosition(), arm));
+    driver.b().whileTrue(Commands.runOnce(() -> arm.motorSetWristPosition(), arm));
+    driver.y().whileTrue(Commands.runOnce(() -> {arm.requestIntake(); arm.requestShooter();}, arm).until(() -> arm.brokenLine()).andThen(() -> arm.requestInShootStop()));
+    operator.a().whileTrue(Commands.runOnce(() -> climber.climbExtend(), climber));
+    operator.b().whileTrue(Commands.runOnce(() -> climber.climbRetract(), climber));
     
     if (Utils.isSimulation()) {
       drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));

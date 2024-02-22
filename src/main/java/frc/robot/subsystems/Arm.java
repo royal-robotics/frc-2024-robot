@@ -4,6 +4,7 @@ import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.AudioConfigs;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -14,6 +15,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -43,6 +45,8 @@ public class Arm extends SubsystemBase {
     MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
     MotorOutputConfigs motorConfigsReversed = new MotorOutputConfigs();
 
+    MagnetSensorConfigs encoderConfigs = new MagnetSensorConfigs();
+
     final DutyCycleOut m_motorRequest = new DutyCycleOut(0.0);
 
     // in init function, set slot 0 gains
@@ -51,7 +55,7 @@ public class Arm extends SubsystemBase {
     // create a position closed-loop request, voltage output, slot 0 configs
     final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
 
-    Orchestra m_orchestra = new Orchestra("Kevins Great File.chrp");
+    public static Orchestra m_orchestra = new Orchestra("Kevins Great File.chrp");
     MusicTone musicFreq = new MusicTone(256); // 256 hz
     AudioConfigs audioConfigs = new AudioConfigs();
 
@@ -72,14 +76,18 @@ public class Arm extends SubsystemBase {
         m_wristBottom.getConfigurator().apply(slot0Configs);
         m_wristTop.getConfigurator().apply(slot0Configs);
 
-        motorConfigs.NeutralMode = NeutralModeValue.Brake;
-        motorConfigsReversed.NeutralMode = NeutralModeValue.Brake;
+        encoderConfigs.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+
+        motorConfigs.NeutralMode = NeutralModeValue.Coast;
+        motorConfigsReversed.NeutralMode = NeutralModeValue.Coast;
         motorConfigsReversed.Inverted = InvertedValue.Clockwise_Positive;
 
         m_armFL.getConfigurator().apply(motorConfigs);
         m_armBL.getConfigurator().apply(motorConfigs);
         m_armFR.getConfigurator().apply(motorConfigs);
         m_armBR.getConfigurator().apply(motorConfigs);
+
+        armEncoder.getConfigurator().apply (encoderConfigs);
 
         m_shooter.getConfigurator().apply(motorConfigs);
         m_intake.getConfigurator().apply(motorConfigsReversed);
@@ -91,10 +99,10 @@ public class Arm extends SubsystemBase {
         m_armBL.setControl(followOppose); // Back left follows and opposes Front Right
         m_wristBottom.setControl(followWrist); // Bottom wrist follows top
 
-        audioConfigs.AllowMusicDurDisable = true;
+        audioConfigs.AllowMusicDurDisable = false;
 
         m_orchestra.addInstrument(m_armFL);
-        System.out.println(m_armFL);
+        System.out.println("The arm motor is " + m_armFL);
         // m_orchestra.addInstrument(m_armFR);
         // m_orchestra.addInstrument(m_armBL);
         // m_orchestra.addInstrument(m_armBR);
@@ -111,14 +119,12 @@ public class Arm extends SubsystemBase {
            System.out.println("error in arm!");
         }
 
-        m_orchestra.play();
+        // m_orchestra.play();
 
         armPosition = m_armFR.getPosition();
         armAbsPosition = armEncoder.getAbsolutePosition();
         wristPosition = m_wristTop.getPosition();
     }
-
-    
 
     public void motorSetArmPosition() {
         // set position to 10 rotations
@@ -153,6 +159,12 @@ public class Arm extends SubsystemBase {
     public void requestShooter() {
         m_motorRequest.Output = 0.9;
         m_shooter.setControl(m_motorRequest);
+    }
+
+    public void requestInShootStop() {
+        m_motorRequest.Output = 0.0;
+        m_shooter.setControl(m_motorRequest);
+        m_intake.setControl(m_motorRequest);
     }
 
     public boolean brokenLine() {

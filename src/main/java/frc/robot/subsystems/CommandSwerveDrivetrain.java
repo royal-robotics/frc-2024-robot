@@ -36,7 +36,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     AudioConfigs audioConfigs = new AudioConfigs();
 
-    Orchestra m_orchestra = new Orchestra("Kevins Great File.chrp");
+    public static Orchestra m_orchestra = new Orchestra("Kevins Great File.chrp");
     MusicTone musicFreq = new MusicTone(256); // 256 hz
 
     SwerveRequest.ApplyChassisSpeeds autoRequestChasisSpeed = new SwerveRequest.ApplyChassisSpeeds();
@@ -54,7 +54,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         }
         // Add a single device to the orchestra
         m_orchestra.addInstrument(this.Modules[0].getDriveMotor());
-        System.out.println(this.Modules[0].getDriveMotor());
+        System.out.println("The swerve motor is" + this.Modules[0].getDriveMotor());
         // m_orchestra.addInstrument(this.Modules[0].getSteerMotor());
         // m_orchestra.addInstrument(this.Modules[1].getDriveMotor());
         // m_orchestra.addInstrument(this.Modules[1].getSteerMotor());
@@ -71,9 +71,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
            System.out.println("error in swerve!");
         }
 
-        audioConfigs.AllowMusicDurDisable = true;
+        // audioConfigs.AllowMusicDurDisable = true;
 
-        this.m_orchestra.play();
+        // m_orchestra.play();
 
         // Configure AutoBuilder last
         AutoBuilder.configureHolonomic(
