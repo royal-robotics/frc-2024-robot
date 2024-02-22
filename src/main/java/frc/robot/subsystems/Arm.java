@@ -9,6 +9,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -26,6 +27,8 @@ public class Arm extends SubsystemBase {
     TalonFX m_armBL = new TalonFX(4); // Back Left ID 4
     TalonFX m_armBR = new TalonFX(2); // Back Right ID 2
     
+    CANcoder armEncoder = new CANcoder(5); 
+
     TalonFX m_shooter = new TalonFX(5); // Shooter motor ID 5
     TalonFX m_intake = new TalonFX(6); // Intake motor ID 6
     TalonFX m_wristBottom = new TalonFX(7); // wrist Bottom ID 7
@@ -56,6 +59,7 @@ public class Arm extends SubsystemBase {
 
     public StatusSignal<Double> armPosition;
     public StatusSignal<Double> wristPosition;
+    public StatusSignal<Double> armAbsPosition;
 
 
     public Arm() {
@@ -90,25 +94,26 @@ public class Arm extends SubsystemBase {
 
         m_orchestra.addInstrument(m_armFL);
         System.out.println(m_armFL);
-        m_orchestra.addInstrument(m_armFR);
-        m_orchestra.addInstrument(m_armBL);
-        m_orchestra.addInstrument(m_armBR);
-        m_orchestra.addInstrument(m_shooter);
-        m_orchestra.addInstrument(m_intake);
-        m_orchestra.addInstrument(m_wristBottom);
-        m_orchestra.addInstrument(m_wristTop);
+        // m_orchestra.addInstrument(m_armFR);
+        // m_orchestra.addInstrument(m_armBL);
+        // m_orchestra.addInstrument(m_armBR);
+        // m_orchestra.addInstrument(m_shooter);
+        // m_orchestra.addInstrument(m_intake);
+        // m_orchestra.addInstrument(m_wristBottom);
+        // m_orchestra.addInstrument(m_wristTop);
         
         // Attempt to load the chrp
-        // StatusCode status = m_orchestra.loadMusic("Kevins Great File.chrp"); // Moved to object declaration
+        StatusCode status = m_orchestra.loadMusic("Kevins Great File.chrp"); // Moved to object declaration
 
-        // if (!status.isOK()) {
-        // // log error
-        //    System.out.println("error in arm!");
-        // }
+        if (!status.isOK()) {
+        // log error
+           System.out.println("error in arm!");
+        }
 
         m_orchestra.play();
 
         armPosition = m_armFR.getPosition();
+        armAbsPosition = armEncoder.getAbsolutePosition();
         wristPosition = m_wristTop.getPosition();
     }
 
@@ -151,7 +156,10 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-
+        armPosition.refresh();
+        armAbsPosition.refresh();
+        wristPosition.refresh();
+        
     }
 
 }
