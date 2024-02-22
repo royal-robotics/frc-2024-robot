@@ -8,6 +8,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MusicTone;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -51,7 +52,7 @@ public class Arm extends SubsystemBase {
     final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
 
     Orchestra m_orchestra = new Orchestra("Kevins Great File.chrp");
-
+    MusicTone musicFreq = new MusicTone(256); // 256 hz
     AudioConfigs audioConfigs = new AudioConfigs();
 
     public AnalogInput lineBreakSensor = new AnalogInput(3); // Linebreak Sensor on channel 3
@@ -90,7 +91,7 @@ public class Arm extends SubsystemBase {
         m_armBL.setControl(followOppose); // Back left follows and opposes Front Right
         m_wristBottom.setControl(followWrist); // Bottom wrist follows top
 
-        audioConfigs.AllowMusicDurDisable = false;
+        audioConfigs.AllowMusicDurDisable = true;
 
         m_orchestra.addInstrument(m_armFL);
         System.out.println(m_armFL);
@@ -152,6 +153,14 @@ public class Arm extends SubsystemBase {
     public void requestShooter() {
         m_motorRequest.Output = 0.9;
         m_shooter.setControl(m_motorRequest);
+    }
+
+    public boolean brokenLine() {
+        if (lineBreakSensor.getVoltage() > 3) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override

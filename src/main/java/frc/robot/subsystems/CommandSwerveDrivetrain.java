@@ -6,6 +6,7 @@ import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.AudioConfigs;
+import com.ctre.phoenix6.controls.MusicTone;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
@@ -36,6 +37,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     AudioConfigs audioConfigs = new AudioConfigs();
 
     Orchestra m_orchestra = new Orchestra("Kevins Great File.chrp");
+    MusicTone musicFreq = new MusicTone(256); // 256 hz
 
     SwerveRequest.ApplyChassisSpeeds autoRequestChasisSpeed = new SwerveRequest.ApplyChassisSpeeds();
 
@@ -71,7 +73,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
         audioConfigs.AllowMusicDurDisable = true;
 
-        m_orchestra.play();
+        this.m_orchestra.play();
 
         // Configure AutoBuilder last
         AutoBuilder.configureHolonomic(
@@ -99,6 +101,21 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             },
             this // Reference to this subsystem to set requirements
         );
+    }
+
+    public void playMusic() {
+        // Add a single device to the orchestra
+        m_orchestra.addInstrument(this.Modules[0].getDriveMotor());
+        System.out.println(this.Modules[0].getDriveMotor());
+        m_orchestra.addInstrument(this.Modules[0].getSteerMotor());
+        m_orchestra.addInstrument(this.Modules[1].getDriveMotor());
+        m_orchestra.addInstrument(this.Modules[1].getSteerMotor());
+        m_orchestra.addInstrument(this.Modules[2].getDriveMotor());
+        m_orchestra.addInstrument(this.Modules[2].getSteerMotor());
+        m_orchestra.addInstrument(this.Modules[3].getDriveMotor());
+        m_orchestra.addInstrument(this.Modules[3].getSteerMotor());
+        audioConfigs.AllowMusicDurDisable = true;
+        m_orchestra.play();
     }
 
     public void resetPose(Pose2d pose) {
