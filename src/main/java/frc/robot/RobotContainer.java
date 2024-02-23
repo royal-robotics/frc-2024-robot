@@ -64,6 +64,7 @@ public class RobotContainer {
     driver.y().whileTrue(Commands.runEnd(() -> {arm.requestIntake(); arm.requestShooter();}, () -> arm.requestInShootStop(), arm).until(() -> arm.brokenLine()));
     operator.a().whileTrue(Commands.runOnce(() -> climber.climbExtend(), climber));
     operator.b().whileTrue(Commands.runOnce(() -> climber.climbRetract(), climber));
+    operator.y().whileTrue(Commands.runOnce(() -> arm.resetWristMotor(), arm));
     
     if (Utils.isSimulation()) {
       drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
