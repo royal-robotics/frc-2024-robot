@@ -17,6 +17,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
@@ -31,6 +32,7 @@ public class Arm extends SubsystemBase {
     TalonFX m_armBR = new TalonFX(2); // Back Right ID 2
     
     CANcoder armEncoder = new CANcoder(5); 
+    double encoderOffset = 16.0;
 
     TalonFX m_shooter = new TalonFX(5); // Shooter motor ID 5
     TalonFX m_intake = new TalonFX(6); // Intake motor ID 6
@@ -128,12 +130,12 @@ public class Arm extends SubsystemBase {
 
     public void motorSetArmPosition() {
         // set position to 10 rotations
-        m_armFR.setControl(m_request.withPosition(10));
+        m_armFR.setControl(m_request.withPosition(0));
     }
 
     public void motorSetWristPosition() {
         // set position to 10 rotations
-        m_wristTop.setControl(m_request.withPosition(10));
+        m_wristTop.setControl(m_request.withPosition(0));
     }
 
     public void motorRequestForward() {
@@ -175,7 +177,7 @@ public class Arm extends SubsystemBase {
         }
     }
 
-public void setMotorBrake(){ 
+    public void setMotorBrake(){ 
         motorConfigs.NeutralMode = NeutralModeValue.Brake;
         motorConfigsReversed.NeutralMode = NeutralModeValue.Brake;
         m_armFL.getConfigurator().apply(motorConfigs);
@@ -187,9 +189,9 @@ public void setMotorBrake(){
         m_intake.getConfigurator().apply(motorConfigsReversed);
         m_wristBottom.getConfigurator().apply(motorConfigsReversed);
         m_wristTop.getConfigurator().apply(motorConfigsReversed);
-}
+    }
 
-public void setMotorCoast(){
+    public void setMotorCoast(){
         motorConfigs.NeutralMode = NeutralModeValue.Coast;
         motorConfigsReversed.NeutralMode = NeutralModeValue.Coast;
         m_armFL.getConfigurator().apply(motorConfigs);
@@ -201,7 +203,16 @@ public void setMotorCoast(){
         m_intake.getConfigurator().apply(motorConfigsReversed);
         m_wristBottom.getConfigurator().apply(motorConfigsReversed);
         m_wristTop.getConfigurator().apply(motorConfigsReversed);
-}
+    }
+
+    public double wristRotations() {
+        return armAbsPosition.getValue() + Units.degreesToRotations(encoderOffset);
+    }
+
+    public void resetWristMotor() {
+        double motorPosition = wristRotations() * (84 / 12) * (84 / 18);
+        m_wristTop.setPosition(motorPosition);
+    }
 
     @Override
     public void periodic() {

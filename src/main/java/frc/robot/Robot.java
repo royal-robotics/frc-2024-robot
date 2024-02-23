@@ -23,6 +23,7 @@ public class Robot extends TimedRobot {
     audioConfigs.AllowMusicDurDisable = true;
     OurShuffleboard shuffleboard = new OurShuffleboard(this);
     CommandSwerveDrivetrain.m_orchestra.play();
+    m_robotContainer.arm.resetWristMotor();
   }
 
   @Override

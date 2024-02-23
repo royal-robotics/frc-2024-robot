@@ -19,6 +19,6 @@ public class OurShuffleboard {
         competitionTab.addBoolean("Arm at Zero", () -> arm.armLimitZero.get()).withPosition(1, 0);
         competitionTab.addDouble("Arm position", () -> arm.armPosition.getValue()).withPosition(2, 0);
         competitionTab.addDouble("wrist position", () -> arm.wristPosition.getValue()).withPosition(3, 0);
-        competitionTab.addDouble("Arm Abs Encoder", () -> Units.rotationsToDegrees(arm.armAbsPosition.getValue())).withPosition(4, 0);
+        competitionTab.addDouble("Arm Abs Encoder", () -> Units.rotationsToDegrees(arm.wristRotations())).withPosition(4, 0);
     }
 }
