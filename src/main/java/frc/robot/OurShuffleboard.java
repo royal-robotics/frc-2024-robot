@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 // import frc.robot.autonomous.AutoModeSelector;
@@ -18,6 +19,6 @@ public class OurShuffleboard {
         competitionTab.addBoolean("Arm at Zero", () -> arm.armLimitZero.get()).withPosition(1, 0);
         competitionTab.addDouble("Arm position", () -> arm.armPosition.getValue()).withPosition(2, 0);
         competitionTab.addDouble("wrist position", () -> arm.wristPosition.getValue()).withPosition(3, 0);
-        competitionTab.addDouble("Arm Abs Encoder", () -> arm.armAbsPosition.getValue()).withPosition(4, 0);
+        competitionTab.addDouble("Arm Abs Encoder", () -> Units.rotationsToDegrees(arm.armAbsPosition.getValue())).withPosition(4, 0);
     }
 }

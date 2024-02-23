@@ -175,6 +175,34 @@ public class Arm extends SubsystemBase {
         }
     }
 
+public void setMotorBrake(){ 
+        motorConfigs.NeutralMode = NeutralModeValue.Brake;
+        motorConfigsReversed.NeutralMode = NeutralModeValue.Brake;
+        m_armFL.getConfigurator().apply(motorConfigs);
+        m_armBL.getConfigurator().apply(motorConfigs);
+        m_armFR.getConfigurator().apply(motorConfigs);
+        m_armBR.getConfigurator().apply(motorConfigs);
+
+        m_shooter.getConfigurator().apply(motorConfigs);
+        m_intake.getConfigurator().apply(motorConfigsReversed);
+        m_wristBottom.getConfigurator().apply(motorConfigsReversed);
+        m_wristTop.getConfigurator().apply(motorConfigsReversed);
+}
+
+public void setMotorCoast(){
+        motorConfigs.NeutralMode = NeutralModeValue.Coast;
+        motorConfigsReversed.NeutralMode = NeutralModeValue.Coast;
+        m_armFL.getConfigurator().apply(motorConfigs);
+        m_armBL.getConfigurator().apply(motorConfigs);
+        m_armFR.getConfigurator().apply(motorConfigs);
+        m_armBR.getConfigurator().apply(motorConfigs);
+
+        m_shooter.getConfigurator().apply(motorConfigs);
+        m_intake.getConfigurator().apply(motorConfigsReversed);
+        m_wristBottom.getConfigurator().apply(motorConfigsReversed);
+        m_wristTop.getConfigurator().apply(motorConfigsReversed);
+}
+
     @Override
     public void periodic() {
         armPosition.refresh();

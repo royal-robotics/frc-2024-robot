@@ -61,7 +61,7 @@ public class RobotContainer {
 
     driver.a().whileTrue(Commands.runOnce(() -> arm.motorSetArmPosition(), arm));
     driver.b().whileTrue(Commands.runOnce(() -> arm.motorSetWristPosition(), arm));
-    driver.y().whileTrue(Commands.runOnce(() -> {arm.requestIntake(); arm.requestShooter();}, arm).until(() -> arm.brokenLine()).andThen(() -> arm.requestInShootStop()));
+    driver.y().whileTrue(Commands.runEnd(() -> {arm.requestIntake(); arm.requestShooter();}, () -> arm.requestInShootStop(), arm).until(() -> arm.brokenLine()));
     operator.a().whileTrue(Commands.runOnce(() -> climber.climbExtend(), climber));
     operator.b().whileTrue(Commands.runOnce(() -> climber.climbRetract(), climber));
     
