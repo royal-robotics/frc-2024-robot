@@ -11,6 +11,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.ParentDevice;
@@ -45,21 +46,20 @@ public class Arm extends SubsystemBase {
     private final TalonFX intakeMotor = new TalonFX(6); // Intake motor ID 6
     
     private final CANcoder armEncoder = new CANcoder(5); 
-    private final double encoderOffset = 16.0;
+    private final double encoderOffset = 17.5;
 
-    private final Follower followArm = new Follower(9, false); // Front right as main motor
-    private final Follower followArmOppose = new Follower(9, true); // Front right as main motor, to oppose
+    private final StrictFollower followArm = new StrictFollower(9); // Front right as main motor
     
-    private final Follower followWrist = new Follower(8, false); // Wrist top is to be folowed
+    private final StrictFollower followWrist = new StrictFollower(8); // Wrist top is to be folowed
 
     private final MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
     private final MotorOutputConfigs motorConfigsReversed = new MotorOutputConfigs();
 
     private final MagnetSensorConfigs encoderConfigs = new MagnetSensorConfigs();
 
-    private final  DutyCycleOut motorOutputRequest = new DutyCycleOut(0.0);
-    private final  PositionVoltage motorPositionRequest = new PositionVoltage(0.0).withSlot(0);
-    private final  VelocityVoltage motorVelocityRequest = new VelocityVoltage(0.0).withSlot(0);
+    private final DutyCycleOut motorOutputRequest = new DutyCycleOut(0.0);
+    private final PositionVoltage motorPositionRequest = new PositionVoltage(0.0).withSlot(0);
+    private final VelocityVoltage motorVelocityRequest = new VelocityVoltage(0.0).withSlot(0);
 
     private final Slot0Configs wristPID = new Slot0Configs(); // For wrist
     private final Slot0Configs armPID = new Slot0Configs(); // For arm
@@ -68,7 +68,7 @@ public class Arm extends SubsystemBase {
     private final AnalogInput lineBreak = new AnalogInput(3); // Linebreak Sensor on channel 3
 
     private final DigitalInput wristTopLimit = new DigitalInput(0); // Wrist limit switch at top
-    private final  DigitalInput armBottomLimit = new DigitalInput(1); // Arm limit switch for arm at 0 on channel 1
+    private final DigitalInput armBottomLimit = new DigitalInput(1); // Arm limit switch for arm at 0 on channel 1
 
     private final StatusSignal<Double> armPosition;
     private final StatusSignal<Double> wristPosition;
@@ -83,17 +83,16 @@ public class Arm extends SubsystemBase {
     private final GenericEntry wristPositionOverrideValue;
 
     private final Orchestra music = new Orchestra();
-
     public Arm() {
         // PID for Wrist
-        wristPID.kP = 0.72;
+        wristPID.kP = 1.1;
         wristPID.kI = 0.0;
-        wristPID.kD = 0.0;
+        wristPID.kD = 0.05;
 
         // PID for arm
-        armPID.kP = 0.96;
+        armPID.kP = 2.0;
         armPID.kI = 0.0;
-        armPID.kD = 0.0;
+        armPID.kD = 0.2;
 
         // PID for shooter
         shooterPID.kS = 0.05;
@@ -103,7 +102,11 @@ public class Arm extends SubsystemBase {
         shooterPID.kD = 0.0;
 
         armMotor.getConfigurator().apply(armPID);
+        armMotorFollow.getConfigurator().apply(armPID);
+        armMotorFollowReverseFront.getConfigurator().apply(armPID);
+        armMotorFollowReverseBack.getConfigurator().apply(armPID);
         wristMotor.getConfigurator().apply(wristPID);
+        wristMotorFollow.getConfigurator().apply(wristPID);
         shooterMotor.getConfigurator().apply(shooterPID);
 
         encoderConfigs.SensorDirection = SensorDirectionValue.Clockwise_Positive;
@@ -116,17 +119,12 @@ public class Arm extends SubsystemBase {
 
         armMotor.getConfigurator().apply(motorConfigs);
         armMotorFollow.getConfigurator().apply(motorConfigs);
-        armMotorFollowReverseFront.getConfigurator().apply(motorConfigs);
-        armMotorFollowReverseBack.getConfigurator().apply(motorConfigs);
+        armMotorFollowReverseFront.getConfigurator().apply(motorConfigsReversed);
+        armMotorFollowReverseBack.getConfigurator().apply(motorConfigsReversed);
         wristMotor.getConfigurator().apply(motorConfigsReversed);
         wristMotorFollow.getConfigurator().apply(motorConfigsReversed);
         shooterMotor.getConfigurator().apply(motorConfigs);
         intakeMotor.getConfigurator().apply(motorConfigsReversed);
-        
-        armMotorFollow.setControl(followArm); // Back right follows Front right
-        armMotorFollowReverseFront.setControl(followArmOppose); // Front left follows and opposes Front Right
-        armMotorFollowReverseBack.setControl(followArmOppose); // Back left follows and opposes Front Right
-        wristMotorFollow.setControl(followWrist); // Bottom wrist follows top
 
         armPosition = armMotor.getPosition();
         wristAbsPosition = armEncoder.getAbsolutePosition();
@@ -152,7 +150,7 @@ public class Arm extends SubsystemBase {
             .withPosition(0, 0)
             .withSize(2, 1)
             .getEntry();
-        armPositionOverrideValue = armTab.add("Arm Position", 0.0)
+        armPositionOverrideValue = armTab.add("New Arm Position", 0.0)
             .withWidget(BuiltInWidgets.kNumberSlider)
             .withProperties(Map.of("min", 0.0, "max", 50.0, "block increment", 1.0))
             .withPosition(0, 1)
@@ -163,7 +161,7 @@ public class Arm extends SubsystemBase {
             .withPosition(3, 0)
             .withSize(2, 1)
             .getEntry();
-        wristPositionOverrideValue = armTab.add("Wrist Position", 0.0)
+        wristPositionOverrideValue = armTab.add("New Wrist Position", 0.0)
             .withWidget(BuiltInWidgets.kNumberSlider)
             .withProperties(Map.of("min", -20.0, "max", 30.0, "block increment", 1.0))
             .withPosition(3, 1)
@@ -214,6 +212,14 @@ public class Arm extends SubsystemBase {
         return getShooterMotorVelocity() * shooterGearRatio;
     }
 
+    public double getWristTopVoltage() {
+        return wristTopVoltage.getValue();
+    }
+
+    public double getWristBottomVoltage() {
+        return wristBottomVoltage.getValue();
+    }
+
     public boolean getLineBreak() {
         if (lineBreak.getVoltage() > 3) {
             return true;
@@ -232,6 +238,9 @@ public class Arm extends SubsystemBase {
 
     public void setArmPosition(double position) {
         armMotor.setControl(motorPositionRequest.withPosition(position));
+        armMotorFollow.setControl(followArm); // Back right follows Front right
+        armMotorFollowReverseFront.setControl(followArm); // Front left follows and opposes Front Right
+        armMotorFollowReverseBack.setControl(followArm); // Back left follows and opposes Front Right
     }
 
     public void setArmAngle(double angle) {
@@ -241,6 +250,7 @@ public class Arm extends SubsystemBase {
 
     public void setWristPosition(double position) {
         wristMotor.setControl(motorPositionRequest.withPosition(position));
+        wristMotorFollow.setControl(followWrist);
     }
 
     public void setWristAngle(double angle) {
@@ -264,11 +274,12 @@ public class Arm extends SubsystemBase {
     public void setMotorBrake() { 
         motorConfigs.NeutralMode = NeutralModeValue.Brake;
         motorConfigsReversed.NeutralMode = NeutralModeValue.Brake;
+        motorConfigsReversed.Inverted = InvertedValue.Clockwise_Positive;
 
         armMotor.getConfigurator().apply(motorConfigs);
         armMotorFollow.getConfigurator().apply(motorConfigs);
-        armMotorFollowReverseFront.getConfigurator().apply(motorConfigs);
-        armMotorFollowReverseBack.getConfigurator().apply(motorConfigs);
+        armMotorFollowReverseFront.getConfigurator().apply(motorConfigsReversed);
+        armMotorFollowReverseBack.getConfigurator().apply(motorConfigsReversed);
 
         wristMotor.getConfigurator().apply(motorConfigsReversed);
         wristMotorFollow.getConfigurator().apply(motorConfigsReversed);
@@ -279,11 +290,12 @@ public class Arm extends SubsystemBase {
     public void setMotorCoast() {
         motorConfigs.NeutralMode = NeutralModeValue.Coast;
         motorConfigsReversed.NeutralMode = NeutralModeValue.Coast;
+        motorConfigsReversed.Inverted = InvertedValue.Clockwise_Positive;
 
         armMotor.getConfigurator().apply(motorConfigs);
         armMotorFollow.getConfigurator().apply(motorConfigs);
-        armMotorFollowReverseFront.getConfigurator().apply(motorConfigs);
-        armMotorFollowReverseBack.getConfigurator().apply(motorConfigs);
+        armMotorFollowReverseFront.getConfigurator().apply(motorConfigsReversed);
+        armMotorFollowReverseBack.getConfigurator().apply(motorConfigsReversed);
 
         wristMotor.getConfigurator().apply(motorConfigsReversed);
         wristMotorFollow.getConfigurator().apply(motorConfigsReversed);
@@ -294,11 +306,15 @@ public class Arm extends SubsystemBase {
     public void resetWristMotorPosition(double newPosition) {
         double motorPosition = newPosition / wristGearRatio;
         wristMotor.setPosition(motorPosition);
+        wristMotorFollow.setPosition(motorPosition);
     }
 
     public void resetArmMotorPosition(double newPosition) {
         double motorPosition = newPosition / armGearRatio;
-        armMotor.setPosition(motorPosition);
+        armMotorFollowReverseFront.setPosition(motorPosition);
+        armMotorFollow.setPosition(motorPosition); // Back right follows Front right
+        armMotor.setPosition(motorPosition);// Front left follows and opposes Front Right
+        armMotorFollowReverseBack.setPosition(motorPosition); // Back left follows and opposes Front Right
     }
 
     public void playMusic() {
@@ -316,11 +332,15 @@ public class Arm extends SubsystemBase {
         if (armPositionOverride.getBoolean(false)) {
             double armPosition = armPositionOverrideValue.getDouble(0.0);
             armMotor.setControl(motorPositionRequest.withPosition(armPosition));
+            armMotorFollow.setControl(followArm); // Back right follows Front right
+            armMotorFollowReverseFront.setControl(followArm); // Front left follows and opposes Front Right
+            armMotorFollowReverseBack.setControl(followArm); // Back left follows and opposes Front Right
         }
 
         if (wristPositionOverride.getBoolean(false)) {
             double wristPosition = wristPositionOverrideValue.getDouble(0.0);
             wristMotor.setControl(motorPositionRequest.withPosition(wristPosition));
+            wristMotorFollow.setControl(followWrist); // Bottom wrist follows top
         }
     }
 }
