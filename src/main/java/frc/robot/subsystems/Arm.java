@@ -74,6 +74,8 @@ public class Arm extends SubsystemBase {
     private final StatusSignal<Double> wristPosition;
     private final StatusSignal<Double> wristAbsPosition;
     private final StatusSignal<Double> shooterVelocity;
+    private final StatusSignal<Double> wristTopVoltage;
+    private final StatusSignal<Double> wristBottomVoltage;
 
     private final GenericEntry armPositionOverride;
     private final GenericEntry armPositionOverrideValue;
@@ -130,9 +132,11 @@ public class Arm extends SubsystemBase {
         wristAbsPosition = armEncoder.getAbsolutePosition();
         wristPosition = wristMotor.getPosition();
         shooterVelocity = shooterMotor.getVelocity();
+        wristTopVoltage = wristMotor.getMotorVoltage();
+        wristBottomVoltage = wristMotorFollow.getMotorVoltage();
 
         BaseStatusSignal.setUpdateFrequencyForAll(100,
-            armPosition, wristAbsPosition, wristPosition, shooterVelocity);
+            armPosition, wristAbsPosition, wristPosition, shooterVelocity, wristTopVoltage, wristBottomVoltage);
         ParentDevice.optimizeBusUtilizationForAll(armMotor, armMotorFollow, armMotorFollowReverseFront, armMotorFollowReverseBack,
             wristMotor, wristMotorFollow, shooterMotor, intakeMotor);
 
@@ -196,6 +200,14 @@ public class Arm extends SubsystemBase {
 
     public double getShooterMotorVelocity() {
         return shooterVelocity.getValue();
+    }
+
+    public double getWristTopVoltage() {
+        return wristTopVoltage.getValue();
+    }
+   
+    public double getWristBottomVoltage() {
+        return wristBottomVoltage.getValue();
     }
 
     public double getShooterWheelVelocity() {
@@ -299,7 +311,7 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        BaseStatusSignal.refreshAll(armPosition, wristAbsPosition, wristPosition, shooterVelocity);
+        BaseStatusSignal.refreshAll(armPosition, wristAbsPosition, wristPosition, shooterVelocity, wristTopVoltage, wristBottomVoltage);
 
         if (armPositionOverride.getBoolean(false)) {
             double armPosition = armPositionOverrideValue.getDouble(0.0);
