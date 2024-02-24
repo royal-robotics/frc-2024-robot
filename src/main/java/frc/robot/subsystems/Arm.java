@@ -33,7 +33,7 @@ public class Arm extends SubsystemBase {
     TalonFX m_armBR = new TalonFX(2); // Back Right ID 2
     
     CANcoder armEncoder = new CANcoder(5); 
-    double encoderOffset = 16.0;
+    double encoderOffset = 16.1;
 
     TalonFX m_shooter = new TalonFX(5); // Shooter motor ID 5
     TalonFX m_intake = new TalonFX(6); // Intake motor ID 6
