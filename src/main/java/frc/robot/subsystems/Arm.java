@@ -76,6 +76,10 @@ public class Arm extends SubsystemBase {
     private final StatusSignal<Double> shooterVelocity;
     private final StatusSignal<Double> wristTopVoltage;
     private final StatusSignal<Double> wristBottomVoltage;
+    private final StatusSignal<Double> armFLVoltage;
+    private final StatusSignal<Double> armFRVoltage;
+    private final StatusSignal<Double> armBLVoltage;
+    private final StatusSignal<Double> armBRVoltage;
 
     private final GenericEntry armPositionOverride;
     private final GenericEntry armPositionOverrideValue;
@@ -90,7 +94,7 @@ public class Arm extends SubsystemBase {
         wristPID.kD = 0.05;
 
         // PID for arm
-        armPID.kP = 2.0;
+        armPID.kP = 1.5;
         armPID.kI = 0.0;
         armPID.kD = 0.2;
 
@@ -132,9 +136,14 @@ public class Arm extends SubsystemBase {
         shooterVelocity = shooterMotor.getVelocity();
         wristTopVoltage = wristMotor.getMotorVoltage();
         wristBottomVoltage = wristMotorFollow.getMotorVoltage();
+        armFLVoltage = armMotor.getMotorVoltage();
+        armFRVoltage = armMotorFollowReverseFront.getMotorVoltage();
+        armBLVoltage = armMotorFollow.getMotorVoltage();
+        armBRVoltage = armMotorFollowReverseBack.getMotorVoltage();
 
         BaseStatusSignal.setUpdateFrequencyForAll(100,
-            armPosition, wristAbsPosition, wristPosition, shooterVelocity, wristTopVoltage, wristBottomVoltage);
+            armPosition, wristAbsPosition, wristPosition, shooterVelocity, wristTopVoltage, wristBottomVoltage,
+            armFLVoltage, armFRVoltage, armBLVoltage, armBRVoltage);
         ParentDevice.optimizeBusUtilizationForAll(armMotor, armMotorFollow, armMotorFollowReverseFront, armMotorFollowReverseBack,
             wristMotor, wristMotorFollow, shooterMotor, intakeMotor);
 
@@ -152,7 +161,7 @@ public class Arm extends SubsystemBase {
             .getEntry();
         armPositionOverrideValue = armTab.add("New Arm Position", 0.0)
             .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", 0.0, "max", 50.0, "block increment", 1.0))
+            .withProperties(Map.of("min", 0.0, "max", 50.0, "block increment", 0.25))
             .withPosition(0, 1)
             .withSize(2, 1)
             .getEntry();
@@ -163,7 +172,7 @@ public class Arm extends SubsystemBase {
             .getEntry();
         wristPositionOverrideValue = armTab.add("New Wrist Position", 0.0)
             .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", -20.0, "max", 30.0, "block increment", 1.0))
+            .withProperties(Map.of("min", -20.0, "max", 30.0, "block increment", 0.25))
             .withPosition(3, 1)
             .withSize(2, 1)
             .getEntry();
@@ -212,6 +221,22 @@ public class Arm extends SubsystemBase {
         return wristBottomVoltage.getValue();
     }
 
+    public double getArmFLVoltage() {
+        return armFLVoltage.getValue();
+    }
+
+    public double getArmFRVoltage() {
+        return armFRVoltage.getValue();
+    }
+
+    public double getArmBLVoltage() {
+        return armBLVoltage.getValue();
+    }
+
+    public double getArmBRVoltage() {
+        return armBRVoltage.getValue();
+    }
+
     public boolean getLineBreak() {
         if (lineBreak.getVoltage() > 3) {
             return true;
@@ -229,10 +254,11 @@ public class Arm extends SubsystemBase {
     }
 
     public void setArmPosition(double position) {
+        armMotorFollow.setControl(new StrictFollower(armMotor.getDeviceID())); // Back right follows Front right
+        armMotorFollowReverseFront.setControl(new StrictFollower(armMotor.getDeviceID())); // Front left follows and opposes Front Right
+        armMotorFollowReverseBack.setControl(new StrictFollower(armMotor.getDeviceID())); // Back left follows and opposes Front Right
+
         armMotor.setControl(motorPositionRequest.withPosition(position));
-        armMotorFollow.setControl(followArm); // Back right follows Front right
-        armMotorFollowReverseFront.setControl(followArm); // Front left follows and opposes Front Right
-        armMotorFollowReverseBack.setControl(followArm); // Back left follows and opposes Front Right
     }
 
     public void setArmAngle(double angle) {
@@ -241,8 +267,9 @@ public class Arm extends SubsystemBase {
     }
 
     public void setWristPosition(double position) {
+        wristMotorFollow.setControl(new StrictFollower(wristMotor.getDeviceID()));
+
         wristMotor.setControl(motorPositionRequest.withPosition(position));
-        wristMotorFollow.setControl(followWrist);
     }
 
     public void setWristAngle(double angle) {
@@ -319,20 +346,30 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        BaseStatusSignal.refreshAll(armPosition, wristAbsPosition, wristPosition, shooterVelocity, wristTopVoltage, wristBottomVoltage);
+        BaseStatusSignal.refreshAll(armPosition, wristAbsPosition, wristPosition, shooterVelocity, wristTopVoltage, wristBottomVoltage,
+            armFLVoltage, armFRVoltage, armBLVoltage, armBRVoltage);
+
+        double angleDiff = Math.abs(this.getWristAbsAngle() - this.getWristAngle());
+        if (angleDiff > 0.5)
+        {
+            System.out.println(String.format("Angle difference", angleDiff));
+            this.resetWristMotorPosition(this.getWristAbsPosition());
+        }
 
         if (armPositionOverride.getBoolean(false)) {
+            armMotorFollow.setControl(new StrictFollower(armMotor.getDeviceID())); // Back right follows Front right
+            armMotorFollowReverseFront.setControl(new StrictFollower(armMotor.getDeviceID())); // Front left follows and opposes Front Right
+            armMotorFollowReverseBack.setControl(new StrictFollower(armMotor.getDeviceID())); // Back left follows and opposes Front Right
+
             double armPosition = armPositionOverrideValue.getDouble(0.0);
             armMotor.setControl(motorPositionRequest.withPosition(armPosition));
-            armMotorFollow.setControl(followArm); // Back right follows Front right
-            armMotorFollowReverseFront.setControl(followArm); // Front left follows and opposes Front Right
-            armMotorFollowReverseBack.setControl(followArm); // Back left follows and opposes Front Right
         }
 
         if (wristPositionOverride.getBoolean(false)) {
+            wristMotorFollow.setControl(new StrictFollower(wristMotor.getDeviceID())); // Bottom wrist follows top
+
             double wristPosition = wristPositionOverrideValue.getDouble(0.0);
             wristMotor.setControl(motorPositionRequest.withPosition(wristPosition));
-            wristMotorFollow.setControl(followWrist); // Bottom wrist follows top
         }
     }
 }

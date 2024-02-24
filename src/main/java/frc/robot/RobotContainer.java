@@ -61,7 +61,7 @@ public class RobotContainer {
         driver.b().onTrue(Commands.runOnce(() -> arm.setWristPosition(0.0), arm));
         driver.y().whileTrue(Commands.startEnd(
             () -> {
-                arm.setIntakePercent(0.5);
+                arm.setIntakePercent(0.6);
                 arm.setShooterMotorVelocity(240.0);
             },
             () -> {
@@ -71,7 +71,7 @@ public class RobotContainer {
             .until(() -> arm.getLineBreak()));
         driver.x().whileTrue(Commands.startEnd(
             () -> {
-                arm.setIntakePercent(0.5);
+                arm.setIntakePercent(0.6);
                 arm.setShooterMotorVelocity(240.0);
             },
             () -> {
