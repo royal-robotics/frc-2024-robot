@@ -2,11 +2,7 @@ package frc.robot.subsystems;
 
 import java.util.function.Supplier;
 
-import com.ctre.phoenix6.Orchestra;
-import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.configs.AudioConfigs;
-import com.ctre.phoenix6.controls.MusicTone;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
@@ -18,7 +14,6 @@ import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
@@ -34,53 +29,20 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
 
-    // AudioConfigs audioConfigs = new AudioConfigs();
+    SwerveRequest.ApplyChassisSpeeds chassisSpeedsRequest = new SwerveRequest.ApplyChassisSpeeds();
 
-    // public static Orchestra m_orchestra = new Orchestra("Kevins Great File.chrp");
-    // MusicTone musicFreq = new MusicTone(256); // 256 hz
-
-    SwerveRequest.ApplyChassisSpeeds autoRequestChasisSpeed = new SwerveRequest.ApplyChassisSpeeds();
-
-    // public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
-    //     super(driveTrainConstants, OdometryUpdateFrequency, modules);
-    //     if (Utils.isSimulation()) {
-    //         startSimThread();
-    //     }
-    // }
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
         super(driveTrainConstants, modules);
         if (Utils.isSimulation()) {
             startSimThread();
         }
-        // Add a single device to the orchestra
-        // m_orchestra.addInstrument(this.Modules[0].getDriveMotor());
-        // System.out.println("The swerve motor is" + this.Modules[0].getDriveMotor());
-        // m_orchestra.addInstrument(this.Modules[0].getSteerMotor());
-        // m_orchestra.addInstrument(this.Modules[1].getDriveMotor());
-        // m_orchestra.addInstrument(this.Modules[1].getSteerMotor());
-        // m_orchestra.addInstrument(this.Modules[2].getDriveMotor());
-        // m_orchestra.addInstrument(this.Modules[2].getSteerMotor());
-        // m_orchestra.addInstrument(this.Modules[3].getDriveMotor());
-        // m_orchestra.addInstrument(this.Modules[3].getSteerMotor());
-
-        // Attempt to load the chrp
-        // StatusCode status = m_orchestra.loadMusic("Kevins Great File.chrp"); // Moved to Object Declaration
-
-        // if (!status.isOK()) {
-        // // log error
-        //    System.out.println("error in swerve!");
-        // }
-
-        // audioConfigs.AllowMusicDurDisable = true;
-
-        // m_orchestra.play();
 
         // Configure AutoBuilder last
         AutoBuilder.configureHolonomic(
-            () -> this.m_odometry.getEstimatedPosition(), // Robot pose supplier
-            this::resetPose,
-            () -> this.m_kinematics.toChassisSpeeds(this.getState().ModuleStates), // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-            this::autoRequestChasisSpeed,
+            this::getPose, // Robot pose supplier
+            this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+            this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            this::setChassisSpeeds, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
             new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
                     new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
                     new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
@@ -103,28 +65,20 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         );
     }
 
-    // public void playMusic() {
-    //     // Add a single device to the orchestra
-    //     m_orchestra.addInstrument(this.Modules[0].getDriveMotor());
-    //     System.out.println(this.Modules[0].getDriveMotor());
-    //     m_orchestra.addInstrument(this.Modules[0].getSteerMotor());
-    //     m_orchestra.addInstrument(this.Modules[1].getDriveMotor());
-    //     m_orchestra.addInstrument(this.Modules[1].getSteerMotor());
-    //     m_orchestra.addInstrument(this.Modules[2].getDriveMotor());
-    //     m_orchestra.addInstrument(this.Modules[2].getSteerMotor());
-    //     m_orchestra.addInstrument(this.Modules[3].getDriveMotor());
-    //     m_orchestra.addInstrument(this.Modules[3].getSteerMotor());
-    //     audioConfigs.AllowMusicDurDisable = true;
-    //     m_orchestra.play();
-    // }
-
-    public void resetPose(Pose2d pose) {
-        this.m_odometry.resetPosition(m_pigeon2.getRotation2d(), m_modulePositions, pose); // Method to reset odometry (will be called if your auto has a starting pose)
+    public Pose2d getPose() {
+        return this.getState().Pose;
     }
 
-    public void autoRequestChasisSpeed(ChassisSpeeds reqAutoChassisSpeeds) {
-        this.setControl(autoRequestChasisSpeed.withSpeeds(reqAutoChassisSpeeds)); // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-     // () -> this.applyRequest(() -> autoRequestChasisSpeed), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+    public void resetPose(Pose2d pose) {
+        this.m_odometry.resetPosition(m_pigeon2.getRotation2d(), m_modulePositions, pose);
+    }
+
+    public ChassisSpeeds getChassisSpeeds() {
+        return this.m_kinematics.toChassisSpeeds(this.getState().ModuleStates);
+    }
+
+    public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+        this.setControl(chassisSpeedsRequest.withSpeeds(chassisSpeeds));
     }
 
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {

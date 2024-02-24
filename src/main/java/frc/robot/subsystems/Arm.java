@@ -1,239 +1,314 @@
 package frc.robot.subsystems;
 
+import java.util.Map;
+
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.Orchestra;
-import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.AudioConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.Slot1Configs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MusicTone;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
+    private final TalonFX armMotor = new TalonFX(9); // Front Right ID 9
+    private final TalonFX armMotorFollow = new TalonFX(2); // Back Right ID 2
+    private final TalonFX armMotorFollowReverseFront = new TalonFX(3); // Front Left ID 3
+    private final TalonFX armMotorFollowReverseBack = new TalonFX(4); // Back Left ID 4
+    private final double armGearRatio = (12.0 / 60.0) * (36.0 / 50.0) * (18.0 / 50.0) * (10.0 / 64.0);
 
-    TalonFX m_armFL = new TalonFX(3); // Front Left ID 3
-    TalonFX m_armFR = new TalonFX(9); // Front Right ID 9
-    TalonFX m_armBL = new TalonFX(4); // Back Left ID 4
-    TalonFX m_armBR = new TalonFX(2); // Back Right ID 2
+    private final TalonFX wristMotor = new TalonFX(8); // Wrist top ID 8
+    private final TalonFX wristMotorFollow = new TalonFX(7); // wrist Bottom ID 7
+    private final double wristGearRatio = (12.0 / 84.0) * (18.0 / 84.0) * (24.0 / 64.0);
+
+    private final TalonFX shooterMotor = new TalonFX(5); // Shooter motor ID 5
+    private final double shooterGearRatio = 1.0;
+
+    private final TalonFX intakeMotor = new TalonFX(6); // Intake motor ID 6
     
-    CANcoder armEncoder = new CANcoder(5); 
-    double encoderOffset = 15.9;
+    private final CANcoder armEncoder = new CANcoder(5); 
+    private final double encoderOffset = 16.0;
 
-    TalonFX m_shooter = new TalonFX(5); // Shooter motor ID 5
-    TalonFX m_intake = new TalonFX(6); // Intake motor ID 6
-    TalonFX m_wristBottom = new TalonFX(7); // wrist Bottom ID 7
-    TalonFX m_wristTop = new TalonFX(8); // Wrist top ID 8
-
-    Follower follow = new Follower(9, false); // Front right as main motor
-    Follower followOppose = new Follower(9, true); // Front right as main motor, to oppose
+    private final Follower followArm = new Follower(9, false); // Front right as main motor
+    private final Follower followArmOppose = new Follower(9, true); // Front right as main motor, to oppose
     
-    Follower followWrist = new Follower(8, false); // Wrist top is to be folowed
+    private final Follower followWrist = new Follower(8, false); // Wrist top is to be folowed
 
-    MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
-    MotorOutputConfigs motorConfigsReversed = new MotorOutputConfigs();
+    private final MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
+    private final MotorOutputConfigs motorConfigsReversed = new MotorOutputConfigs();
 
-    MagnetSensorConfigs encoderConfigs = new MagnetSensorConfigs();
+    private final MagnetSensorConfigs encoderConfigs = new MagnetSensorConfigs();
 
-    final DutyCycleOut m_motorRequest = new DutyCycleOut(0.0);
+    private final  DutyCycleOut motorOutputRequest = new DutyCycleOut(0.0);
+    private final  PositionVoltage motorPositionRequest = new PositionVoltage(0.0).withSlot(0);
+    private final  VelocityVoltage motorVelocityRequest = new VelocityVoltage(0.0).withSlot(0);
 
-    // in init function, set slot 0 gains
-    Slot0Configs wristPID = new Slot0Configs(); // For wrist
-    Slot0Configs armPID = new Slot0Configs(); // For arm
+    private final Slot0Configs wristPID = new Slot0Configs(); // For wrist
+    private final Slot0Configs armPID = new Slot0Configs(); // For arm
+    private final Slot0Configs shooterPID = new Slot0Configs(); // For shooter
 
-    // create a position closed-loop request, voltage output, slot 0 configs
-    final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
+    private final AnalogInput lineBreak = new AnalogInput(3); // Linebreak Sensor on channel 3
 
-    // public static Orchestra m_orchestra = new Orchestra("Kevins Great File.chrp");
-    // MusicTone musicFreq = new MusicTone(256); // 256 hz
-    // AudioConfigs audioConfigs = new AudioConfigs();
+    private final DigitalInput wristTopLimit = new DigitalInput(0); // Wrist limit switch at top
+    private final  DigitalInput armBottomLimit = new DigitalInput(1); // Arm limit switch for arm at 0 on channel 1
 
-    public AnalogInput lineBreakSensor = new AnalogInput(3); // Linebreak Sensor on channel 3
-    public DigitalInput armLimitZero = new DigitalInput(1); // Arm limit switch for arm at 0 on channel 1
-    public DigitalInput wristLimitTop = new DigitalInput(0); // Wrist limit switch at top
+    private final StatusSignal<Double> armPosition;
+    private final StatusSignal<Double> wristPosition;
+    private final StatusSignal<Double> wristAbsPosition;
+    private final StatusSignal<Double> shooterVelocity;
 
-    public StatusSignal<Double> armPosition;
-    public StatusSignal<Double> wristPosition;
-    public StatusSignal<Double> wristAbsPosition;
+    private final GenericEntry armPositionOverride;
+    private final GenericEntry armPositionOverrideValue;
+    private final GenericEntry wristPositionOverride;
+    private final GenericEntry wristPositionOverrideValue;
 
+    private final Orchestra music = new Orchestra();
 
     public Arm() {
         // PID for Wrist
-        wristPID.kP = 0.72; // An error of 0.5 rotations results in 12 V output
-        wristPID.kI = 0; // no output for integrated error
-        wristPID.kD = 0.0; // A velocity of 1 rps results in 0.1 V output
+        wristPID.kP = 0.72;
+        wristPID.kI = 0.0;
+        wristPID.kD = 0.0;
 
         // PID for arm
-        armPID.kP = 0.96; // An error of 0.5 rotations results in 12 V output
-        armPID.kI = 0; // no output for integrated error
-        armPID.kD = 0.0; // A velocity of 1 rps results in 0.1 V output
+        armPID.kP = 0.96;
+        armPID.kI = 0.0;
+        armPID.kD = 0.0;
 
-        m_armFR.getConfigurator().apply(armPID);
-        m_wristBottom.getConfigurator().apply(wristPID);
-        m_wristTop.getConfigurator().apply(wristPID);
+        // PID for shooter
+        shooterPID.kS = 0.05;
+        shooterPID.kV = 0.1;
+        shooterPID.kP = 0.0;
+        shooterPID.kI = 0.0;
+        shooterPID.kD = 0.0;
+
+        armMotor.getConfigurator().apply(armPID);
+        wristMotor.getConfigurator().apply(wristPID);
+        shooterMotor.getConfigurator().apply(shooterPID);
 
         encoderConfigs.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+
+        armEncoder.getConfigurator().apply(encoderConfigs);
 
         motorConfigs.NeutralMode = NeutralModeValue.Coast;
         motorConfigsReversed.NeutralMode = NeutralModeValue.Coast;
         motorConfigsReversed.Inverted = InvertedValue.Clockwise_Positive;
 
-        m_armFL.getConfigurator().apply(motorConfigs);
-        m_armBL.getConfigurator().apply(motorConfigs);
-        m_armFR.getConfigurator().apply(motorConfigs);
-        m_armBR.getConfigurator().apply(motorConfigs);
-
-        armEncoder.getConfigurator().apply (encoderConfigs);
-
-        m_shooter.getConfigurator().apply(motorConfigs);
-        m_intake.getConfigurator().apply(motorConfigsReversed);
-        m_wristBottom.getConfigurator().apply(motorConfigsReversed);
-        m_wristTop.getConfigurator().apply(motorConfigsReversed);
+        armMotor.getConfigurator().apply(motorConfigs);
+        armMotorFollow.getConfigurator().apply(motorConfigs);
+        armMotorFollowReverseFront.getConfigurator().apply(motorConfigs);
+        armMotorFollowReverseBack.getConfigurator().apply(motorConfigs);
+        wristMotor.getConfigurator().apply(motorConfigsReversed);
+        wristMotorFollow.getConfigurator().apply(motorConfigsReversed);
+        shooterMotor.getConfigurator().apply(motorConfigs);
+        intakeMotor.getConfigurator().apply(motorConfigsReversed);
         
-        m_armBR.setControl(follow); // Back right follows Front right
-        m_armFL.setControl(followOppose); // Front left follows and opposes Front Right
-        m_armBL.setControl(followOppose); // Back left follows and opposes Front Right
-        m_wristBottom.setControl(followWrist); // Bottom wrist follows top
+        armMotorFollow.setControl(followArm); // Back right follows Front right
+        armMotorFollowReverseFront.setControl(followArmOppose); // Front left follows and opposes Front Right
+        armMotorFollowReverseBack.setControl(followArmOppose); // Back left follows and opposes Front Right
+        wristMotorFollow.setControl(followWrist); // Bottom wrist follows top
 
-        // audioConfigs.AllowMusicDurDisable = false;
-
-        // m_orchestra.addInstrument(m_armFL);
-        // System.out.println("The arm motor is " + m_armFL);
-        // m_orchestra.addInstrument(m_armFR);
-        // m_orchestra.addInstrument(m_armBL);
-        // m_orchestra.addInstrument(m_armBR);
-        // m_orchestra.addInstrument(m_shooter);
-        // m_orchestra.addInstrument(m_intake);
-        // m_orchestra.addInstrument(m_wristBottom);
-        // m_orchestra.addInstrument(m_wristTop);
-        
-        // Attempt to load the chrp
-        // StatusCode status = m_orchestra.loadMusic("Kevins Great File.chrp"); // Moved to object declaration
-
-        // if (!status.isOK()) {
-        // // log error
-        //    System.out.println("error in arm!");
-        // }
-
-        // m_orchestra.play();
-
-        armPosition = m_armFR.getPosition();
+        armPosition = armMotor.getPosition();
         wristAbsPosition = armEncoder.getAbsolutePosition();
-        wristPosition = m_wristTop.getPosition();
+        wristPosition = wristMotor.getPosition();
+        shooterVelocity = shooterMotor.getVelocity();
+
+        BaseStatusSignal.setUpdateFrequencyForAll(100,
+            armPosition, wristAbsPosition, wristPosition, shooterVelocity);
+        ParentDevice.optimizeBusUtilizationForAll(armMotor, armMotorFollow, armMotorFollowReverseFront, armMotorFollowReverseBack,
+            wristMotor, wristMotorFollow, shooterMotor, intakeMotor);
+
+        armPosition.waitForUpdate(0.02);
+        this.resetArmMotorPosition(0.0);
+
+        wristAbsPosition.waitForUpdate(0.02);
+        this.resetWristMotorPosition(getWristAbsPosition());
+
+        ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
+        armPositionOverride = armTab.add("Arm Override", false)
+            .withWidget(BuiltInWidgets.kToggleButton)
+            .withPosition(0, 0)
+            .withSize(2, 1)
+            .getEntry();
+        armPositionOverrideValue = armTab.add("Arm Position", 0.0)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", 0.0, "max", 50.0, "block increment", 1.0))
+            .withPosition(0, 1)
+            .withSize(2, 1)
+            .getEntry();
+        wristPositionOverride = armTab.add("Wrist Override", false)
+            .withWidget(BuiltInWidgets.kToggleButton)
+            .withPosition(3, 0)
+            .withSize(2, 1)
+            .getEntry();
+        wristPositionOverrideValue = armTab.add("Wrist Position", 0.0)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", -20.0, "max", 30.0, "block increment", 1.0))
+            .withPosition(3, 1)
+            .withSize(2, 1)
+            .getEntry();
+
+        music.loadMusic("test.chrp");
+        music.addInstrument(intakeMotor);
     }
 
-    public void motorSetArmPosition() {
-        // set position to 10 rotations
-        m_armFR.setControl(m_request.withPosition(10));
+    public double getArmPosition() {
+        return armPosition.getValue();
     }
 
-    public void motorSetWristPosition() {
-        // set position to 10 rotations
-        m_wristTop.setControl(m_request.withPosition(0));
+    public double getArmAngle() {
+        return Units.rotationsToDegrees(getArmPosition() * armGearRatio);
     }
 
-    public void motorRequestForward() {
-        m_motorRequest.Output = 0.1;
-        m_armFR.setControl(m_motorRequest);
-    }
-    
-    public void motorRequestReverse() {
-        m_motorRequest.Output = -0.1;
-        m_armFR.setControl(m_motorRequest);
+    public double getWristAbsPosition() {
+        return wristAbsPosition.getValue() + Units.degreesToRotations(encoderOffset);
     }
 
-    public void motorRequestBrake() {
-        m_motorRequest.Output = 0.0;
-        m_armFR.setControl(m_motorRequest);
+    public double getWristAbsAngle() {
+        return Units.rotationsToDegrees(getWristAbsPosition());
     }
 
-    public void requestIntake() {
-        m_motorRequest.Output = 0.6;
-        m_intake.setControl(m_motorRequest);
+    public double getWristPosition() {
+        return wristPosition.getValue();
     }
 
-    public void requestShooter() {
-        m_motorRequest.Output = 0.9;
-        m_shooter.setControl(m_motorRequest);
+    public double getWristAngle() {
+        return Units.rotationsToDegrees(getWristPosition() * wristGearRatio);
     }
 
-    public void requestInShootStop() {
-        m_motorRequest.Output = 0.0;
-        m_shooter.setControl(m_motorRequest);
-        m_intake.setControl(m_motorRequest);
+    public double getShooterMotorVelocity() {
+        return shooterVelocity.getValue();
     }
 
-    public boolean brokenLine() {
-        if (lineBreakSensor.getVoltage() > 3) {
+    public double getShooterWheelVelocity() {
+        return getShooterMotorVelocity() * shooterGearRatio;
+    }
+
+    public boolean getLineBreak() {
+        if (lineBreak.getVoltage() > 3) {
             return true;
         } else {
             return false;
         }
     }
 
-    public void setMotorBrake(){ 
+    public boolean getWristTopLimit() {
+        return wristTopLimit.get();
+    }
+
+    public boolean getArmBottomLimit() {
+        return armBottomLimit.get();
+    }
+
+    public void setArmPosition(double position) {
+        armMotor.setControl(motorPositionRequest.withPosition(position));
+    }
+
+    public void setArmAngle(double angle) {
+        double position = Units.degreesToRotations(angle) / armGearRatio;
+        setArmPosition(position);
+    }
+
+    public void setWristPosition(double position) {
+        wristMotor.setControl(motorPositionRequest.withPosition(position));
+    }
+
+    public void setWristAngle(double angle) {
+        double position = Units.degreesToRotations(angle) / wristGearRatio;
+        setWristPosition(position);
+    }
+
+    public void setIntakePercent(double percent) {
+        intakeMotor.setControl(motorOutputRequest.withOutput(percent));
+    }
+
+    public void setShooterMotorVelocity(double velocity) {
+        shooterMotor.setControl(motorVelocityRequest.withVelocity(velocity));
+    }
+
+    public void setShooterWheelVelocity(double wheelVelocity) {
+        double motorVelocity = wheelVelocity / shooterGearRatio;
+        setShooterMotorVelocity(motorVelocity);
+    }
+
+    public void setMotorBrake() { 
         motorConfigs.NeutralMode = NeutralModeValue.Brake;
         motorConfigsReversed.NeutralMode = NeutralModeValue.Brake;
-        m_armFL.getConfigurator().apply(motorConfigs);
-        m_armBL.getConfigurator().apply(motorConfigs);
-        m_armFR.getConfigurator().apply(motorConfigs);
-        m_armBR.getConfigurator().apply(motorConfigs);
 
-        m_shooter.getConfigurator().apply(motorConfigs);
-        m_intake.getConfigurator().apply(motorConfigsReversed);
-        m_wristBottom.getConfigurator().apply(motorConfigsReversed);
-        m_wristTop.getConfigurator().apply(motorConfigsReversed);
+        armMotor.getConfigurator().apply(motorConfigs);
+        armMotorFollow.getConfigurator().apply(motorConfigs);
+        armMotorFollowReverseFront.getConfigurator().apply(motorConfigs);
+        armMotorFollowReverseBack.getConfigurator().apply(motorConfigs);
+
+        wristMotor.getConfigurator().apply(motorConfigsReversed);
+        wristMotorFollow.getConfigurator().apply(motorConfigsReversed);
+        shooterMotor.getConfigurator().apply(motorConfigs);
+        intakeMotor.getConfigurator().apply(motorConfigsReversed);
     }
 
-    public void setMotorCoast(){
+    public void setMotorCoast() {
         motorConfigs.NeutralMode = NeutralModeValue.Coast;
         motorConfigsReversed.NeutralMode = NeutralModeValue.Coast;
-        m_armFL.getConfigurator().apply(motorConfigs);
-        m_armBL.getConfigurator().apply(motorConfigs);
-        m_armFR.getConfigurator().apply(motorConfigs);
-        m_armBR.getConfigurator().apply(motorConfigs);
 
-        m_shooter.getConfigurator().apply(motorConfigs);
-        m_intake.getConfigurator().apply(motorConfigsReversed);
-        m_wristBottom.getConfigurator().apply(motorConfigsReversed);
-        m_wristTop.getConfigurator().apply(motorConfigsReversed);
+        armMotor.getConfigurator().apply(motorConfigs);
+        armMotorFollow.getConfigurator().apply(motorConfigs);
+        armMotorFollowReverseFront.getConfigurator().apply(motorConfigs);
+        armMotorFollowReverseBack.getConfigurator().apply(motorConfigs);
+
+        wristMotor.getConfigurator().apply(motorConfigsReversed);
+        wristMotorFollow.getConfigurator().apply(motorConfigsReversed);
+        shooterMotor.getConfigurator().apply(motorConfigs);
+        intakeMotor.getConfigurator().apply(motorConfigsReversed);
     }
 
-    public double wristRotations() {
-        return wristAbsPosition.getValue() + Units.degreesToRotations(encoderOffset);
+    public void resetWristMotorPosition(double newPosition) {
+        double motorPosition = newPosition / wristGearRatio;
+        wristMotor.setPosition(motorPosition);
     }
 
-    public void resetWristMotor() {
-        double motorPosition = wristRotations() * (84.0 / 12.0) * (84.0 / 18.0) * (64.0 / 24.0); // (84 / 12) * (84 / 18) * (64 / 24)Added 33/21 by human
-        m_wristTop.setPosition(motorPosition);
-        System.out.println("The biggest motor postiion is " + motorPosition);
+    public void resetArmMotorPosition(double newPosition) {
+        double motorPosition = newPosition / armGearRatio;
+        armMotor.setPosition(motorPosition);
     }
 
-public void resetArmMotor(){
-    m_armFR.setPosition(0);
-}
+    public void playMusic() {
+        music.play();
+    }
+
+    public void stopMusic() {
+        music.stop();
+    }
 
     @Override
     public void periodic() {
-        armPosition.refresh();
-        wristAbsPosition.refresh();
-        wristPosition.refresh();
-        
-    }
+        BaseStatusSignal.refreshAll(armPosition, wristAbsPosition, wristPosition, shooterVelocity);
 
+        if (armPositionOverride.getBoolean(false)) {
+            double armPosition = armPositionOverrideValue.getDouble(0.0);
+            armMotor.setControl(motorPositionRequest.withPosition(armPosition));
+        }
+
+        if (wristPositionOverride.getBoolean(false)) {
+            double wristPosition = wristPositionOverrideValue.getDouble(0.0);
+            wristMotor.setControl(motorPositionRequest.withPosition(wristPosition));
+        }
+    }
 }

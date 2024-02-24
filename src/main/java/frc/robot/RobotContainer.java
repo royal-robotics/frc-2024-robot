@@ -13,7 +13,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -24,74 +23,94 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class RobotContainer {
-  private double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
-  private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
+    private double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
+    private double MaxAngularRate = 3 * Math.PI; // 1.5 rotations per second max angular velocity
 
-  /* Setting up bindings for necessary control of the swerve drive platform */
-  private final CommandXboxController driver = new CommandXboxController(0); // My joystick for Driver
-  private final CommandXboxController operator  = new CommandXboxController(1); // My joystick for Operator
-  private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
+    /* Setting up bindings for necessary control of the swerve drive platform */
+    private final CommandXboxController driver = new CommandXboxController(0); // My joystick for Driver
+    private final CommandXboxController operator  = new CommandXboxController(1); // My joystick for Operator
+    private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
 
-  public final Arm arm = new Arm(); // Arm subsystem
-  public final Climber climber = new Climber(); // Climber subsystem
+    private final Arm arm = new Arm(); // Arm subsystem
+    private final Climber climber = new Climber(); // Climber subsystem
+    private final OurShuffleboard shuffleboard = new OurShuffleboard(arm);
 
-private final Trigger armzero = new Trigger(() -> arm.armLimitZero.get());
+    private final Trigger armBottomTrigger = new Trigger(() -> arm.getArmBottomLimit());
+    private final Trigger wristTopTrigger = new Trigger(() -> arm.getWristTopLimit());
 
-  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-      .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-      .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
-                                                               // driving in open loop
-  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-  private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-  private final Telemetry logger = new Telemetry(MaxSpeed);
+    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric() // I want field-centric
+        .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // driving in open loop
 
-  private final SendableChooser<Command> autoChooser;
+    private final Telemetry logger = new Telemetry(MaxSpeed);
 
-  private void configureBindings() {
-    drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-        drivetrain.applyRequest(() -> drive.withVelocityX(-driver.getLeftY() * MaxSpeed) // Drive forward with
-                                                                                           // negative Y (forward)
-            .withVelocityY(-driver.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-            .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+    private final SendableChooser<Command> autoChooser;
+
+    private void configureBindings() {
+        drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
+            drivetrain.applyRequest(() -> drive
+                .withVelocityX(-driver.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                .withVelocityY(-driver.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
         ));
 
-    // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake)); // Bring ack later
-    // joystick.b().whileTrue(drivetrain
-        // .applyRequest(() -> point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))));
+        // reset the field-centric heading on left bumper press
+        driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
 
-    // reset the field-centric heading on left bumper press
-    driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
+        driver.a().onTrue(Commands.runOnce(() -> arm.setArmPosition(0.0), arm));
+        driver.b().onTrue(Commands.runOnce(() -> arm.setWristPosition(0.0), arm));
+        driver.y().whileTrue(Commands.startEnd(
+            () -> {
+                arm.setIntakePercent(0.5);
+                arm.setShooterMotorVelocity(240.0);
+            },
+            () -> {
+                arm.setIntakePercent(0.0);
+                arm.setShooterMotorVelocity(0.0);
+            }, arm)
+            .until(() -> arm.getLineBreak()));
+        driver.x().whileTrue(Commands.startEnd(
+            () -> {
+                arm.setIntakePercent(0.5);
+                arm.setShooterMotorVelocity(240.0);
+            },
+            () -> {
+                arm.setIntakePercent(0.0);
+                arm.setShooterMotorVelocity(0.0);
+            }, arm));
 
-    driver.a().whileTrue(Commands.runOnce(() -> arm.motorSetArmPosition(), arm));
-    driver.b().whileTrue(Commands.runOnce(() -> arm.motorSetWristPosition(), arm));
-    driver.y().whileTrue(Commands.runEnd(() -> {arm.requestIntake(); arm.requestShooter();}, () -> arm.requestInShootStop(), arm).until(() -> arm.brokenLine()));
-    driver.x().whileTrue(Commands.runEnd(() -> {arm.requestIntake(); arm.requestShooter();}, () -> arm.requestInShootStop(), arm));
-    operator.a().whileTrue(Commands.runOnce(() -> climber.climbExtend(), climber));
-    operator.b().whileTrue(Commands.runOnce(() -> climber.climbRetract(), climber));
-    operator.y().whileTrue(Commands.runOnce(() -> arm.resetWristMotor(), arm));
+        operator.a().whileTrue(Commands.runOnce(() -> climber.climbExtend(), climber));
+        operator.b().whileTrue(Commands.runOnce(() -> climber.climbRetract(), climber));
 
-    armzero.onTrue(Commands.runOnce(() -> arm.resetArmMotor(), arm));
-    
-    if (Utils.isSimulation()) {
-      drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
+        operator.leftBumper().onTrue(Commands.runOnce(() -> arm.playMusic(), arm));
+        operator.rightBumper().onTrue(Commands.runOnce(() -> arm.stopMusic(), arm));
+
+        armBottomTrigger.onTrue(Commands.runOnce(() -> arm.resetArmMotorPosition(0.0), arm));
+        wristTopTrigger.onTrue(Commands.runOnce(() -> arm.resetWristMotorPosition(arm.getWristAbsPosition()), arm));
+
+        if (Utils.isSimulation()) {
+            drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
+        }
+
+        drivetrain.registerTelemetry(logger::telemeterize);
     }
-    drivetrain.registerTelemetry(logger::telemeterize);
-  }
 
-  public RobotContainer() {
-    configureBindings();
+    public RobotContainer() {
+        configureBindings();
 
-    // Build an auto chooser. This will use Commands.none() as the default option.
-    autoChooser = AutoBuilder.buildAutoChooser();
+        // Build an auto chooser. This will use Commands.none() as the default option.
+        autoChooser = AutoBuilder.buildAutoChooser();
+    }
 
-    // Another option that allows you to specify the default auto by its name
-    // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
+    public Command getAutonomousCommand() {
+        return autoChooser.getSelected();
+    }
 
-    SmartDashboard.putData("Auto Chooser", autoChooser);
-  }
+    public void setArmCoast() {
+        arm.setMotorCoast();
+    }
 
-  public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
-  }
-
+    public void setArmBrake() {
+        arm.setMotorBrake();
+    }
 }

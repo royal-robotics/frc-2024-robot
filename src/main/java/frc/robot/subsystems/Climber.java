@@ -7,13 +7,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
     
-    DoubleSolenoid climbLeft = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6,2);
-    DoubleSolenoid climbRight = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 7, 3);
-
-
+    private final DoubleSolenoid climbLeft = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6,2);
+    private final DoubleSolenoid climbRight = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 7, 3);
 
     public Climber() {
-
     }
 
     public void climbExtend() {
@@ -25,5 +22,4 @@ public class Climber extends SubsystemBase {
         climbLeft.set(Value.kReverse);
         climbRight.set(Value.kReverse);
     }
-
 }

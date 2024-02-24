@@ -1,26 +1,22 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-// import frc.robot.autonomous.AutoModeSelector;
-// import frc.robot.sensors.Limelight;
 import frc.robot.subsystems.*;
 
 public class OurShuffleboard {
-    public OurShuffleboard(Robot robot) {
-        Arm arm = robot.m_robotContainer.arm;
+    public OurShuffleboard(Arm arm) {
         ShuffleboardTab competitionTab = Shuffleboard.getTab("Competition");
-        competitionTab.addBoolean("Line Break, Note Loaded", () -> arm.brokenLine()).withPosition(0, 0);
-        competitionTab.addBoolean("Arm at Zero", () -> arm.armLimitZero.get()).withPosition(1, 0);
-        competitionTab.addDouble("Arm position", () -> arm.armPosition.getValue()).withPosition(2, 0);
-        competitionTab.addDouble("wrist position", () -> arm.wristPosition.getValue()).withPosition(3, 0);
-        competitionTab.addDouble("Arm Abs Encoder", () -> Units.rotationsToDegrees(arm.wristRotations())).withPosition(4, 0);
-        competitionTab.addBoolean("Wrist at Top", () -> arm.wristLimitTop.get()).withPosition(1, 1);
-
+        competitionTab.addBoolean("Line Break", () -> arm.getLineBreak()).withPosition(0, 0);
+        competitionTab.addBoolean("Arm Bottom", () -> arm.getArmBottomLimit()).withPosition(1, 0);
+        competitionTab.addBoolean("Wrist Top", () -> arm.getWristTopLimit()).withPosition(1, 1);
+        competitionTab.addDouble("Arm Position", () -> arm.getArmPosition()).withPosition(2, 0);
+        competitionTab.addDouble("Arm Angle", () -> arm.getArmAngle()).withPosition(2, 1);
+        competitionTab.addDouble("Wrist Position", () -> arm.getWristPosition()).withPosition(3, 0);
+        competitionTab.addDouble("Wrist Angle", () -> arm.getWristAngle()).withPosition(3, 1);
+        competitionTab.addDouble("Wrist Abs Pos", () -> arm.getWristAbsPosition()).withPosition(4, 0);
+        competitionTab.addDouble("Wrist Abs Angle", () -> arm.getWristAbsAngle()).withPosition(4, 1);
+        competitionTab.addDouble("Shoot Motor RPM", () -> arm.getShooterMotorVelocity()).withPosition(5, 0);
+        competitionTab.addDouble("Shoot Wheel RPM", () -> arm.getShooterWheelVelocity()).withPosition(5, 1);
     }
 }
