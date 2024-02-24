@@ -33,7 +33,7 @@ public class Arm extends SubsystemBase {
     TalonFX m_armBR = new TalonFX(2); // Back Right ID 2
     
     CANcoder armEncoder = new CANcoder(5); 
-    double encoderOffset = 16.1;
+    double encoderOffset = 15.9;
 
     TalonFX m_shooter = new TalonFX(5); // Shooter motor ID 5
     TalonFX m_intake = new TalonFX(6); // Intake motor ID 6
@@ -79,7 +79,7 @@ public class Arm extends SubsystemBase {
         wristPID.kD = 0.0; // A velocity of 1 rps results in 0.1 V output
 
         // PID for arm
-        armPID.kP = 0.24; // An error of 0.5 rotations results in 12 V output
+        armPID.kP = 0.96; // An error of 0.5 rotations results in 12 V output
         armPID.kI = 0; // no output for integrated error
         armPID.kD = 0.0; // A velocity of 1 rps results in 0.1 V output
 
@@ -139,7 +139,7 @@ public class Arm extends SubsystemBase {
 
     public void motorSetArmPosition() {
         // set position to 10 rotations
-        m_armFR.setControl(m_request.withPosition(0));
+        m_armFR.setControl(m_request.withPosition(10));
     }
 
     public void motorSetWristPosition() {
