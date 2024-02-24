@@ -4,7 +4,9 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.configs.AudioConfigs;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,13 +19,35 @@ public class Robot extends TimedRobot {
   public RobotContainer m_robotContainer;
   AudioConfigs audioConfigs = new AudioConfigs();
 
+  TalonFX m_armFL = new TalonFX(3); // Front Left ID 3
+  TalonFX m_armFR = new TalonFX(9); // Front Right ID 9
+  TalonFX m_armBL = new TalonFX(4); // Back Left ID 4
+  TalonFX m_armBR = new TalonFX(2); // Back Right ID 2
+  TalonFX m_shooter = new TalonFX(5); // Shooter motor ID 5
+  TalonFX m_intake = new TalonFX(6); // Intake motor ID 6
+  TalonFX m_wristBottom = new TalonFX(7); // wrist Bottom ID 7
+  TalonFX m_wristTop = new TalonFX(8); // Wrist top ID 8
+  Orchestra m_orchestra = new Orchestra("Kevins Great File.chrp");
+  
+  // audioConfigs.AllowMusicDurDisable = false;
+
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-    audioConfigs.AllowMusicDurDisable = true;
     OurShuffleboard shuffleboard = new OurShuffleboard(this);
-    CommandSwerveDrivetrain.m_orchestra.play();
     m_robotContainer.arm.resetWristMotor();
+
+    m_orchestra.addInstrument(m_armFL);
+    System.out.println("The arm motor is " + m_armFL);
+    // m_orchestra.addInstrument(m_armFR);
+    // m_orchestra.addInstrument(m_armBL);
+    // m_orchestra.addInstrument(m_armBR);
+    // m_orchestra.addInstrument(m_shooter);
+    // m_orchestra.addInstrument(m_intake);
+    // m_orchestra.addInstrument(m_wristBottom);
+    // m_orchestra.addInstrument(m_wristTop);
+    audioConfigs.AllowMusicDurDisable = true;
+    m_orchestra.play();
   }
 
   @Override
@@ -64,11 +88,19 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    Arm.m_orchestra.play();
+    // m_orchestra.addInstrument(m_armFL);
+    // System.out.println("The arm motor is " + m_armFL);
+    // m_orchestra.addInstrument(m_armFR);
+    // m_orchestra.addInstrument(m_armBL);
+    // m_orchestra.addInstrument(m_armBR);
+    // audioConfigs.AllowMusicDurDisable = true;
+    m_orchestra.play();
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    m_orchestra.play();
+  }
 
   @Override
   public void teleopExit() {}

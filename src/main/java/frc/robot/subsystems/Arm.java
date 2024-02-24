@@ -59,21 +59,22 @@ public class Arm extends SubsystemBase {
     // create a position closed-loop request, voltage output, slot 0 configs
     final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
 
-    public static Orchestra m_orchestra = new Orchestra("Kevins Great File.chrp");
-    MusicTone musicFreq = new MusicTone(256); // 256 hz
-    AudioConfigs audioConfigs = new AudioConfigs();
+    // public static Orchestra m_orchestra = new Orchestra("Kevins Great File.chrp");
+    // MusicTone musicFreq = new MusicTone(256); // 256 hz
+    // AudioConfigs audioConfigs = new AudioConfigs();
 
     public AnalogInput lineBreakSensor = new AnalogInput(3); // Linebreak Sensor on channel 3
     public DigitalInput armLimitZero = new DigitalInput(1); // Arm limit switch for arm at 0 on channel 1
+    public DigitalInput wristLimitTop = new DigitalInput(0); // Wrist limit switch at top
 
     public StatusSignal<Double> armPosition;
     public StatusSignal<Double> wristPosition;
-    public StatusSignal<Double> armAbsPosition;
+    public StatusSignal<Double> wristAbsPosition;
 
 
     public Arm() {
         // PID for Wrist
-        wristPID.kP = 0.24; // An error of 0.5 rotations results in 12 V output
+        wristPID.kP = 0.72; // An error of 0.5 rotations results in 12 V output
         wristPID.kI = 0; // no output for integrated error
         wristPID.kD = 0.0; // A velocity of 1 rps results in 0.1 V output
 
@@ -109,10 +110,10 @@ public class Arm extends SubsystemBase {
         m_armBL.setControl(followOppose); // Back left follows and opposes Front Right
         m_wristBottom.setControl(followWrist); // Bottom wrist follows top
 
-        audioConfigs.AllowMusicDurDisable = false;
+        // audioConfigs.AllowMusicDurDisable = false;
 
-        m_orchestra.addInstrument(m_armFL);
-        System.out.println("The arm motor is " + m_armFL);
+        // m_orchestra.addInstrument(m_armFL);
+        // System.out.println("The arm motor is " + m_armFL);
         // m_orchestra.addInstrument(m_armFR);
         // m_orchestra.addInstrument(m_armBL);
         // m_orchestra.addInstrument(m_armBR);
@@ -122,17 +123,17 @@ public class Arm extends SubsystemBase {
         // m_orchestra.addInstrument(m_wristTop);
         
         // Attempt to load the chrp
-        StatusCode status = m_orchestra.loadMusic("Kevins Great File.chrp"); // Moved to object declaration
+        // StatusCode status = m_orchestra.loadMusic("Kevins Great File.chrp"); // Moved to object declaration
 
-        if (!status.isOK()) {
-        // log error
-           System.out.println("error in arm!");
-        }
+        // if (!status.isOK()) {
+        // // log error
+        //    System.out.println("error in arm!");
+        // }
 
         // m_orchestra.play();
 
         armPosition = m_armFR.getPosition();
-        armAbsPosition = armEncoder.getAbsolutePosition();
+        wristAbsPosition = armEncoder.getAbsolutePosition();
         wristPosition = m_wristTop.getPosition();
     }
 
@@ -214,18 +215,19 @@ public class Arm extends SubsystemBase {
     }
 
     public double wristRotations() {
-        return armAbsPosition.getValue() + Units.degreesToRotations(encoderOffset);
+        return wristAbsPosition.getValue() + Units.degreesToRotations(encoderOffset);
     }
 
     public void resetWristMotor() {
-        double motorPosition = wristRotations() * (84 / 12) * (84 / 18);
+        double motorPosition = wristRotations() * (84.0 / 12.0) * (84.0 / 18.0) * (64.0 / 24.0); // (84 / 12) * (84 / 18) * (64 / 24)Added 33/21 by human
         m_wristTop.setPosition(motorPosition);
+        System.out.println("The biggest motor postiion is " + motorPosition);
     }
 
     @Override
     public void periodic() {
         armPosition.refresh();
-        armAbsPosition.refresh();
+        wristAbsPosition.refresh();
         wristPosition.refresh();
         
     }

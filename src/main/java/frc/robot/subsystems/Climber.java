@@ -7,8 +7,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
     
-    DoubleSolenoid climbLeft = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 2,6);
-    DoubleSolenoid climbRight = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 3, 7);
+    DoubleSolenoid climbLeft = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6,2);
+    DoubleSolenoid climbRight = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 7, 3);
 
 
 

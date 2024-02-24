@@ -34,10 +34,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
 
-    AudioConfigs audioConfigs = new AudioConfigs();
+    // AudioConfigs audioConfigs = new AudioConfigs();
 
-    public static Orchestra m_orchestra = new Orchestra("Kevins Great File.chrp");
-    MusicTone musicFreq = new MusicTone(256); // 256 hz
+    // public static Orchestra m_orchestra = new Orchestra("Kevins Great File.chrp");
+    // MusicTone musicFreq = new MusicTone(256); // 256 hz
 
     SwerveRequest.ApplyChassisSpeeds autoRequestChasisSpeed = new SwerveRequest.ApplyChassisSpeeds();
 
@@ -53,8 +53,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             startSimThread();
         }
         // Add a single device to the orchestra
-        m_orchestra.addInstrument(this.Modules[0].getDriveMotor());
-        System.out.println("The swerve motor is" + this.Modules[0].getDriveMotor());
+        // m_orchestra.addInstrument(this.Modules[0].getDriveMotor());
+        // System.out.println("The swerve motor is" + this.Modules[0].getDriveMotor());
         // m_orchestra.addInstrument(this.Modules[0].getSteerMotor());
         // m_orchestra.addInstrument(this.Modules[1].getDriveMotor());
         // m_orchestra.addInstrument(this.Modules[1].getSteerMotor());
@@ -64,12 +64,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         // m_orchestra.addInstrument(this.Modules[3].getSteerMotor());
 
         // Attempt to load the chrp
-        StatusCode status = m_orchestra.loadMusic("Kevins Great File.chrp"); // Moved to Object Declaration
+        // StatusCode status = m_orchestra.loadMusic("Kevins Great File.chrp"); // Moved to Object Declaration
 
-        if (!status.isOK()) {
-        // log error
-           System.out.println("error in swerve!");
-        }
+        // if (!status.isOK()) {
+        // // log error
+        //    System.out.println("error in swerve!");
+        // }
 
         // audioConfigs.AllowMusicDurDisable = true;
 
@@ -103,20 +103,20 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         );
     }
 
-    public void playMusic() {
-        // Add a single device to the orchestra
-        m_orchestra.addInstrument(this.Modules[0].getDriveMotor());
-        System.out.println(this.Modules[0].getDriveMotor());
-        m_orchestra.addInstrument(this.Modules[0].getSteerMotor());
-        m_orchestra.addInstrument(this.Modules[1].getDriveMotor());
-        m_orchestra.addInstrument(this.Modules[1].getSteerMotor());
-        m_orchestra.addInstrument(this.Modules[2].getDriveMotor());
-        m_orchestra.addInstrument(this.Modules[2].getSteerMotor());
-        m_orchestra.addInstrument(this.Modules[3].getDriveMotor());
-        m_orchestra.addInstrument(this.Modules[3].getSteerMotor());
-        audioConfigs.AllowMusicDurDisable = true;
-        m_orchestra.play();
-    }
+    // public void playMusic() {
+    //     // Add a single device to the orchestra
+    //     m_orchestra.addInstrument(this.Modules[0].getDriveMotor());
+    //     System.out.println(this.Modules[0].getDriveMotor());
+    //     m_orchestra.addInstrument(this.Modules[0].getSteerMotor());
+    //     m_orchestra.addInstrument(this.Modules[1].getDriveMotor());
+    //     m_orchestra.addInstrument(this.Modules[1].getSteerMotor());
+    //     m_orchestra.addInstrument(this.Modules[2].getDriveMotor());
+    //     m_orchestra.addInstrument(this.Modules[2].getSteerMotor());
+    //     m_orchestra.addInstrument(this.Modules[3].getDriveMotor());
+    //     m_orchestra.addInstrument(this.Modules[3].getSteerMotor());
+    //     audioConfigs.AllowMusicDurDisable = true;
+    //     m_orchestra.play();
+    // }
 
     public void resetPose(Pose2d pose) {
         this.m_odometry.resetPosition(m_pigeon2.getRotation2d(), m_modulePositions, pose); // Method to reset odometry (will be called if your auto has a starting pose)
