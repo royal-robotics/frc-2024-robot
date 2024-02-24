@@ -200,14 +200,6 @@ public class Arm extends SubsystemBase {
         return shooterVelocity.getValue();
     }
 
-    public double getWristTopVoltage() {
-        return wristTopVoltage.getValue();
-    }
-   
-    public double getWristBottomVoltage() {
-        return wristBottomVoltage.getValue();
-    }
-
     public double getShooterWheelVelocity() {
         return getShooterMotorVelocity() * shooterGearRatio;
     }
