@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.AudioConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.Slot1Configs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MusicTone;
@@ -52,7 +53,8 @@ public class Arm extends SubsystemBase {
     final DutyCycleOut m_motorRequest = new DutyCycleOut(0.0);
 
     // in init function, set slot 0 gains
-    Slot0Configs slot0Configs = new Slot0Configs();
+    Slot0Configs wristPID = new Slot0Configs(); // For wrist
+    Slot0Configs armPID = new Slot0Configs(); // For arm
 
     // create a position closed-loop request, voltage output, slot 0 configs
     final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
@@ -71,13 +73,19 @@ public class Arm extends SubsystemBase {
 
 
     public Arm() {
-        slot0Configs.kP = 0.72; // An error of 0.5 rotations results in 12 V output
-        slot0Configs.kI = 0; // no output for integrated error
-        slot0Configs.kD = 0.0; // A velocity of 1 rps results in 0.1 V output
+        // PID for Wrist
+        wristPID.kP = 0.72; // An error of 0.5 rotations results in 12 V output
+        wristPID.kI = 0; // no output for integrated error
+        wristPID.kD = 0.0; // A velocity of 1 rps results in 0.1 V output
 
-        m_armFR.getConfigurator().apply(slot0Configs);
-        m_wristBottom.getConfigurator().apply(slot0Configs);
-        m_wristTop.getConfigurator().apply(slot0Configs);
+        // PID for arm
+        armPID.kP = 0.24; // An error of 0.5 rotations results in 12 V output
+        armPID.kI = 0; // no output for integrated error
+        armPID.kD = 0.0; // A velocity of 1 rps results in 0.1 V output
+
+        m_armFR.getConfigurator().apply(armPID);
+        m_wristBottom.getConfigurator().apply(wristPID);
+        m_wristTop.getConfigurator().apply(wristPID);
 
         encoderConfigs.SensorDirection = SensorDirectionValue.Clockwise_Positive;
 
