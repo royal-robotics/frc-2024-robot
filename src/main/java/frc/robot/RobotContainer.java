@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Climber;
@@ -33,6 +34,8 @@ public class RobotContainer {
 
   public final Arm arm = new Arm(); // Arm subsystem
   public final Climber climber = new Climber(); // Climber subsystem
+
+private final Trigger armzero = new Trigger(() -> arm.armLimitZero.get());
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -66,6 +69,8 @@ public class RobotContainer {
     operator.a().whileTrue(Commands.runOnce(() -> climber.climbExtend(), climber));
     operator.b().whileTrue(Commands.runOnce(() -> climber.climbRetract(), climber));
     operator.y().whileTrue(Commands.runOnce(() -> arm.resetWristMotor(), arm));
+
+    armzero.onTrue(Commands.runOnce(() -> arm.resetArmMotor(), arm));
     
     if (Utils.isSimulation()) {
       drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));

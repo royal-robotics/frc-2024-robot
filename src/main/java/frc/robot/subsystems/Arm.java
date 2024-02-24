@@ -224,6 +224,10 @@ public class Arm extends SubsystemBase {
         System.out.println("The biggest motor postiion is " + motorPosition);
     }
 
+public void resetArmMotor(){
+    m_armFR.setPosition(0);
+}
+
     @Override
     public void periodic() {
         armPosition.refresh();
