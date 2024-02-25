@@ -81,6 +81,14 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         this.setControl(chassisSpeedsRequest.withSpeeds(chassisSpeeds));
     }
 
+    public double odometryX() {
+        return this.getState().Pose.getX();
+    }
+
+    public double odometryY() {
+        return this.getState().Pose.getY();
+    }
+
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
         return run(() -> this.setControl(requestSupplier.get()));
     }

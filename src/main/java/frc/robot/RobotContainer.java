@@ -36,7 +36,7 @@ public class RobotContainer {
 
     private final Arm arm = new Arm(); // Arm subsystem
     private final Climber climber = new Climber(); // Climber subsystem
-    private final OurShuffleboard shuffleboard = new OurShuffleboard(arm);
+    private final OurShuffleboard shuffleboard = new OurShuffleboard(drivetrain, arm);
     private final AddressableLED leds = new AddressableLED(0);
     private final AddressableLEDBuffer ledData = new AddressableLEDBuffer(12);
 
@@ -83,10 +83,10 @@ public class RobotContainer {
             () -> arm.getLineBreak()));
         driver.rightTrigger().whileTrue(Commands.either(
             Commands.startEnd(
-                () -> arm.setShooterMotorVelocity(45),
+                () -> arm.setShooterMotorVelocity(60),
                 () -> arm.setShooterMotorVelocity(0.0)),
             Commands.startEnd(
-                () -> arm.setShooterMotorVelocity(60),
+                () -> arm.setShooterMotorVelocity(75),
                 () -> arm.setShooterMotorVelocity(0.0)),
             () -> arm.getArmPosition() >= 10));
         driver.y().whileTrue(Commands.startEnd(() -> arm.setIntakePercent(-0.4), () -> arm.setIntakePercent(0.0)));
@@ -126,12 +126,12 @@ public class RobotContainer {
         NamedCommands.registerCommand("MoveWristToPickup", arm.moveWristPositionCommand(0.5));
 
         NamedCommands.registerCommand("Shoot", Commands.sequence(
-            arm.spinWheelsCommand(60.0),
+            arm.spinWheelsCommand(90.0),
             Commands.runOnce(() -> arm.setIntakePercent(0.4), arm),
             Commands.waitSeconds(1.0),
             Commands.runOnce(() -> {
                 arm.setIntakePercent(0.0);
-                arm.setShooterMotorVelocity(0.0);
+                arm.setShooterMotorVelocity(0.0); // Kevin action
             }, arm)
         ));
 
@@ -141,7 +141,8 @@ public class RobotContainer {
             arm
         ).until(() -> arm.getLineBreak()));
 
-        NamedCommands.registerCommand("LiftWrist", arm.moveWristPositionCommand(4.5));
+        NamedCommands.registerCommand("LiftWrist", arm.moveWristPositionCommand(4.6));
+        NamedCommands.registerCommand("LiftWrist2", arm.moveWristPositionCommand(3.5));
 
         if (Utils.isSimulation()) {
             drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));

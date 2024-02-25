@@ -101,8 +101,8 @@ public class Arm extends SubsystemBase {
 
         // PID for shooter
         shooterPID.kS = 0.05;
-        shooterPID.kV = 0.15;
-        shooterPID.kP = 0.0;
+        shooterPID.kV = 0.125;
+        shooterPID.kP = 0.3;
         shooterPID.kI = 0.0;
         shooterPID.kD = 0.0;
 
@@ -180,7 +180,7 @@ public class Arm extends SubsystemBase {
             .getEntry();
         wristPositionOverrideValue = armTab.add("New Wrist Position", 0.0)
             .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", -20.0, "max", 30.0, "block increment", 0.25))
+            .withProperties(Map.of("min", -20.0, "max", 30.0, "block increment", 0.1))
             .withPosition(3, 1)
             .withSize(2, 1)
             .getEntry();
@@ -191,7 +191,7 @@ public class Arm extends SubsystemBase {
             .getEntry();
         shooterRPMOverrideValue = armTab.add("New Shooter RPS", 0.0)
             .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", 0.0, "max", 100.0, "block increment", 10.0))
+            .withProperties(Map.of("min", 0.0, "max", 100.0, "block increment", 1.0))
             .withPosition(6, 1)
             .withSize(2, 1)
             .getEntry();
