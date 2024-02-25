@@ -24,7 +24,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
-    private double MaxAngularRate = 3 * Math.PI; // 1.5 rotations per second max angular velocity
+    private double MaxAngularRate = 3.0 * Math.PI; // 1.5 rotations per second max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final CommandXboxController driver = new CommandXboxController(0); // My joystick for Driver
@@ -32,7 +32,7 @@ public class RobotContainer {
     private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
 
     private final Arm arm = new Arm(); // Arm subsystem
-    //private final Climber climber = new Climber(); // Climber subsystem
+    private final Climber climber = new Climber(); // Climber subsystem
     private final OurShuffleboard shuffleboard = new OurShuffleboard(arm);
 
     private final Trigger armBottomTrigger = new Trigger(() -> arm.getArmBottomLimit());
@@ -56,37 +56,68 @@ public class RobotContainer {
 
         // reset the field-centric heading on left bumper press
         driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
+        driver.rightBumper().whileTrue(Commands.startEnd(
+          () -> {
+            MaxSpeed = 1.0;
+            MaxAngularRate = 1.0 * Math.PI;
+          }, 
+          () -> {
+            MaxSpeed = TunerConstants.kSpeedAt12VoltsMps;
+            MaxAngularRate = 3.0 * Math.PI;
+          }
+        ));
 
         driver.a().onTrue(Commands.runOnce(() -> arm.setArmPosition(0.0), arm));
-        driver.b().onTrue(Commands.runOnce(() -> arm.setWristPosition(0.0), arm));
-        driver.y().whileTrue(Commands.startEnd(
+        driver.b().onTrue(Commands.runOnce(() -> arm.setWristPosition(0.5), arm));
+        driver.leftTrigger().whileTrue(Commands.startEnd(
             () -> {
                 arm.setIntakePercent(0.6);
-                arm.setShooterMotorVelocity(240.0);
             },
             () -> {
                 arm.setIntakePercent(0.0);
-                arm.setShooterMotorVelocity(0.0);
             }, arm)
             .until(() -> arm.getLineBreak()));
-        driver.x().whileTrue(Commands.startEnd(
-            () -> {
-                arm.setIntakePercent(0.6);
-                arm.setShooterMotorVelocity(240.0);
-            },
-            () -> {
-                arm.setIntakePercent(0.0);
-                arm.setShooterMotorVelocity(0.0);
-            }, arm));
+        /*driver.x().whileTrue(Commands.sequence(
+          Commands.runOnce(() -> {
+            arm.setShooterMotorVelocity(240.0);
+          }, arm),
+          Commands.waitSeconds(2.0),
+          Commands.runOnce(() -> {
+            arm.setIntakePercent(0.6);
+          }, arm),
+          Commands.waitSeconds(0.5),
+          Commands.runOnce(() -> {
+            arm.setIntakePercent(0.0);
+            arm.setShooterMotorVelocity(0.0);
+          }, arm)
+        ).finallyDo(() -> {
+          arm.setIntakePercent(0.0);
+          arm.setShooterMotorVelocity(0.0);
+        }));*/
+        driver.rightTrigger().whileTrue(Commands.startEnd(
+          () -> arm.setIntakePercent(0.6), 
+          () -> arm.setIntakePercent(0.0),
+          arm));
 
-        //operator.a().whileTrue(Commands.runOnce(() -> climber.climbExtend(), climber));
-        //operator.b().whileTrue(Commands.runOnce(() -> climber.climbRetract(), climber));
+        operator.x().onTrue(Commands.sequence(
+          arm.moveArmPositionCommand(20.0),
+          arm.moveWristPositionCommand(-20.5)
+        ));
+        operator.y().onTrue(Commands.sequence(
+          arm.moveArmPositionCommand(30.25),
+          arm.moveWristPositionCommand(-1.0)
+        ));
+        operator.b().onTrue(Commands.sequence(
+          arm.moveWristPositionCommand(0.5),
+          arm.moveArmPositionCommand(0.0)
+        ));
+        operator.a().onTrue(Commands.runOnce(() -> climber.climbToggle(), climber));
 
         operator.leftBumper().onTrue(Commands.runOnce(() -> arm.playMusic(), arm));
         operator.rightBumper().onTrue(Commands.runOnce(() -> arm.stopMusic(), arm));
 
-        armBottomTrigger.onTrue(Commands.runOnce(() -> arm.resetArmMotorPosition(0.0), arm));
-        wristTopTrigger.onTrue(Commands.runOnce(() -> arm.resetWristMotorPosition(arm.getWristAbsPosition()), arm));
+        armBottomTrigger.onTrue(Commands.runOnce(() -> arm.resetArmMotorPosition(0.0), arm).ignoringDisable(true));
+        wristTopTrigger.onTrue(Commands.runOnce(() -> arm.resetWristMotorPosition(arm.getWristAbsPosition()), arm).ignoringDisable(true));
 
         if (Utils.isSimulation()) {
             drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));

@@ -22,4 +22,13 @@ public class Climber extends SubsystemBase {
         climbLeft.set(Value.kReverse);
         climbRight.set(Value.kReverse);
     }
+
+    public void climbToggle() {
+        if (climbLeft.get() == Value.kForward ||
+            climbRight.get() == Value.kForward) {
+                climbRetract();
+        } else {
+            climbExtend();
+        }
+    }
 }

@@ -9,7 +9,6 @@ import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -27,6 +26,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
@@ -47,10 +47,6 @@ public class Arm extends SubsystemBase {
     
     private final CANcoder armEncoder = new CANcoder(5); 
     private final double encoderOffset = 17.5;
-
-    private final StrictFollower followArm = new StrictFollower(9); // Front right as main motor
-    
-    private final StrictFollower followWrist = new StrictFollower(8); // Wrist top is to be folowed
 
     private final MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
     private final MotorOutputConfigs motorConfigsReversed = new MotorOutputConfigs();
@@ -74,17 +70,19 @@ public class Arm extends SubsystemBase {
     private final StatusSignal<Double> wristPosition;
     private final StatusSignal<Double> wristAbsPosition;
     private final StatusSignal<Double> shooterVelocity;
-    private final StatusSignal<Double> wristTopVoltage;
-    private final StatusSignal<Double> wristBottomVoltage;
     private final StatusSignal<Double> armFLVoltage;
     private final StatusSignal<Double> armFRVoltage;
     private final StatusSignal<Double> armBLVoltage;
     private final StatusSignal<Double> armBRVoltage;
+    private final StatusSignal<Double> wristTopVoltage;
+    private final StatusSignal<Double> wristBottomVoltage;
 
     private final GenericEntry armPositionOverride;
     private final GenericEntry armPositionOverrideValue;
     private final GenericEntry wristPositionOverride;
     private final GenericEntry wristPositionOverrideValue;
+    private final GenericEntry shooterRPMOverride;
+    private final GenericEntry shooterRPMOverrideValue;
 
     private final Orchestra music = new Orchestra();
     public Arm() {
@@ -94,13 +92,13 @@ public class Arm extends SubsystemBase {
         wristPID.kD = 0.05;
 
         // PID for arm
-        armPID.kP = 1.5;
+        armPID.kP = 1.0;
         armPID.kI = 0.0;
-        armPID.kD = 0.2;
+        armPID.kD = 0.1;
 
         // PID for shooter
         shooterPID.kS = 0.05;
-        shooterPID.kV = 0.1;
+        shooterPID.kV = 0.15;
         shooterPID.kP = 0.0;
         shooterPID.kI = 0.0;
         shooterPID.kD = 0.0;
@@ -134,16 +132,16 @@ public class Arm extends SubsystemBase {
         wristAbsPosition = armEncoder.getAbsolutePosition();
         wristPosition = wristMotor.getPosition();
         shooterVelocity = shooterMotor.getVelocity();
-        wristTopVoltage = wristMotor.getMotorVoltage();
-        wristBottomVoltage = wristMotorFollow.getMotorVoltage();
         armFLVoltage = armMotor.getMotorVoltage();
         armFRVoltage = armMotorFollowReverseFront.getMotorVoltage();
         armBLVoltage = armMotorFollow.getMotorVoltage();
         armBRVoltage = armMotorFollowReverseBack.getMotorVoltage();
+        wristTopVoltage = wristMotor.getMotorVoltage();
+        wristBottomVoltage = wristMotorFollow.getMotorVoltage();
 
         BaseStatusSignal.setUpdateFrequencyForAll(100,
-            armPosition, wristAbsPosition, wristPosition, shooterVelocity, wristTopVoltage, wristBottomVoltage,
-            armFLVoltage, armFRVoltage, armBLVoltage, armBRVoltage);
+            armPosition, wristAbsPosition, wristPosition, shooterVelocity, armFLVoltage, armFRVoltage,
+            armBLVoltage, armBRVoltage, wristTopVoltage, wristBottomVoltage);
         ParentDevice.optimizeBusUtilizationForAll(armMotor, armMotorFollow, armMotorFollowReverseFront, armMotorFollowReverseBack,
             wristMotor, wristMotorFollow, shooterMotor, intakeMotor);
 
@@ -174,6 +172,17 @@ public class Arm extends SubsystemBase {
             .withWidget(BuiltInWidgets.kNumberSlider)
             .withProperties(Map.of("min", -20.0, "max", 30.0, "block increment", 0.25))
             .withPosition(3, 1)
+            .withSize(2, 1)
+            .getEntry();
+        shooterRPMOverride = armTab.add("Shooter Override", false)
+            .withWidget(BuiltInWidgets.kToggleButton)
+            .withPosition(6, 0)
+            .withSize(2, 1)
+            .getEntry();
+        shooterRPMOverrideValue = armTab.add("New Shooter RPM", 0.0)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", 0.0, "max", 500.0, "block increment", 10.0))
+            .withPosition(6, 1)
             .withSize(2, 1)
             .getEntry();
 
@@ -209,32 +218,8 @@ public class Arm extends SubsystemBase {
         return shooterVelocity.getValue();
     }
 
-    public double getShooterWheelVelocity() {
-        return getShooterMotorVelocity() * shooterGearRatio;
-    }
-
-    public double getWristTopVoltage() {
-        return wristTopVoltage.getValue();
-    }
-
-    public double getWristBottomVoltage() {
-        return wristBottomVoltage.getValue();
-    }
-
-    public double getArmFLVoltage() {
-        return armFLVoltage.getValue();
-    }
-
-    public double getArmFRVoltage() {
-        return armFRVoltage.getValue();
-    }
-
-    public double getArmBLVoltage() {
-        return armBLVoltage.getValue();
-    }
-
-    public double getArmBRVoltage() {
-        return armBRVoltage.getValue();
+    public double getShooterWheelRPM() {
+        return getShooterMotorVelocity() * shooterGearRatio * 60.0;
     }
 
     public boolean getLineBreak() {
@@ -322,6 +307,26 @@ public class Arm extends SubsystemBase {
         intakeMotor.getConfigurator().apply(motorConfigsReversed);
     }
 
+    public Command moveArmPositionCommand(double position)
+    {
+        return this.run(() -> this.setArmPosition(position))
+            .until(() -> {
+                double positionDiff = Math.abs(this.getArmPosition() - position);
+                System.out.println(String.format("Position diff: %f", positionDiff));
+                return positionDiff < 0.5;
+            });
+    }
+
+    public Command moveWristPositionCommand(double position)
+    {
+        return this.run(() -> this.setWristPosition(position))
+            .until(() -> {
+                double positionDiff = Math.abs(this.getWristPosition() - position);
+                System.out.println(String.format("Position diff: %f", positionDiff));
+                return positionDiff < 0.5;
+            });
+    }
+
     public void resetWristMotorPosition(double newPosition) {
         double motorPosition = newPosition / wristGearRatio;
         wristMotor.setPosition(motorPosition);
@@ -346,15 +351,10 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        BaseStatusSignal.refreshAll(armPosition, wristAbsPosition, wristPosition, shooterVelocity, wristTopVoltage, wristBottomVoltage,
-            armFLVoltage, armFRVoltage, armBLVoltage, armBRVoltage);
+        BaseStatusSignal.refreshAll(armPosition, wristAbsPosition, wristPosition, shooterVelocity, armFLVoltage, armFRVoltage,
+            armBLVoltage, armBRVoltage, wristTopVoltage, wristBottomVoltage);   
 
-        double angleDiff = Math.abs(this.getWristAbsAngle() - this.getWristAngle());
-        if (angleDiff > 0.5)
-        {
-            System.out.println(String.format("Angle difference", angleDiff));
             this.resetWristMotorPosition(this.getWristAbsPosition());
-        }
 
         if (armPositionOverride.getBoolean(false)) {
             armMotorFollow.setControl(new StrictFollower(armMotor.getDeviceID())); // Back right follows Front right
@@ -371,5 +371,12 @@ public class Arm extends SubsystemBase {
             double wristPosition = wristPositionOverrideValue.getDouble(0.0);
             wristMotor.setControl(motorPositionRequest.withPosition(wristPosition));
         }
+
+        if (shooterRPMOverride.getBoolean(false)) {
+            double shooterRPM = shooterRPMOverrideValue.getDouble(0.0);
+            shooterMotor.setControl(motorVelocityRequest.withVelocity(shooterRPM));
+            
+        }
+
     }
 }

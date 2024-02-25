@@ -17,18 +17,13 @@ public class OurShuffleboard {
         competitionTab.addDouble("Wrist Abs Pos", () -> arm.getWristAbsPosition()).withPosition(4, 0);
         competitionTab.addDouble("Wrist Abs Angle", () -> arm.getWristAbsAngle()).withPosition(4, 1);
         competitionTab.addDouble("Shoot Motor RPM", () -> arm.getShooterMotorVelocity()).withPosition(5, 0);
-        competitionTab.addDouble("Shoot Wheel RPM", () -> arm.getShooterWheelVelocity()).withPosition(5, 1);
+        competitionTab.addDouble("Shoot Wheel RPM", () -> arm.getShooterWheelRPM()).withPosition(5, 1);
 
         ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
         armTab.addDouble("Arm Position", () -> arm.getArmPosition()).withPosition(0, 2);
         armTab.addDouble("Arm Angle", () -> arm.getArmAngle()).withPosition(1, 2);
         armTab.addDouble("Wrist Position", () -> arm.getWristPosition()).withPosition(3, 2);
         armTab.addDouble("Wrist Angle", () -> arm.getWristAngle()).withPosition(4, 2);
-        armTab.addDouble("Wrist Top Volt", () -> arm.getWristTopVoltage()).withPosition(3, 3);
-        armTab.addDouble("Wrist Bottom Volt", () -> arm.getWristBottomVoltage()).withPosition(4, 3);
-        armTab.addDouble("Arm FL Volt", () -> arm.getWristTopVoltage()).withPosition(5, 0);
-        armTab.addDouble("Arm FR Volt", () -> arm.getWristBottomVoltage()).withPosition(5, 1);
-        armTab.addDouble("Arm BL Volt", () -> arm.getWristTopVoltage()).withPosition(5, 2);
-        armTab.addDouble("Arm BR Volt", () -> arm.getWristBottomVoltage()).withPosition(5, 3);
+        armTab.addDouble("ShooterRPM", () -> arm.getShooterMotorVelocity()).withPosition(6, 2);
     }
 }
