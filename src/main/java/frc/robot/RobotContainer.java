@@ -32,7 +32,7 @@ public class RobotContainer {
     private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
 
     private final Arm arm = new Arm(); // Arm subsystem
-    //private final Climber climber = new Climber(); // Climber subsystem
+    private final Climber climber = new Climber(); // Climber subsystem
     private final OurShuffleboard shuffleboard = new OurShuffleboard(arm);
 
     private final Trigger armBottomTrigger = new Trigger(() -> arm.getArmBottomLimit());
@@ -79,8 +79,8 @@ public class RobotContainer {
                 arm.setShooterMotorVelocity(0.0);
             }, arm));
 
-        //operator.a().whileTrue(Commands.runOnce(() -> climber.climbExtend(), climber));
-        //operator.b().whileTrue(Commands.runOnce(() -> climber.climbRetract(), climber));
+        operator.a().whileTrue(Commands.runOnce(() -> climber.climbExtend(), climber));
+        operator.b().whileTrue(Commands.runOnce(() -> climber.climbRetract(), climber));
 
         operator.leftBumper().onTrue(Commands.runOnce(() -> arm.playMusic(), arm));
         operator.rightBumper().onTrue(Commands.runOnce(() -> arm.stopMusic(), arm));
