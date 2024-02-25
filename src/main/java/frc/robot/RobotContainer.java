@@ -55,10 +55,10 @@ public class RobotContainer {
         ));
 
         // reset the field-centric heading on left bumper press
-        driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
-        driver.rightBumper().whileTrue(Commands.startEnd(
+        driver.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
+        driver.leftBumper().whileTrue(Commands.startEnd(
           () -> {
-            MaxSpeed = 1.0;
+            MaxSpeed = 2.5;
             MaxAngularRate = 1.0 * Math.PI;
           }, 
           () -> {
@@ -66,40 +66,12 @@ public class RobotContainer {
             MaxAngularRate = 3.0 * Math.PI;
           }
         ));
+        driver.rightBumper().whileTrue(Commands.either(Commands.startEnd(() -> arm.setIntakePercent(0.6), () -> arm.setIntakePercent(0.0), arm), Commands.startEnd( () -> arm.setIntakePercent(0.6)  , () -> arm.setIntakePercent(0.0), arm).until(() -> arm.getLineBreak()), () -> arm.getLineBreak()));
+        driver.rightTrigger().whileTrue(Commands.either(Commands.startEnd(() -> arm.setShooterMotorVelocity(30), () -> arm.setShooterMotorVelocity(0.0), arm), Commands.startEnd( () -> arm.setShooterMotorVelocity(60)  , () -> arm.setShooterMotorVelocity(0.0), arm), () -> arm.getArmPosition() >= 10));
 
-        driver.a().onTrue(Commands.runOnce(() -> arm.setArmPosition(0.0), arm));
-        driver.b().onTrue(Commands.runOnce(() -> arm.setWristPosition(0.5), arm));
-        driver.leftTrigger().whileTrue(Commands.startEnd(
-            () -> {
-                arm.setIntakePercent(0.6);
-            },
-            () -> {
-                arm.setIntakePercent(0.0);
-            }, arm)
-            .until(() -> arm.getLineBreak()));
-        /*driver.x().whileTrue(Commands.sequence(
-          Commands.runOnce(() -> {
-            arm.setShooterMotorVelocity(240.0);
-          }, arm),
-          Commands.waitSeconds(2.0),
-          Commands.runOnce(() -> {
-            arm.setIntakePercent(0.6);
-          }, arm),
-          Commands.waitSeconds(0.5),
-          Commands.runOnce(() -> {
-            arm.setIntakePercent(0.0);
-            arm.setShooterMotorVelocity(0.0);
-          }, arm)
-        ).finallyDo(() -> {
-          arm.setIntakePercent(0.0);
-          arm.setShooterMotorVelocity(0.0);
-        }));*/
-        driver.rightTrigger().whileTrue(Commands.startEnd(
-          () -> arm.setIntakePercent(0.6), 
-          () -> arm.setIntakePercent(0.0),
-          arm));
+        driver.y().whileTrue(Commands.startEnd(() -> arm.setIntakePercent(-0.5), () -> arm.setIntakePercent(0), arm));
 
-        operator.x().onTrue(Commands.sequence(
+        operator.leftTrigger().onTrue(Commands.sequence(
           arm.moveArmPositionCommand(20.0),
           arm.moveWristPositionCommand(-20.5)
         ));
@@ -107,14 +79,13 @@ public class RobotContainer {
           arm.moveArmPositionCommand(30.25),
           arm.moveWristPositionCommand(-1.0)
         ));
-        operator.b().onTrue(Commands.sequence(
+        operator.rightTrigger().onTrue(Commands.sequence(
           arm.moveWristPositionCommand(0.5),
           arm.moveArmPositionCommand(0.0)
         ));
-        operator.a().onTrue(Commands.runOnce(() -> climber.climbToggle(), climber));
+        operator.rightBumper().onTrue(Commands.runOnce(() -> climber.climbExtend(), climber));
+        operator.leftBumper().onTrue(Commands.runOnce(() -> climber.climbRetract(), climber));
 
-        operator.leftBumper().onTrue(Commands.runOnce(() -> arm.playMusic(), arm));
-        operator.rightBumper().onTrue(Commands.runOnce(() -> arm.stopMusic(), arm));
 
         armBottomTrigger.onTrue(Commands.runOnce(() -> arm.resetArmMotorPosition(0.0), arm).ignoringDisable(true));
         wristTopTrigger.onTrue(Commands.runOnce(() -> arm.resetWristMotorPosition(arm.getWristAbsPosition()), arm).ignoringDisable(true));
