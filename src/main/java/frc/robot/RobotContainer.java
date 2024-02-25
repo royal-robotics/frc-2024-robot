@@ -142,7 +142,7 @@ public class RobotContainer {
         ).until(() -> arm.getLineBreak()));
 
         NamedCommands.registerCommand("LiftWrist", arm.moveWristPositionCommand(4.6));
-        NamedCommands.registerCommand("LiftWrist2", arm.moveWristPositionCommand(3.5));
+        NamedCommands.registerCommand("LiftWrist2", arm.moveWristPositionCommand(3.5)); // For bottom to bottom auto
 
         if (Utils.isSimulation()) {
             drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
