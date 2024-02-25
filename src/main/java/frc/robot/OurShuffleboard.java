@@ -2,6 +2,8 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.*;
 
 public class OurShuffleboard {
@@ -24,6 +26,11 @@ public class OurShuffleboard {
         armTab.addDouble("Arm Angle", () -> arm.getArmAngle()).withPosition(1, 2);
         armTab.addDouble("Wrist Position", () -> arm.getWristPosition()).withPosition(3, 2);
         armTab.addDouble("Wrist Angle", () -> arm.getWristAngle()).withPosition(4, 2);
-        armTab.addDouble("ShooterRPM", () -> arm.getShooterMotorVelocity()).withPosition(6, 2);
+        armTab.addDouble("ShooterRPM", () -> arm.getShooterWheelRPM()).withPosition(6, 2);
+    }
+
+    public void addAutoChooser(SendableChooser<Command> autoChooser){
+        ShuffleboardTab competitionTab = Shuffleboard.getTab("Competition");
+        competitionTab.add(autoChooser).withPosition(0, 2).withSize(2, 1);
     }
 }

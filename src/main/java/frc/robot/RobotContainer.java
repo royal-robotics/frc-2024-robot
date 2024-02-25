@@ -7,11 +7,14 @@ package frc.robot;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -34,12 +37,15 @@ public class RobotContainer {
     private final Arm arm = new Arm(); // Arm subsystem
     private final Climber climber = new Climber(); // Climber subsystem
     private final OurShuffleboard shuffleboard = new OurShuffleboard(arm);
+    private final AddressableLED leds = new AddressableLED(0);
+    private final AddressableLEDBuffer ledData = new AddressableLEDBuffer(12);
 
     private final Trigger armBottomTrigger = new Trigger(() -> arm.getArmBottomLimit());
     private final Trigger wristTopTrigger = new Trigger(() -> arm.getWristTopLimit());
+    private final Trigger lineBreakTrigger = new Trigger(() -> arm.getLineBreak());
 
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric() // I want field-centric
-        .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+        .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.05) // Add a 5% deadband
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // driving in open loop
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
@@ -49,9 +55,9 @@ public class RobotContainer {
     private void configureBindings() {
         drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() -> drive
-                .withVelocityX(-driver.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                .withVelocityY(-driver.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed) // Drive forward with negative Y (forward)
+                .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed) // Drive left with negative X (left)
+                .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate) // Drive counterclockwise with negative X (left)
         ));
 
         // reset the field-centric heading on left bumper press
@@ -66,13 +72,27 @@ public class RobotContainer {
             MaxAngularRate = 3.0 * Math.PI;
           }
         ));
-        driver.rightBumper().whileTrue(Commands.either(Commands.startEnd(() -> arm.setIntakePercent(0.6), () -> arm.setIntakePercent(0.0), arm), Commands.startEnd( () -> arm.setIntakePercent(0.6)  , () -> arm.setIntakePercent(0.0), arm).until(() -> arm.getLineBreak()), () -> arm.getLineBreak()));
-        driver.rightTrigger().whileTrue(Commands.either(Commands.startEnd(() -> arm.setShooterMotorVelocity(30), () -> arm.setShooterMotorVelocity(0.0), arm), Commands.startEnd( () -> arm.setShooterMotorVelocity(60)  , () -> arm.setShooterMotorVelocity(0.0), arm), () -> arm.getArmPosition() >= 10));
-
-        driver.y().whileTrue(Commands.startEnd(() -> arm.setIntakePercent(-0.5), () -> arm.setIntakePercent(0), arm));
+        driver.rightBumper().whileTrue(Commands.either(
+            Commands.startEnd(
+                () -> arm.setIntakePercent(0.4),
+                () -> arm.setIntakePercent(0.0)),
+            Commands.startEnd(
+                () -> arm.setIntakePercent(0.4),
+                () -> arm.setIntakePercent(0.0))
+                .until(() -> arm.getLineBreak()),
+            () -> arm.getLineBreak()));
+        driver.rightTrigger().whileTrue(Commands.either(
+            Commands.startEnd(
+                () -> arm.setShooterMotorVelocity(45),
+                () -> arm.setShooterMotorVelocity(0.0)),
+            Commands.startEnd(
+                () -> arm.setShooterMotorVelocity(60),
+                () -> arm.setShooterMotorVelocity(0.0)),
+            () -> arm.getArmPosition() >= 10));
+        driver.y().whileTrue(Commands.startEnd(() -> arm.setIntakePercent(-0.4), () -> arm.setIntakePercent(0.0)));
 
         operator.leftTrigger().onTrue(Commands.sequence(
-          arm.moveArmPositionCommand(20.0),
+          arm.moveArmPositionCommand(19.0),
           arm.moveWristPositionCommand(-20.5)
         ));
         operator.y().onTrue(Commands.sequence(
@@ -86,9 +106,42 @@ public class RobotContainer {
         operator.rightBumper().onTrue(Commands.runOnce(() -> climber.climbExtend(), climber));
         operator.leftBumper().onTrue(Commands.runOnce(() -> climber.climbRetract(), climber));
 
+        armBottomTrigger.onTrue(Commands.runOnce(() -> arm.resetArmMotorPosition(0.0))
+            .ignoringDisable(true));
+        wristTopTrigger.onTrue(Commands.runOnce(() -> arm.resetWristMotorPosition(arm.getWristAbsPosition()))
+            .ignoringDisable(true));
+        lineBreakTrigger.onTrue(Commands.runOnce(() -> {
+            for (int i = 0; i < ledData.getLength(); i++) {
+                ledData.setRGB(i, 0, 128, 0);
+            }
+            leds.setData(ledData);
+        }).ignoringDisable(true));
+        lineBreakTrigger.onFalse(Commands.runOnce(() -> {
+            for (int i = 0; i < ledData.getLength(); i++) {
+                ledData.setRGB(i, 128, 0, 0);
+            }
+            leds.setData(ledData);
+        }).ignoringDisable(true));
 
-        armBottomTrigger.onTrue(Commands.runOnce(() -> arm.resetArmMotorPosition(0.0), arm).ignoringDisable(true));
-        wristTopTrigger.onTrue(Commands.runOnce(() -> arm.resetWristMotorPosition(arm.getWristAbsPosition()), arm).ignoringDisable(true));
+        NamedCommands.registerCommand("MoveWristToPickup", arm.moveWristPositionCommand(0.5));
+
+        NamedCommands.registerCommand("Shoot", Commands.sequence(
+            arm.spinWheelsCommand(60.0),
+            Commands.runOnce(() -> arm.setIntakePercent(0.4), arm),
+            Commands.waitSeconds(1.0),
+            Commands.runOnce(() -> {
+                arm.setIntakePercent(0.0);
+                arm.setShooterMotorVelocity(0.0);
+            }, arm)
+        ));
+
+        NamedCommands.registerCommand("Intake", Commands.startEnd(
+            () -> arm.setIntakePercent(0.4),
+            () -> arm.setIntakePercent(0.0),
+            arm
+        ).until(() -> arm.getLineBreak()));
+
+        NamedCommands.registerCommand("LiftWrist", arm.moveWristPositionCommand(4.5));
 
         if (Utils.isSimulation()) {
             drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
@@ -98,10 +151,18 @@ public class RobotContainer {
     }
 
     public RobotContainer() {
+        leds.setLength(ledData.getLength());
+        for (int i = 0; i < ledData.getLength(); i++) {
+            ledData.setRGB(i, 128, 0, 0);
+        }
+        leds.setData(ledData);
+        leds.start();
+
         configureBindings();
 
         // Build an auto chooser. This will use Commands.none() as the default option.
         autoChooser = AutoBuilder.buildAutoChooser();
+        shuffleboard.addAutoChooser(autoChooser);
     }
 
     public Command getAutonomousCommand() {

@@ -49,7 +49,9 @@ public class Arm extends SubsystemBase {
     private final double encoderOffset = 17.5;
 
     private final MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
+    private final MotorOutputConfigs armMotorConfigs = new MotorOutputConfigs();
     private final MotorOutputConfigs motorConfigsReversed = new MotorOutputConfigs();
+    private final MotorOutputConfigs armMotorConfigsReversed = new MotorOutputConfigs();
 
     private final MagnetSensorConfigs encoderConfigs = new MagnetSensorConfigs();
 
@@ -85,6 +87,7 @@ public class Arm extends SubsystemBase {
     private final GenericEntry shooterRPMOverrideValue;
 
     private final Orchestra music = new Orchestra();
+
     public Arm() {
         // PID for Wrist
         wristPID.kP = 1.1;
@@ -92,7 +95,7 @@ public class Arm extends SubsystemBase {
         wristPID.kD = 0.05;
 
         // PID for arm
-        armPID.kP = 1.0;
+        armPID.kP = 1.5;
         armPID.kI = 0.0;
         armPID.kD = 0.1;
 
@@ -116,13 +119,20 @@ public class Arm extends SubsystemBase {
         armEncoder.getConfigurator().apply(encoderConfigs);
 
         motorConfigs.NeutralMode = NeutralModeValue.Coast;
+        armMotorConfigs.NeutralMode = NeutralModeValue.Coast;
         motorConfigsReversed.NeutralMode = NeutralModeValue.Coast;
+        armMotorConfigsReversed.NeutralMode = NeutralModeValue.Coast;
         motorConfigsReversed.Inverted = InvertedValue.Clockwise_Positive;
+        armMotorConfigsReversed.Inverted = InvertedValue.Clockwise_Positive;
+        armMotorConfigs.PeakForwardDutyCycle = 0.5;
+        armMotorConfigs.PeakReverseDutyCycle = -0.5;
+        armMotorConfigsReversed.PeakForwardDutyCycle = 0.5;
+        armMotorConfigsReversed.PeakReverseDutyCycle = -0.5;
 
-        armMotor.getConfigurator().apply(motorConfigs);
-        armMotorFollow.getConfigurator().apply(motorConfigs);
-        armMotorFollowReverseFront.getConfigurator().apply(motorConfigsReversed);
-        armMotorFollowReverseBack.getConfigurator().apply(motorConfigsReversed);
+        armMotor.getConfigurator().apply(armMotorConfigs);
+        armMotorFollow.getConfigurator().apply(armMotorConfigs);
+        armMotorFollowReverseFront.getConfigurator().apply(armMotorConfigsReversed);
+        armMotorFollowReverseBack.getConfigurator().apply(armMotorConfigsReversed);
         wristMotor.getConfigurator().apply(motorConfigsReversed);
         wristMotorFollow.getConfigurator().apply(motorConfigsReversed);
         shooterMotor.getConfigurator().apply(motorConfigs);
@@ -179,9 +189,9 @@ public class Arm extends SubsystemBase {
             .withPosition(6, 0)
             .withSize(2, 1)
             .getEntry();
-        shooterRPMOverrideValue = armTab.add("New Shooter RPM", 0.0)
+        shooterRPMOverrideValue = armTab.add("New Shooter RPS", 0.0)
             .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", 0.0, "max", 500.0, "block increment", 10.0))
+            .withProperties(Map.of("min", 0.0, "max", 100.0, "block increment", 10.0))
             .withPosition(6, 1)
             .withSize(2, 1)
             .getEntry();
@@ -275,16 +285,22 @@ public class Arm extends SubsystemBase {
         setShooterMotorVelocity(motorVelocity);
     }
 
-    public void setMotorBrake() { 
+    public void setMotorBrake() {
         motorConfigs.NeutralMode = NeutralModeValue.Brake;
+        armMotorConfigs.NeutralMode = NeutralModeValue.Brake;
         motorConfigsReversed.NeutralMode = NeutralModeValue.Brake;
+        armMotorConfigsReversed.NeutralMode = NeutralModeValue.Brake;
         motorConfigsReversed.Inverted = InvertedValue.Clockwise_Positive;
+        armMotorConfigsReversed.Inverted = InvertedValue.Clockwise_Positive;
+        armMotorConfigs.PeakForwardDutyCycle = 0.5;
+        armMotorConfigs.PeakReverseDutyCycle = -0.5;
+        armMotorConfigsReversed.PeakForwardDutyCycle = 0.5;
+        armMotorConfigsReversed.PeakReverseDutyCycle = -0.5;
 
-        armMotor.getConfigurator().apply(motorConfigs);
-        armMotorFollow.getConfigurator().apply(motorConfigs);
-        armMotorFollowReverseFront.getConfigurator().apply(motorConfigsReversed);
-        armMotorFollowReverseBack.getConfigurator().apply(motorConfigsReversed);
-
+        armMotor.getConfigurator().apply(armMotorConfigs);
+        armMotorFollow.getConfigurator().apply(armMotorConfigs);
+        armMotorFollowReverseFront.getConfigurator().apply(armMotorConfigsReversed);
+        armMotorFollowReverseBack.getConfigurator().apply(armMotorConfigsReversed);
         wristMotor.getConfigurator().apply(motorConfigsReversed);
         wristMotorFollow.getConfigurator().apply(motorConfigsReversed);
         shooterMotor.getConfigurator().apply(motorConfigs);
@@ -293,14 +309,20 @@ public class Arm extends SubsystemBase {
 
     public void setMotorCoast() {
         motorConfigs.NeutralMode = NeutralModeValue.Coast;
+        armMotorConfigs.NeutralMode = NeutralModeValue.Coast;
         motorConfigsReversed.NeutralMode = NeutralModeValue.Coast;
+        armMotorConfigsReversed.NeutralMode = NeutralModeValue.Coast;
         motorConfigsReversed.Inverted = InvertedValue.Clockwise_Positive;
+        armMotorConfigsReversed.Inverted = InvertedValue.Clockwise_Positive;
+        armMotorConfigs.PeakForwardDutyCycle = 0.5;
+        armMotorConfigs.PeakReverseDutyCycle = -0.5;
+        armMotorConfigsReversed.PeakForwardDutyCycle = 0.5;
+        armMotorConfigsReversed.PeakReverseDutyCycle = -0.5;
 
-        armMotor.getConfigurator().apply(motorConfigs);
-        armMotorFollow.getConfigurator().apply(motorConfigs);
-        armMotorFollowReverseFront.getConfigurator().apply(motorConfigsReversed);
-        armMotorFollowReverseBack.getConfigurator().apply(motorConfigsReversed);
-
+        armMotor.getConfigurator().apply(armMotorConfigs);
+        armMotorFollow.getConfigurator().apply(armMotorConfigs);
+        armMotorFollowReverseFront.getConfigurator().apply(armMotorConfigsReversed);
+        armMotorFollowReverseBack.getConfigurator().apply(armMotorConfigsReversed);
         wristMotor.getConfigurator().apply(motorConfigsReversed);
         wristMotorFollow.getConfigurator().apply(motorConfigsReversed);
         shooterMotor.getConfigurator().apply(motorConfigs);
@@ -312,8 +334,7 @@ public class Arm extends SubsystemBase {
         return this.run(() -> this.setArmPosition(position))
             .until(() -> {
                 double positionDiff = Math.abs(this.getArmPosition() - position);
-                System.out.println(String.format("Position diff: %f", positionDiff));
-                return positionDiff < 0.5;
+                return positionDiff < 5.0;
             });
     }
 
@@ -322,8 +343,15 @@ public class Arm extends SubsystemBase {
         return this.run(() -> this.setWristPosition(position))
             .until(() -> {
                 double positionDiff = Math.abs(this.getWristPosition() - position);
-                System.out.println(String.format("Position diff: %f", positionDiff));
-                return positionDiff < 0.5;
+                return positionDiff < 5.0;
+            });
+    }
+
+    public Command spinWheelsCommand(double velocity) {
+        return this.run(() -> this.setShooterMotorVelocity(velocity))
+            .until(() -> {
+                double speedDiff = Math.abs(this.getShooterMotorVelocity() - velocity);
+                return speedDiff < 1.0;
             });
     }
 
@@ -354,7 +382,7 @@ public class Arm extends SubsystemBase {
         BaseStatusSignal.refreshAll(armPosition, wristAbsPosition, wristPosition, shooterVelocity, armFLVoltage, armFRVoltage,
             armBLVoltage, armBRVoltage, wristTopVoltage, wristBottomVoltage);   
 
-            this.resetWristMotorPosition(this.getWristAbsPosition());
+        this.resetWristMotorPosition(this.getWristAbsPosition());
 
         if (armPositionOverride.getBoolean(false)) {
             armMotorFollow.setControl(new StrictFollower(armMotor.getDeviceID())); // Back right follows Front right
@@ -375,8 +403,6 @@ public class Arm extends SubsystemBase {
         if (shooterRPMOverride.getBoolean(false)) {
             double shooterRPM = shooterRPMOverrideValue.getDouble(0.0);
             shooterMotor.setControl(motorVelocityRequest.withVelocity(shooterRPM));
-            
         }
-
     }
 }
