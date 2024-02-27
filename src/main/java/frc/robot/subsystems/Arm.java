@@ -2,6 +2,11 @@ package frc.robot.subsystems;
 
 import java.util.Map;
 
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonUtils;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.StatusSignal;
@@ -19,6 +24,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -86,9 +92,20 @@ public class Arm extends SubsystemBase {
     private final GenericEntry shooterRPMOverride;
     private final GenericEntry shooterRPMOverrideValue;
 
+    private PhotonCamera aprilTag;
+    private boolean hasAprilTag;
+    private int aprilTagId;
+    private double aprilTagAngle;
+    private double transformX;
+    private double transformY;
+    private double transformZ;
+    private double aprilTagDistance;
+
     private final Orchestra music = new Orchestra();
 
-    public Arm() {
+    public Arm(PhotonCamera aprilTag) {
+        this.aprilTag = aprilTag;
+
         // PID for Wrist
         wristPID.kP = 1.1;
         wristPID.kI = 0.0;
@@ -133,8 +150,8 @@ public class Arm extends SubsystemBase {
         armMotorFollow.getConfigurator().apply(armMotorConfigs);
         armMotorFollowReverseFront.getConfigurator().apply(armMotorConfigsReversed);
         armMotorFollowReverseBack.getConfigurator().apply(armMotorConfigsReversed);
-        wristMotor.getConfigurator().apply(motorConfigsReversed);
-        wristMotorFollow.getConfigurator().apply(motorConfigsReversed);
+        wristMotor.getConfigurator().apply(armMotorConfigsReversed);
+        wristMotorFollow.getConfigurator().apply(armMotorConfigsReversed);
         shooterMotor.getConfigurator().apply(motorConfigs);
         intakeMotor.getConfigurator().apply(motorConfigsReversed);
 
@@ -248,6 +265,34 @@ public class Arm extends SubsystemBase {
         return armBottomLimit.get();
     }
 
+    public boolean hasAprilTag() {
+        return this.hasAprilTag;
+    }
+
+    public int aprilTagId() {
+        return this.aprilTagId;
+    }
+
+    public double aprilTagAngle() {
+        return this.aprilTagAngle;
+    }
+
+    public double aprilTagTransformX() {
+        return this.transformX;
+    }
+
+    public double aprilTagTransformY() {
+        return this.transformY;
+    }
+
+    public double aprilTagTransformZ() {
+        return this.transformZ;
+    }
+
+    public double aprilTagDistance() {
+        return this.aprilTagDistance;
+    }
+
     public void setArmPosition(double position) {
         armMotorFollow.setControl(new StrictFollower(armMotor.getDeviceID())); // Back right follows Front right
         armMotorFollowReverseFront.setControl(new StrictFollower(armMotor.getDeviceID())); // Front left follows and opposes Front Right
@@ -301,8 +346,8 @@ public class Arm extends SubsystemBase {
         armMotorFollow.getConfigurator().apply(armMotorConfigs);
         armMotorFollowReverseFront.getConfigurator().apply(armMotorConfigsReversed);
         armMotorFollowReverseBack.getConfigurator().apply(armMotorConfigsReversed);
-        wristMotor.getConfigurator().apply(motorConfigsReversed);
-        wristMotorFollow.getConfigurator().apply(motorConfigsReversed);
+        wristMotor.getConfigurator().apply(armMotorConfigsReversed);
+        wristMotorFollow.getConfigurator().apply(armMotorConfigsReversed);
         shooterMotor.getConfigurator().apply(motorConfigs);
         intakeMotor.getConfigurator().apply(motorConfigsReversed);
     }
@@ -323,8 +368,8 @@ public class Arm extends SubsystemBase {
         armMotorFollow.getConfigurator().apply(armMotorConfigs);
         armMotorFollowReverseFront.getConfigurator().apply(armMotorConfigsReversed);
         armMotorFollowReverseBack.getConfigurator().apply(armMotorConfigsReversed);
-        wristMotor.getConfigurator().apply(motorConfigsReversed);
-        wristMotorFollow.getConfigurator().apply(motorConfigsReversed);
+        wristMotor.getConfigurator().apply(armMotorConfigsReversed);
+        wristMotorFollow.getConfigurator().apply(armMotorConfigsReversed);
         shooterMotor.getConfigurator().apply(motorConfigs);
         intakeMotor.getConfigurator().apply(motorConfigsReversed);
     }
@@ -334,7 +379,7 @@ public class Arm extends SubsystemBase {
         return this.run(() -> this.setArmPosition(position))
             .until(() -> {
                 double positionDiff = Math.abs(this.getArmPosition() - position);
-                return positionDiff < 5.0;
+                return positionDiff < 8.0;
             });
     }
 
@@ -343,7 +388,7 @@ public class Arm extends SubsystemBase {
         return this.run(() -> this.setWristPosition(position))
             .until(() -> {
                 double positionDiff = Math.abs(this.getWristPosition() - position);
-                return positionDiff < 5.0;
+                return positionDiff < 8.0;
             });
     }
 
@@ -383,6 +428,30 @@ public class Arm extends SubsystemBase {
             armBLVoltage, armBRVoltage, wristTopVoltage, wristBottomVoltage);   
 
         this.resetWristMotorPosition(this.getWristAbsPosition());
+
+        PhotonPipelineResult result = aprilTag.getLatestResult();
+        this.hasAprilTag = result.hasTargets();
+        if (this.hasAprilTag) {
+            PhotonTrackedTarget target = result.getBestTarget();
+            this.aprilTagId = target.getFiducialId();
+            this.aprilTagAngle = target.getYaw();
+            Transform3d transform = target.getBestCameraToTarget();
+            this.transformX = transform.getX();
+            this.transformY = transform.getY();
+            this.transformZ = transform.getZ();
+            this.aprilTagDistance = PhotonUtils.calculateDistanceToTargetMeters(
+                Units.inchesToMeters(34.375), 
+                Units.degreesToRadians(0.0), 
+                Units.inchesToMeters(57.375),
+                Units.degreesToRadians(target.getPitch()));
+        } else {
+            this.aprilTagId = -1;
+            this.transformX = 0.0;
+            this.transformY = 0.0;
+            this.transformZ = 0.0;
+            this.aprilTagDistance = 0.0;
+            this.aprilTagAngle = 0.0;
+        }
 
         if (armPositionOverride.getBoolean(false)) {
             armMotorFollow.setControl(new StrictFollower(armMotor.getDeviceID())); // Back right follows Front right

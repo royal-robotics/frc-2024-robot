@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import org.photonvision.PhotonCamera;
+
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -34,7 +36,8 @@ public class RobotContainer {
     private final CommandXboxController operator  = new CommandXboxController(1); // My joystick for Operator
     private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
 
-    private final Arm arm = new Arm(); // Arm subsystem
+    private final PhotonCamera aprilTag = new PhotonCamera("AprilTag");
+    private final Arm arm = new Arm(aprilTag); // Arm subsystem
     private final Climber climber = new Climber(); // Climber subsystem
     private final OurShuffleboard shuffleboard = new OurShuffleboard(drivetrain, arm);
     private final AddressableLED leds = new AddressableLED(0);
@@ -74,32 +77,40 @@ public class RobotContainer {
         ));
         driver.rightBumper().whileTrue(Commands.either(
             Commands.startEnd(
-                () -> arm.setIntakePercent(0.4),
+                () -> arm.setIntakePercent(0.6),
                 () -> arm.setIntakePercent(0.0)),
             Commands.startEnd(
-                () -> arm.setIntakePercent(0.4),
+                () -> arm.setIntakePercent(0.5),
                 () -> arm.setIntakePercent(0.0))
                 .until(() -> arm.getLineBreak()),
             () -> arm.getLineBreak()));
         driver.rightTrigger().whileTrue(Commands.either(
             Commands.startEnd(
-                () -> arm.setShooterMotorVelocity(60),
+                () -> arm.setShooterMotorVelocity(45.0),
                 () -> arm.setShooterMotorVelocity(0.0)),
             Commands.startEnd(
-                () -> arm.setShooterMotorVelocity(75),
+                () -> arm.setShooterMotorVelocity(75.0),
                 () -> arm.setShooterMotorVelocity(0.0)),
             () -> arm.getArmPosition() >= 10));
-        driver.y().whileTrue(Commands.startEnd(() -> arm.setIntakePercent(-0.4), () -> arm.setIntakePercent(0.0)));
+        driver.y().whileTrue(Commands.startEnd(() -> arm.setIntakePercent(-0.6), () -> arm.setIntakePercent(0.0)));
+        driver.a().onTrue(Commands.sequence(
+          Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
+          arm.moveArmPositionCommand(19.0),
+          arm.moveWristPositionCommand(-1.0)
+        ));
 
         operator.leftTrigger().onTrue(Commands.sequence(
+          Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
           arm.moveArmPositionCommand(19.0),
           arm.moveWristPositionCommand(-20.5)
         ));
         operator.y().onTrue(Commands.sequence(
           arm.moveArmPositionCommand(30.25),
-          arm.moveWristPositionCommand(-1.0)
+          arm.moveWristPositionCommand(-1.0),
+          arm.spinWheelsCommand(45.0)
         ));
         operator.rightTrigger().onTrue(Commands.sequence(
+          Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
           arm.moveWristPositionCommand(0.5),
           arm.moveArmPositionCommand(0.0)
         ));
@@ -127,7 +138,7 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("Shoot", Commands.sequence(
             arm.spinWheelsCommand(90.0),
-            Commands.runOnce(() -> arm.setIntakePercent(0.4), arm),
+            Commands.runOnce(() -> arm.setIntakePercent(0.6), arm),
             Commands.waitSeconds(1.0),
             Commands.runOnce(() -> {
                 arm.setIntakePercent(0.0);
@@ -136,13 +147,13 @@ public class RobotContainer {
         ));
 
         NamedCommands.registerCommand("Intake", Commands.startEnd(
-            () -> arm.setIntakePercent(0.4),
+            () -> arm.setIntakePercent(0.5),
             () -> arm.setIntakePercent(0.0),
             arm
         ).until(() -> arm.getLineBreak()));
 
-        NamedCommands.registerCommand("LiftWrist", arm.moveWristPositionCommand(4.6));
-        NamedCommands.registerCommand("LiftWrist2", arm.moveWristPositionCommand(3.5));
+        NamedCommands.registerCommand("LiftWrist4.6", arm.moveWristPositionCommand(4.6));
+        NamedCommands.registerCommand("LiftWrist3.5", arm.moveWristPositionCommand(3.5));
 
         if (Utils.isSimulation()) {
             drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
