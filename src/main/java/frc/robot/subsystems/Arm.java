@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.photonvision.PhotonCamera;
@@ -10,6 +12,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -59,6 +62,10 @@ public class Arm extends SubsystemBase {
     private final MotorOutputConfigs motorConfigsReversed = new MotorOutputConfigs();
     private final MotorOutputConfigs armMotorConfigsReversed = new MotorOutputConfigs();
 
+    private final CurrentLimitsConfigs currentLimit = new CurrentLimitsConfigs()
+        .withStatorCurrentLimitEnable(true)
+        .withStatorCurrentLimit(30.0);
+
     private final MagnetSensorConfigs encoderConfigs = new MagnetSensorConfigs();
 
     private final DutyCycleOut motorOutputRequest = new DutyCycleOut(0.0);
@@ -94,12 +101,7 @@ public class Arm extends SubsystemBase {
 
     private PhotonCamera aprilTag;
     private boolean hasAprilTag;
-    private int aprilTagId;
-    private double aprilTagAngle;
-    private double transformX;
-    private double transformY;
-    private double transformZ;
-    private double aprilTagDistance;
+    private List<PhotonTrackedTarget> aprilTags;
 
     private final Orchestra music = new Orchestra();
 
@@ -134,6 +136,15 @@ public class Arm extends SubsystemBase {
         encoderConfigs.SensorDirection = SensorDirectionValue.Clockwise_Positive;
 
         armEncoder.getConfigurator().apply(encoderConfigs);
+
+        armMotor.getConfigurator().apply(currentLimit);
+        armMotorFollow.getConfigurator().apply(currentLimit);
+        armMotorFollowReverseFront.getConfigurator().apply(currentLimit);
+        armMotorFollowReverseBack.getConfigurator().apply(currentLimit);
+        wristMotor.getConfigurator().apply(currentLimit);
+        wristMotorFollow.getConfigurator().apply(currentLimit);
+        shooterMotor.getConfigurator().apply(currentLimit);
+        intakeMotor.getConfigurator().apply(currentLimit);
 
         motorConfigs.NeutralMode = NeutralModeValue.Coast;
         armMotorConfigs.NeutralMode = NeutralModeValue.Coast;
@@ -268,29 +279,9 @@ public class Arm extends SubsystemBase {
     public boolean hasAprilTag() {
         return this.hasAprilTag;
     }
-
-    public int aprilTagId() {
-        return this.aprilTagId;
-    }
-
-    public double aprilTagAngle() {
-        return this.aprilTagAngle;
-    }
-
-    public double aprilTagTransformX() {
-        return this.transformX;
-    }
-
-    public double aprilTagTransformY() {
-        return this.transformY;
-    }
-
-    public double aprilTagTransformZ() {
-        return this.transformZ;
-    }
-
-    public double aprilTagDistance() {
-        return this.aprilTagDistance;
+    
+    public List<PhotonTrackedTarget> getAprilTags() {
+        return this.aprilTags;
     }
 
     public void setArmPosition(double position) {
@@ -432,25 +423,9 @@ public class Arm extends SubsystemBase {
         PhotonPipelineResult result = aprilTag.getLatestResult();
         this.hasAprilTag = result.hasTargets();
         if (this.hasAprilTag) {
-            PhotonTrackedTarget target = result.getBestTarget();
-            this.aprilTagId = target.getFiducialId();
-            this.aprilTagAngle = target.getYaw();
-            Transform3d transform = target.getBestCameraToTarget();
-            this.transformX = transform.getX();
-            this.transformY = transform.getY();
-            this.transformZ = transform.getZ();
-            this.aprilTagDistance = PhotonUtils.calculateDistanceToTargetMeters(
-                Units.inchesToMeters(34.375), 
-                Units.degreesToRadians(0.0), 
-                Units.inchesToMeters(57.375),
-                Units.degreesToRadians(target.getPitch()));
+            this.aprilTags = result.getTargets();
         } else {
-            this.aprilTagId = -1;
-            this.transformX = 0.0;
-            this.transformY = 0.0;
-            this.transformZ = 0.0;
-            this.aprilTagDistance = 0.0;
-            this.aprilTagAngle = 0.0;
+            this.aprilTags = new ArrayList<PhotonTrackedTarget>();
         }
 
         if (armPositionOverride.getBoolean(false)) {

@@ -1,10 +1,14 @@
 package frc.robot;
 
+import java.util.List;
 import java.util.Map;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -37,12 +41,22 @@ public class OurShuffleboard {
 
         ShuffleboardTab aprilTagTab = Shuffleboard.getTab("AprilTag");
         aprilTagTab.addBoolean("Has Targets", () -> arm.hasAprilTag()).withPosition(0, 0);
-        aprilTagTab.addInteger("April Tag ID", () -> arm.aprilTagId()).withPosition(1, 0);
-        aprilTagTab.addDouble("Angle", () -> arm.aprilTagAngle()).withPosition(2, 0);
-        aprilTagTab.addDouble("Transform X", () -> arm.aprilTagTransformX()).withPosition(0, 1);
-        aprilTagTab.addDouble("Transform Y", () -> arm.aprilTagTransformY()).withPosition(1, 1);
-        aprilTagTab.addDouble("Transform Z", () -> arm.aprilTagTransformZ()).withPosition(2, 1);
-        aprilTagTab.addDouble("April Tag Distance", () -> arm.aprilTagDistance()).withPosition(0, 2);
+        aprilTagTab.addDouble("First Target Distance", () -> {
+            double distance = 0.0;
+            List<PhotonTrackedTarget> targets = arm.getAprilTags();
+            for (PhotonTrackedTarget target : targets) {
+                int id = target.getFiducialId();
+                if (id == 4 || id == 7) {
+                    distance = PhotonUtils.calculateDistanceToTargetMeters(
+                        Units.inchesToMeters(32.0), 
+                        Units.inchesToMeters(57.375), 
+                        Units.degreesToRadians(35.0), 
+                        Units.degreesToRadians(targets.get(0).getPitch()))
+                        * 2 - 1; // Distance off
+                }
+            }
+            return distance;
+        }).withPosition(1, 0);
     }
 
     public void addAutoChooser(SendableChooser<Command> autoChooser){

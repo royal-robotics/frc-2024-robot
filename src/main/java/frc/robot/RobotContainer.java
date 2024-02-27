@@ -4,7 +4,11 @@
 
 package frc.robot;
 
+import java.util.List;
+
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonUtils;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
@@ -15,6 +19,8 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -55,6 +61,9 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
+    private boolean trackingTag = false;
+    private double angleFromTag = 0.0;
+
     private void configureBindings() {
         drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() -> drive
@@ -84,19 +93,131 @@ public class RobotContainer {
                 () -> arm.setIntakePercent(0.0))
                 .until(() -> arm.getLineBreak()),
             () -> arm.getLineBreak()));
-        driver.rightTrigger().whileTrue(Commands.either(
+        /*driver.rightTrigger().whileTrue(Commands.either(
             Commands.startEnd(
                 () -> arm.setShooterMotorVelocity(45.0),
                 () -> arm.setShooterMotorVelocity(0.0)),
             Commands.startEnd(
                 () -> arm.setShooterMotorVelocity(75.0),
                 () -> arm.setShooterMotorVelocity(0.0)),
-            () -> arm.getArmPosition() >= 10));
+            () -> arm.getArmPosition() >= 10));*/
+        driver.rightTrigger().onTrue(Commands.sequence(
+            arm.spinWheelsCommand(70.0),
+            Commands.runOnce(() -> arm.setIntakePercent(0.5)),
+            Commands.waitSeconds(0.5),
+            Commands.runOnce(() -> {
+                arm.setIntakePercent(0.0);
+                arm.setShooterMotorVelocity(0.0);
+            })
+        ));
         driver.y().whileTrue(Commands.startEnd(() -> arm.setIntakePercent(-0.6), () -> arm.setIntakePercent(0.0)));
         driver.a().onTrue(Commands.sequence(
-          Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
+          Commands.runOnce(() -> arm.setShooterMotorVelocity(52)),
           arm.moveArmPositionCommand(19.0),
-          arm.moveWristPositionCommand(-1.0)
+          arm.moveWristPositionCommand(-8.55),
+            drivetrain.applyRequest(() -> {
+                if (arm.hasAprilTag()) {
+                    double angleToDrive = 0.0;
+                    List<PhotonTrackedTarget> targets = arm.getAprilTags();
+                    for (PhotonTrackedTarget target : targets) {
+                        int id = target.getFiducialId();
+                        if (id == 4 || id == 7) {
+                            for (int i = 0; i < ledData.getLength(); i++) {
+                                ledData.setRGB(i, 0, 128, 0);
+                            }
+                            leds.setData(ledData);
+                            this.trackingTag = true;
+                            this.angleFromTag = target.getYaw() - 5.0;
+                            angleToDrive = -Units.degreesToRadians(this.angleFromTag) * MaxAngularRate * 1.2;
+                            break;
+                        } else {
+                            for (int i = 0; i < ledData.getLength(); i++) {
+                                ledData.setRGB(i, 128, 128, 0);
+                            }
+                            leds.setData(ledData);
+                            this.trackingTag = false;
+                            this.angleFromTag = 0.0;
+                            angleToDrive = Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate;
+                        }
+                    }
+                    System.out.println(angleToDrive);
+                    return drive
+                        .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed) // Drive forward with negative Y (forward)
+                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed) // Drive left with negative X (left)
+                        .withRotationalRate(angleToDrive); // Drive counterclockwise with negative X (left)
+                } else {
+                    for (int i = 0; i < ledData.getLength(); i++) {
+                        ledData.setRGB(i, 0, 0, 128);
+                    }
+                    leds.setData(ledData);
+                    return drive
+                        .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed) // Drive forward with negative Y (forward)
+                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed) // Drive left with negative X (left)
+                        .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate); // Drive counterclockwise with negative X (left)
+                }
+            }
+            /*Commands.run(() -> {
+                if (arm.hasAprilTag()) {
+                    List<PhotonTrackedTarget> targets = arm.getAprilTags();
+                    for (PhotonTrackedTarget target : targets) {
+                        int id = target.getFiducialId();
+                        if (id == 4 || id == 7) {
+                            double distance = PhotonUtils.calculateDistanceToTargetMeters(
+                                Units.inchesToMeters(32.0), 
+                                Units.inchesToMeters(57.375), 
+                                Units.degreesToRadians(35.0), 
+                                Units.degreesToRadians(target.getPitch()))
+                                * 2 - 1; // Distance off
+                            arm.setWristPosition(1.7 * distance - 14.35); // Regression
+                        }
+                        break;
+                    }
+                }
+            })*/
+          ),
+          /*Commands.run(() -> {
+            if (arm.hasAprilTag()) {
+                double angleSpeed = 0.0;
+                List<PhotonTrackedTarget> targets = arm.getAprilTags();
+                for (PhotonTrackedTarget target : targets) {
+                    int id = target.getFiducialId();
+                    if (id == 4 || id == 7) { 
+                        for (int i = 0; i < ledData.getLength(); i++) {
+                            ledData.setRGB(i, 0, 128, 0);
+                        }
+                        leds.setData(ledData);
+                        this.trackingTag = true;
+                        this.angleFromTag = target.getYaw();
+                        angleSpeed = angleFromTag;
+                    } else {
+                        for (int i = 0; i < ledData.getLength(); i++) {
+                            ledData.setRGB(i, 128, 128, 0);
+                        }
+                        leds.setData(ledData);
+                        this.trackingTag = false;
+                        this.angleFromTag = 0.0;
+                        angleSpeed = Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate;
+                    }
+                }
+                System.out.println(angleSpeed);
+            } else {
+                for (int i = 0; i < ledData.getLength(); i++) {
+                    ledData.setRGB(i, 0, 0, 128);
+                }
+                leds.setData(ledData);
+            }
+            drivetrain.setChassisSpeeds(new ChassisSpeeds(
+                Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed,
+                Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed,
+                Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate
+            ));
+          }, drivetrain).withTimeout(30.0),*/
+          Commands.runOnce(() -> {
+                for (int i = 0; i < ledData.getLength(); i++) {
+                    ledData.setRGB(i, 128, 0, 0);
+                }
+                leds.setData(ledData);
+          })
         ));
 
         operator.leftTrigger().onTrue(Commands.sequence(
