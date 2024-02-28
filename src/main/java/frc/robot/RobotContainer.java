@@ -89,32 +89,31 @@ public class RobotContainer {
                 () -> arm.setIntakePercent(0.6),
                 () -> arm.setIntakePercent(0.0)),
             Commands.startEnd(
-                () -> arm.setIntakePercent(0.5),
+                () -> arm.setIntakePercent(0.6),
                 () -> arm.setIntakePercent(0.0))
                 .until(() -> arm.getLineBreak()),
             () -> arm.getLineBreak()));
-        /*driver.rightTrigger().whileTrue(Commands.either(
-            Commands.startEnd(
-                () -> arm.setShooterMotorVelocity(45.0),
-                () -> arm.setShooterMotorVelocity(0.0)),
-            Commands.startEnd(
-                () -> arm.setShooterMotorVelocity(75.0),
-                () -> arm.setShooterMotorVelocity(0.0)),
-            () -> arm.getArmPosition() >= 10));*/
         driver.rightTrigger().onTrue(Commands.sequence(
-            arm.spinWheelsCommand(70.0),
-            Commands.runOnce(() -> arm.setIntakePercent(0.5)),
+            arm.spinWheelsCommand(65.0),
+            Commands.runOnce(() -> arm.setIntakePercent(0.6)),
             Commands.waitSeconds(0.5),
             Commands.runOnce(() -> {
                 arm.setIntakePercent(0.0);
                 arm.setShooterMotorVelocity(0.0);
             })
         ));
-        driver.y().whileTrue(Commands.startEnd(() -> arm.setIntakePercent(-0.6), () -> arm.setIntakePercent(0.0)));
+        //driver.y().whileTrue(Commands.startEnd(() -> arm.setIntakePercent(-0.6), () -> arm.setIntakePercent(0.0)));
+        driver.y().onTrue(Commands.sequence(
+           Commands.runOnce(() -> arm.setIntakePercent(-0.3)),
+           Commands.waitSeconds(0.12),
+           Commands.runOnce(() -> arm.setIntakePercent(0.3)),
+           Commands.waitSeconds(0.10),
+           Commands.runOnce(() -> arm.setIntakePercent(0.0))
+        ));
         driver.a().onTrue(Commands.sequence(
-          Commands.runOnce(() -> arm.setShooterMotorVelocity(52)),
-          arm.moveArmPositionCommand(19.0),
-          arm.moveWristPositionCommand(-8.55),
+            Commands.runOnce(() -> arm.setShooterMotorVelocity(55.0)),
+            arm.moveArmPositionCommand(19.0),
+            arm.moveWristPositionCommand(-8.8),
             drivetrain.applyRequest(() -> {
                 if (arm.hasAprilTag()) {
                     double angleToDrive = 0.0;
@@ -127,7 +126,11 @@ public class RobotContainer {
                             }
                             leds.setData(ledData);
                             this.trackingTag = true;
-                            this.angleFromTag = target.getYaw() - 5.0;
+                            if (id == 4) {
+                                this.angleFromTag = target.getYaw() + 3.0;
+                            } else {
+                                this.angleFromTag = target.getYaw() - 3.0;
+                            }
                             angleToDrive = -Units.degreesToRadians(this.angleFromTag) * MaxAngularRate * 1.2;
                             break;
                         } else {
@@ -140,84 +143,27 @@ public class RobotContainer {
                             angleToDrive = Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate;
                         }
                     }
-                    System.out.println(angleToDrive);
                     return drive
-                        .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed) // Drive forward with negative Y (forward)
-                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed) // Drive left with negative X (left)
-                        .withRotationalRate(angleToDrive); // Drive counterclockwise with negative X (left)
+                        .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
+                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
+                        .withRotationalRate(angleToDrive);
                 } else {
                     for (int i = 0; i < ledData.getLength(); i++) {
                         ledData.setRGB(i, 0, 0, 128);
                     }
                     leds.setData(ledData);
                     return drive
-                        .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed) // Drive forward with negative Y (forward)
-                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed) // Drive left with negative X (left)
-                        .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate); // Drive counterclockwise with negative X (left)
+                        .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
+                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
+                        .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate);
                 }
-            }
-            /*Commands.run(() -> {
-                if (arm.hasAprilTag()) {
-                    List<PhotonTrackedTarget> targets = arm.getAprilTags();
-                    for (PhotonTrackedTarget target : targets) {
-                        int id = target.getFiducialId();
-                        if (id == 4 || id == 7) {
-                            double distance = PhotonUtils.calculateDistanceToTargetMeters(
-                                Units.inchesToMeters(32.0), 
-                                Units.inchesToMeters(57.375), 
-                                Units.degreesToRadians(35.0), 
-                                Units.degreesToRadians(target.getPitch()))
-                                * 2 - 1; // Distance off
-                            arm.setWristPosition(1.7 * distance - 14.35); // Regression
-                        }
-                        break;
-                    }
-                }
-            })*/
-          ),
-          /*Commands.run(() -> {
-            if (arm.hasAprilTag()) {
-                double angleSpeed = 0.0;
-                List<PhotonTrackedTarget> targets = arm.getAprilTags();
-                for (PhotonTrackedTarget target : targets) {
-                    int id = target.getFiducialId();
-                    if (id == 4 || id == 7) { 
-                        for (int i = 0; i < ledData.getLength(); i++) {
-                            ledData.setRGB(i, 0, 128, 0);
-                        }
-                        leds.setData(ledData);
-                        this.trackingTag = true;
-                        this.angleFromTag = target.getYaw();
-                        angleSpeed = angleFromTag;
-                    } else {
-                        for (int i = 0; i < ledData.getLength(); i++) {
-                            ledData.setRGB(i, 128, 128, 0);
-                        }
-                        leds.setData(ledData);
-                        this.trackingTag = false;
-                        this.angleFromTag = 0.0;
-                        angleSpeed = Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate;
-                    }
-                }
-                System.out.println(angleSpeed);
-            } else {
-                for (int i = 0; i < ledData.getLength(); i++) {
-                    ledData.setRGB(i, 0, 0, 128);
-                }
-                leds.setData(ledData);
-            }
-            drivetrain.setChassisSpeeds(new ChassisSpeeds(
-                Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed,
-                Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed,
-                Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate
-            ));
-          }, drivetrain).withTimeout(30.0),*/
-          Commands.runOnce(() -> {
+            }).until(() -> this.angleFromTag > 0.0 && this.angleFromTag < 0.5),
+            Commands.runOnce(() -> {
                 for (int i = 0; i < ledData.getLength(); i++) {
                     ledData.setRGB(i, 128, 0, 0);
                 }
                 leds.setData(ledData);
-          })
+            })
         ));
 
         operator.leftTrigger().onTrue(Commands.sequence(
@@ -268,7 +214,7 @@ public class RobotContainer {
         ));
 
         NamedCommands.registerCommand("Intake", Commands.startEnd(
-            () -> arm.setIntakePercent(0.5),
+            () -> arm.setIntakePercent(0.6),
             () -> arm.setIntakePercent(0.0),
             arm
         ).until(() -> arm.getLineBreak()));

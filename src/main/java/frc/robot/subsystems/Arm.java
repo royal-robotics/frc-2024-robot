@@ -65,6 +65,8 @@ public class Arm extends SubsystemBase {
     private final CurrentLimitsConfigs currentLimit = new CurrentLimitsConfigs()
         .withStatorCurrentLimitEnable(true)
         .withStatorCurrentLimit(30.0);
+    private final CurrentLimitsConfigs currentLimitDisable = new CurrentLimitsConfigs()
+        .withStatorCurrentLimitEnable(false);
 
     private final MagnetSensorConfigs encoderConfigs = new MagnetSensorConfigs();
 
@@ -143,8 +145,8 @@ public class Arm extends SubsystemBase {
         armMotorFollowReverseBack.getConfigurator().apply(currentLimit);
         wristMotor.getConfigurator().apply(currentLimit);
         wristMotorFollow.getConfigurator().apply(currentLimit);
-        shooterMotor.getConfigurator().apply(currentLimit);
-        intakeMotor.getConfigurator().apply(currentLimit);
+        intakeMotor.getConfigurator().apply(currentLimitDisable);
+        shooterMotor.getConfigurator().apply(currentLimitDisable);
 
         motorConfigs.NeutralMode = NeutralModeValue.Coast;
         armMotorConfigs.NeutralMode = NeutralModeValue.Coast;
@@ -370,7 +372,7 @@ public class Arm extends SubsystemBase {
         return this.run(() -> this.setArmPosition(position))
             .until(() -> {
                 double positionDiff = Math.abs(this.getArmPosition() - position);
-                return positionDiff < 8.0;
+                return positionDiff < 16.0;
             });
     }
 
@@ -379,7 +381,7 @@ public class Arm extends SubsystemBase {
         return this.run(() -> this.setWristPosition(position))
             .until(() -> {
                 double positionDiff = Math.abs(this.getWristPosition() - position);
-                return positionDiff < 8.0;
+                return positionDiff < 16.0;
             });
     }
 
