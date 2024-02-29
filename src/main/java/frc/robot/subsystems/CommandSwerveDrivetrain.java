@@ -89,6 +89,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         return this.getState().Pose.getY();
     }
 
+    public double getAngle() {
+        return this.getState().Pose.getRotation().getDegrees();
+    }
+
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
         return run(() -> this.setControl(requestSupplier.get()));
     }

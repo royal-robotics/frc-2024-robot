@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.84,
-      "y": 4.43
+      "x": 0.81,
+      "y": 6.67
     },
-    "rotation": -58.07068723030463
+    "rotation": 60.0
   },
   "command": {
     "type": "sequential",
@@ -26,7 +26,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Bottom to Bottom"
+            "pathName": "TopToTop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LiftWrist5.5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "MoveWristToPickup"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TopToMiddle"
           }
         },
         {
@@ -39,6 +63,12 @@
           "type": "named",
           "data": {
             "name": "Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "MoveWristToPickup"
           }
         }
       ]

@@ -3,60 +3,37 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.51,
-        "y": 6.76
+        "x": 2.52,
+        "y": 5.54
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.6085489313835772,
-        "y": 7.036539787365289
+        "x": 1.7870271054827824,
+        "y": 5.671935121013099
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.771834972241374,
-        "y": 7.432345150404587
+        "x": 2.450451758046374,
+        "y": 6.743350629558403
       },
       "prevControl": {
-        "x": 6.771834972241374,
-        "y": 7.432345150404587
+        "x": 1.7174788635291562,
+        "y": 6.244929061286694
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": 0,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.25,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "MoveWristToPickup"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "New Event Marker",
-      "waypointRelativePos": 0.5,
+      "waypointRelativePos": 0.3,
       "command": {
         "type": "parallel",
         "data": {
@@ -80,7 +57,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 25.0,
     "rotateFast": false
   },
   "reversed": false,

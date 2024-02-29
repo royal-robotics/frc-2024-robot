@@ -5,7 +5,7 @@
       "x": 0.81,
       "y": 6.67
     },
-    "rotation": 59.91865121020086
+    "rotation": 60.0
   },
   "command": {
     "type": "sequential",
@@ -32,13 +32,19 @@
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist4.6"
+            "name": "LiftWrist5.5"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "MoveWristToPickup"
           }
         }
       ]

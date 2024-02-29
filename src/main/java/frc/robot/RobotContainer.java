@@ -7,7 +7,6 @@ package frc.robot;
 import java.util.List;
 
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix6.Utils;
@@ -19,7 +18,6 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -61,8 +59,8 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
-    private boolean trackingTag = false;
-    private double angleFromTag = 0.0;
+    private PhotonTrackedTarget currentTarget;
+    private double targetAngle;
 
     private void configureBindings() {
         drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
@@ -102,7 +100,6 @@ public class RobotContainer {
                 arm.setShooterMotorVelocity(0.0);
             })
         ));
-        //driver.y().whileTrue(Commands.startEnd(() -> arm.setIntakePercent(-0.6), () -> arm.setIntakePercent(0.0)));
         driver.y().onTrue(Commands.sequence(
            Commands.runOnce(() -> arm.setIntakePercent(-0.3)),
            Commands.waitSeconds(0.12),
@@ -110,71 +107,50 @@ public class RobotContainer {
            Commands.waitSeconds(0.10),
            Commands.runOnce(() -> arm.setIntakePercent(0.0))
         ));
-        driver.a().onTrue(Commands.sequence(
+        driver.a().whileTrue(Commands.repeatingSequence(
             Commands.runOnce(() -> arm.setShooterMotorVelocity(55.0)),
             arm.moveArmPositionCommand(19.0),
             arm.moveWristPositionCommand(-8.8),
             drivetrain.applyRequest(() -> {
-                if (arm.hasAprilTag()) {
-                    double angleToDrive = 0.0;
-                    List<PhotonTrackedTarget> targets = arm.getAprilTags();
-                    for (PhotonTrackedTarget target : targets) {
-                        int id = target.getFiducialId();
-                        if (id == 4 || id == 7) {
-                            for (int i = 0; i < ledData.getLength(); i++) {
-                                ledData.setRGB(i, 0, 128, 0);
-                            }
-                            leds.setData(ledData);
-                            this.trackingTag = true;
-                            if (id == 4) {
-                                this.angleFromTag = target.getYaw() + 3.0;
-                            } else {
-                                this.angleFromTag = target.getYaw() - 3.0;
-                            }
-                            angleToDrive = -Units.degreesToRadians(this.angleFromTag) * MaxAngularRate * 1.2;
-                            break;
-                        } else {
-                            for (int i = 0; i < ledData.getLength(); i++) {
-                                ledData.setRGB(i, 128, 128, 0);
-                            }
-                            leds.setData(ledData);
-                            this.trackingTag = false;
-                            this.angleFromTag = 0.0;
-                            angleToDrive = Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate;
-                        }
+                this.currentTarget = arm.getTrackingTarget();
+                if (this.currentTarget != null) {
+                    if (this.currentTarget.getFiducialId() == 4) {
+                        this.targetAngle = -7.0;
+                    } else {
+                        this.targetAngle = 7.0;
                     }
-                    return drive
-                        .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
+                    return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
                         .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
-                        .withRotationalRate(angleToDrive);
+                        .withRotationalRate(-Units.degreesToRadians(this.currentTarget.getYaw() - this.targetAngle) * MaxAngularRate * 1.8);
                 } else {
-                    for (int i = 0; i < ledData.getLength(); i++) {
-                        ledData.setRGB(i, 0, 0, 128);
-                    }
-                    leds.setData(ledData);
-                    return drive
-                        .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
+                    return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
                         .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
                         .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate);
                 }
-            }).until(() -> this.angleFromTag > 0.0 && this.angleFromTag < 0.5),
+            }).until(() -> this.currentTarget != null && (this.currentTarget.getYaw() < (this.targetAngle + 0.5) && this.currentTarget.getYaw() > (this.targetAngle - 0.5))),
             Commands.runOnce(() -> {
                 for (int i = 0; i < ledData.getLength(); i++) {
-                    ledData.setRGB(i, 128, 0, 0);
+                    ledData.setRGB(i, 0, 0, 128);
                 }
                 leds.setData(ledData);
             })
         ));
+
 
         operator.leftTrigger().onTrue(Commands.sequence(
           Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
           arm.moveArmPositionCommand(19.0),
           arm.moveWristPositionCommand(-20.5)
         ));
+        operator.a().onTrue(Commands.sequence(
+          Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
+          arm.moveArmPositionCommand(19.0),
+          arm.moveWristPositionCommand(-13.0)
+        ));
         operator.y().onTrue(Commands.sequence(
           arm.moveArmPositionCommand(30.25),
           arm.moveWristPositionCommand(-1.0),
-          arm.spinWheelsCommand(45.0)
+          Commands.runOnce(() -> arm.setShooterMotorVelocity(35.0))
         ));
         operator.rightTrigger().onTrue(Commands.sequence(
           Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
@@ -206,7 +182,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("Shoot", Commands.sequence(
             arm.spinWheelsCommand(90.0),
             Commands.runOnce(() -> arm.setIntakePercent(0.6), arm),
-            Commands.waitSeconds(1.0),
+            Commands.waitSeconds(0.5),
             Commands.runOnce(() -> {
                 arm.setIntakePercent(0.0);
                 arm.setShooterMotorVelocity(0.0); // Kevin action
@@ -219,7 +195,7 @@ public class RobotContainer {
             arm
         ).until(() -> arm.getLineBreak()));
 
-        NamedCommands.registerCommand("LiftWrist4.6", arm.moveWristPositionCommand(4.6));
+        NamedCommands.registerCommand("LiftWrist5.5", arm.moveWristPositionCommand(5.5));
         NamedCommands.registerCommand("LiftWrist3.5", arm.moveWristPositionCommand(3.5));
 
         if (Utils.isSimulation()) {

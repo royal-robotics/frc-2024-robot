@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -27,7 +26,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -284,6 +282,61 @@ public class Arm extends SubsystemBase {
     
     public List<PhotonTrackedTarget> getAprilTags() {
         return this.aprilTags;
+    }
+
+    public boolean hasTrackingTarget() {
+        for (PhotonTrackedTarget target : this.aprilTags) {
+            int id = target.getFiducialId();
+            if (id == 4 || id == 7) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public PhotonTrackedTarget getTrackingTarget() {
+        for (PhotonTrackedTarget target : this.aprilTags) {
+            int id = target.getFiducialId();
+            if (id == 4 || id == 7) {
+                return target;
+            }
+        }
+
+        return null;
+    }
+
+    public double getTargetYaw() {
+        for (PhotonTrackedTarget target : this.aprilTags) {
+            int id = target.getFiducialId();
+            if (id == 4 || id == 7) {
+                return target.getYaw();
+            }
+        }
+
+        return 0.0;
+    }
+
+    public double getTargetX() {
+        for (PhotonTrackedTarget target : this.aprilTags) {
+            int id = target.getFiducialId();
+            if (id == 4 || id == 7) {
+                return target.getBestCameraToTarget().getX();
+            }
+        }
+
+        return 0.0;
+    }
+
+    public double getTargetY() {
+        for (PhotonTrackedTarget target : aprilTags) {
+            int id = target.getFiducialId();
+            if (id == 4 || id == 7) {
+                return target.getBestCameraToTarget().getY();
+            }
+        }
+
+        return 0.0;
     }
 
     public void setArmPosition(double position) {
