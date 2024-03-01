@@ -483,7 +483,7 @@ public class Arm extends SubsystemBase {
             this.aprilTags = new ArrayList<PhotonTrackedTarget>();
         }
 
-        if (armPositionOverride.getBoolean(false)) {
+        /*if (armPositionOverride.getBoolean(false)) {
             armMotorFollow.setControl(new StrictFollower(armMotor.getDeviceID())); // Back right follows Front right
             armMotorFollowReverseFront.setControl(new StrictFollower(armMotor.getDeviceID())); // Front left follows and opposes Front Right
             armMotorFollowReverseBack.setControl(new StrictFollower(armMotor.getDeviceID())); // Back left follows and opposes Front Right
@@ -502,6 +502,6 @@ public class Arm extends SubsystemBase {
         if (shooterRPMOverride.getBoolean(false)) {
             double shooterRPM = shooterRPMOverrideValue.getDouble(0.0);
             shooterMotor.setControl(motorVelocityRequest.withVelocity(shooterRPM));
-        }
+        }*/
     }
 }

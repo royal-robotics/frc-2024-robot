@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.4,
-        "y": 4.35
+        "x": 2.5,
+        "y": 4.2
       },
       "prevControl": null,
       "nextControl": {
         "x": 2.2012409739105196,
-        "y": 2.638702420261984
+        "y": 2.2308538045647524
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.7844624260677096,
-        "y": 2.374832178235786
+        "x": 3.696505678725644,
+        "y": 2.066983562538554
       },
       "prevControl": {
-        "x": 2.7729598316339494,
-        "y": 2.814615914946116
+        "x": 2.6850030842918837,
+        "y": 2.506767299248884
       },
       "nextControl": {
-        "x": 4.701532482320941,
-        "y": 1.9761060668213384
+        "x": 4.613575734978875,
+        "y": 1.6682574511241062
       },
       "isLocked": false,
       "linkedName": null
@@ -33,15 +33,15 @@
     {
       "anchor": {
         "x": 8.5,
-        "y": 0.95
+        "y": 0.4
       },
       "prevControl": {
         "x": 7.459178489785551,
-        "y": 0.9793189157806883
+        "y": 0.42931891578068837
       },
       "nextControl": {
         "x": 9.54082151021445,
-        "y": 0.9206810842193116
+        "y": 0.3706810842193117
       },
       "isLocked": false,
       "linkedName": null
@@ -52,8 +52,8 @@
         "y": 3.3130374832178244
       },
       "prevControl": {
-        "x": 2.6410247106208504,
-        "y": 2.1842592256613096
+        "x": 2.5677274211691286,
+        "y": 1.7151565731702902
       },
       "nextControl": null,
       "isLocked": false,
@@ -70,7 +70,7 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "New Event Marker",
+      "name": "Wrist to Pickup",
       "waypointRelativePos": 0.75,
       "command": {
         "type": "parallel",
@@ -87,7 +87,7 @@
       }
     },
     {
-      "name": "New Event Marker",
+      "name": "Lift Wrist 5.5",
       "waypointRelativePos": 2.5,
       "command": {
         "type": "parallel",
@@ -104,7 +104,7 @@
       }
     },
     {
-      "name": "New Event Marker",
+      "name": "Intake",
       "waypointRelativePos": 1.0,
       "command": {
         "type": "parallel",
