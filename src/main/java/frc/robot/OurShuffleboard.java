@@ -13,12 +13,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.*;
 
 public class OurShuffleboard {
-    public OurShuffleboard(CommandSwerveDrivetrain drivetrain, Arm arm) {
+    public OurShuffleboard(CommandSwerveDrivetrain drivetrain, Arm arm, Vision vision) {
         ShuffleboardTab competitionTab = Shuffleboard.getTab("Competition");
         competitionTab.addBoolean("Arm Bottom", () -> arm.getArmBottomLimit()).withPosition(0, 0);
         competitionTab.addBoolean("Wrist Top", () -> arm.getWristTopLimit()).withPosition(1, 0);
-        competitionTab.addDouble("Odometry X", () -> drivetrain.odometryX()).withPosition(0, 1);
-        competitionTab.addDouble("Odometry Y", () -> drivetrain.odometryY()).withPosition(1, 1);
         competitionTab.addCamera("AprilTag", "cam1", "mjpg:http://10.25.22.32:1182/?action=stream")
             .withProperties(Map.of("showControls", false))
             .withPosition(2, 0)
@@ -37,8 +35,16 @@ public class OurShuffleboard {
         armTab.addDouble("ShooterRPM", () -> arm.getShooterWheelRPM()).withPosition(7, 2);
 
         ShuffleboardTab aprilTagTab = Shuffleboard.getTab("AprilTag");
-        aprilTagTab.addBoolean("Has Targets", () -> arm.hasAprilTag()).withPosition(0, 0);
-        aprilTagTab.addDouble("Target Yaw", () -> arm.getTargetYaw()).withPosition(2, 1);
+        aprilTagTab.addBoolean("Has Tag", () -> vision.hasAprilTag()).withPosition(0, 0);
+        aprilTagTab.addDouble("Tag Distance", () -> {
+            PhotonTrackedTarget aprilTag = vision.getAprilTag(7);
+            if (aprilTag != null) {
+                return vision.getAprilTagDistance(aprilTag);
+            }
+
+            return 0.0;
+        });
+        /*aprilTagTab.addDouble("Target Yaw", () -> arm.getTargetYaw()).withPosition(2, 1);
         aprilTagTab.addDouble("Target X", () -> arm.getTargetX()).withPosition(0, 1);
         aprilTagTab.addDouble("Target Y", () -> arm.getTargetY()).withPosition(1, 1);
         aprilTagTab.addDouble("Distance", () -> {
@@ -80,7 +86,7 @@ public class OurShuffleboard {
             double m1 = m1Top / m1Bottom;
             double m2 = arm.getTargetY() / arm.getTargetX();
             return Math.atan((m1 - m2) / (1.0 + (m1 * m2))) + 10.0;
-        }).withPosition(0, 3);
+        }).withPosition(0, 3);*/
     }
 
     public void addAutoChooser(SendableChooser<Command> autoChooser){

@@ -99,15 +99,9 @@ public class Arm extends SubsystemBase {
     private final GenericEntry shooterRPMOverride;
     private final GenericEntry shooterRPMOverrideValue;
 
-    private PhotonCamera aprilTag;
-    private boolean hasAprilTag;
-    private List<PhotonTrackedTarget> aprilTags;
-
     private final Orchestra music = new Orchestra();
 
-    public Arm(PhotonCamera aprilTag) {
-        this.aprilTag = aprilTag;
-
+    public Arm() {
         // PID for Wrist
         wristPID.kP = 1.1;
         wristPID.kI = 0.0;
@@ -177,7 +171,7 @@ public class Arm extends SubsystemBase {
         wristTopVoltage = wristMotor.getMotorVoltage();
         wristBottomVoltage = wristMotorFollow.getMotorVoltage();
 
-        BaseStatusSignal.setUpdateFrequencyForAll(100,
+        BaseStatusSignal.setUpdateFrequencyForAll(50,
             armPosition, wristAbsPosition, wristPosition, shooterVelocity, armFLVoltage, armFRVoltage,
             armBLVoltage, armBRVoltage, wristTopVoltage, wristBottomVoltage);
         ParentDevice.optimizeBusUtilizationForAll(armMotor, armMotorFollow, armMotorFollowReverseFront, armMotorFollowReverseBack,
@@ -276,69 +270,6 @@ public class Arm extends SubsystemBase {
         return armBottomLimit.get();
     }
 
-    public boolean hasAprilTag() {
-        return this.hasAprilTag;
-    }
-    
-    public List<PhotonTrackedTarget> getAprilTags() {
-        return this.aprilTags;
-    }
-
-    public boolean hasTrackingTarget() {
-        for (PhotonTrackedTarget target : this.aprilTags) {
-            int id = target.getFiducialId();
-            if (id == 4 || id == 7) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public PhotonTrackedTarget getTrackingTarget() {
-        for (PhotonTrackedTarget target : this.aprilTags) {
-            int id = target.getFiducialId();
-            if (id == 4 || id == 7) {
-                return target;
-            }
-        }
-
-        return null;
-    }
-
-    public double getTargetYaw() {
-        for (PhotonTrackedTarget target : this.aprilTags) {
-            int id = target.getFiducialId();
-            if (id == 4 || id == 7) {
-                return target.getYaw();
-            }
-        }
-
-        return 0.0;
-    }
-
-    public double getTargetX() {
-        for (PhotonTrackedTarget target : this.aprilTags) {
-            int id = target.getFiducialId();
-            if (id == 4 || id == 7) {
-                return target.getBestCameraToTarget().getX();
-            }
-        }
-
-        return 0.0;
-    }
-
-    public double getTargetY() {
-        for (PhotonTrackedTarget target : aprilTags) {
-            int id = target.getFiducialId();
-            if (id == 4 || id == 7) {
-                return target.getBestCameraToTarget().getY();
-            }
-        }
-
-        return 0.0;
-    }
-
     public void setArmPosition(double position) {
         armMotorFollow.setControl(new StrictFollower(armMotor.getDeviceID())); // Back right follows Front right
         armMotorFollowReverseFront.setControl(new StrictFollower(armMotor.getDeviceID())); // Front left follows and opposes Front Right
@@ -425,7 +356,7 @@ public class Arm extends SubsystemBase {
         return this.run(() -> this.setArmPosition(position))
             .until(() -> {
                 double positionDiff = Math.abs(this.getArmPosition() - position);
-                return positionDiff < 16.0;
+                return positionDiff < 19.0;
             });
     }
 
@@ -434,7 +365,7 @@ public class Arm extends SubsystemBase {
         return this.run(() -> this.setWristPosition(position))
             .until(() -> {
                 double positionDiff = Math.abs(this.getWristPosition() - position);
-                return positionDiff < 16.0;
+                return positionDiff < 23.0;
             });
     }
 
@@ -475,15 +406,7 @@ public class Arm extends SubsystemBase {
 
         this.resetWristMotorPosition(this.getWristAbsPosition());
 
-        PhotonPipelineResult result = aprilTag.getLatestResult();
-        this.hasAprilTag = result.hasTargets();
-        if (this.hasAprilTag) {
-            this.aprilTags = result.getTargets();
-        } else {
-            this.aprilTags = new ArrayList<PhotonTrackedTarget>();
-        }
-
-        /*if (armPositionOverride.getBoolean(false)) {
+        if (armPositionOverride.getBoolean(false)) {
             armMotorFollow.setControl(new StrictFollower(armMotor.getDeviceID())); // Back right follows Front right
             armMotorFollowReverseFront.setControl(new StrictFollower(armMotor.getDeviceID())); // Front left follows and opposes Front Right
             armMotorFollowReverseBack.setControl(new StrictFollower(armMotor.getDeviceID())); // Back left follows and opposes Front Right
@@ -502,6 +425,6 @@ public class Arm extends SubsystemBase {
         if (shooterRPMOverride.getBoolean(false)) {
             double shooterRPM = shooterRPMOverrideValue.getDouble(0.0);
             shooterMotor.setControl(motorVelocityRequest.withVelocity(shooterRPM));
-        }*/
+        }
     }
 }

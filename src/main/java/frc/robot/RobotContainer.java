@@ -44,10 +44,10 @@ public class RobotContainer {
     private final CommandXboxController operator  = new CommandXboxController(1); // My joystick for Operator
     private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
 
-    private final PhotonCamera aprilTag = new PhotonCamera("AprilTag");
-    private final Arm arm = new Arm(aprilTag); // Arm subsystem
+    private final Arm arm = new Arm(); // Arm subsystem
     private final Climber climber = new Climber(); // Climber subsystem
-    private final OurShuffleboard shuffleboard = new OurShuffleboard(drivetrain, arm);
+    private final Vision vision = new Vision();
+    private final OurShuffleboard shuffleboard = new OurShuffleboard(drivetrain, arm, vision);
     private final AddressableLED leds = new AddressableLED(0);
     private final AddressableLEDBuffer ledData = new AddressableLEDBuffer(12);
 
@@ -58,13 +58,9 @@ public class RobotContainer {
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric() // I want field-centric
         .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.05) // Add a 5% deadband
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // driving in open loop
-    private final SwerveRequest.FieldCentricFacingAngle angle = new SwerveRequest.FieldCentricFacingAngle();
-    private final Telemetry logger = new Telemetry(MaxSpeed);
+    //private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final SendableChooser<Command> autoChooser;
-
-    private PhotonTrackedTarget currentTarget;
-    private double targetAngle;
 
     private void configureBindings() {
         drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
@@ -76,7 +72,7 @@ public class RobotContainer {
 
         // reset the field-centric heading on left bumper press
         driver.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
-        driver.leftBumper().whileTrue(Commands.startEnd(
+        /*driver.leftBumper().whileTrue(Commands.startEnd(
           () -> {
             MaxSpeed = 2.5;
             MaxAngularRate = 1.0 * Math.PI;
@@ -85,11 +81,12 @@ public class RobotContainer {
             MaxSpeed = TunerConstants.kSpeedAt12VoltsMps;
             MaxAngularRate = 3.0 * Math.PI;
           }
-        ));
+        ));*/
         driver.rightBumper().whileTrue(Commands.either(
             Commands.startEnd(
-                () -> arm.setIntakePercent(0.6),
-                () -> arm.setIntakePercent(0.0)),
+                () -> arm.setIntakePercent(1.0),
+                () -> arm.setIntakePercent(0.0))
+                .onlyIf(() -> arm.getShooterMotorVelocity() > 15.0),
             Commands.startEnd(
                 () -> arm.setIntakePercent(0.6),
                 () -> arm.setIntakePercent(0.0))
@@ -97,44 +94,62 @@ public class RobotContainer {
             () -> arm.getLineBreak()));
         driver.rightTrigger().onTrue(Commands.sequence(
             arm.spinWheelsCommand(65.0),
-            Commands.runOnce(() -> arm.setIntakePercent(0.6)),
+            Commands.runOnce(() -> arm.setIntakePercent(1.0)),
             Commands.waitSeconds(0.5),
             Commands.runOnce(() -> {
                 arm.setIntakePercent(0.0);
                 arm.setShooterMotorVelocity(0.0);
             })
         ));
+        driver.leftBumper().whileTrue(Commands.startEnd(
+            () -> arm.setIntakePercent(-0.5), 
+            () -> arm.setIntakePercent(0.0))
+        );
         driver.y().onTrue(Commands.sequence(
-           Commands.runOnce(() -> arm.setIntakePercent(-0.3)),
-           Commands.waitSeconds(0.12),
-           Commands.runOnce(() -> arm.setIntakePercent(0.3)),
-           Commands.waitSeconds(0.10),
-           Commands.runOnce(() -> arm.setIntakePercent(0.0))
+            Commands.runOnce(() -> arm.setIntakePercent(-0.3)),
+            Commands.waitSeconds(0.1),
+            Commands.startEnd(
+                () -> arm.setIntakePercent(0.3), 
+                () -> arm.setIntakePercent(0.0))
+                .until(() -> arm.getLineBreak())
         ));
         driver.a().whileTrue(Commands.repeatingSequence(
-            Commands.runOnce(() -> arm.setShooterMotorVelocity(55.0)),
+            Commands.runOnce(() -> arm.setShooterMotorVelocity(65.0)),
             arm.moveArmPositionCommand(19.0),
             arm.moveWristPositionCommand(-8.8),
             drivetrain.applyRequest(() -> {
-                this.currentTarget = arm.getTrackingTarget();
-                if (this.currentTarget != null) {
-                    if (this.currentTarget.getFiducialId() == 4) {
-                        this.targetAngle = -7.0;
-                    } else {
-                        this.targetAngle = 7.0;
+                vision.refresh();
+                if (vision.hasAprilTag()) {
+                    PhotonTrackedTarget currentTag = vision.getAprilTag(4);
+                    if (currentTag == null) {
+                        currentTag = vision.getAprilTag(7);
                     }
-                    return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
-                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
-                        .withRotationalRate(-Units.degreesToRadians(this.currentTarget.getYaw() - this.targetAngle) * MaxAngularRate * 1.8);
-                } else {
-                    return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
-                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
-                        .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate);
+
+                    if (currentTag != null) {
+                        double distance = vision.getAprilTagDistance(currentTag);
+                        arm.setWristPosition(vision.getShootingAngle(distance));
+                        if (currentTag.getYaw() < 0.5 && currentTag.getYaw() > -0.5) {
+                            for (int i = 0; i < ledData.getLength(); i++) {
+                                ledData.setRGB(i, 0, 0, 255);
+                            }
+                            leds.setData(ledData);
+                        }
+                        return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
+                            .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
+                            .withRotationalRate(-Units.degreesToRadians(currentTag.getYaw()) * MaxAngularRate * 1.9);
+                    }
                 }
-            }).until(() -> this.currentTarget != null && (this.currentTarget.getYaw() < (this.targetAngle + 0.5) && this.currentTarget.getYaw() > (this.targetAngle - 0.5))),
-            Commands.runOnce(() -> {
+
                 for (int i = 0; i < ledData.getLength(); i++) {
-                    ledData.setRGB(i, 0, 0, 128);
+                    ledData.setRGB(i, 0, 255, 0);
+                }
+                leds.setData(ledData);
+                return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
+                    .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
+                    .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate);
+            }).finallyDo(() -> {
+                for (int i = 0; i < ledData.getLength(); i++) {
+                    ledData.setRGB(i, 255, 0, 0);
                 }
                 leds.setData(ledData);
             })
@@ -147,14 +162,19 @@ public class RobotContainer {
           arm.moveWristPositionCommand(-20.5)
         ));
         operator.a().onTrue(Commands.sequence(
-          Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
           arm.moveArmPositionCommand(19.0),
-          arm.moveWristPositionCommand(-13.0)
+          arm.moveWristPositionCommand(-13.0),
+          Commands.runOnce(() -> arm.setShooterMotorVelocity(60.0))
+        ));
+        operator.x().onTrue(Commands.sequence(
+          Commands.runOnce(() -> arm.setShooterMotorVelocity(60.0)),
+          arm.moveArmPositionCommand(19.0),
+          arm.moveWristPositionCommand(-10.5)
         ));
         operator.y().onTrue(Commands.sequence(
           arm.moveArmPositionCommand(30.25),
-          arm.moveWristPositionCommand(-1.0),
-          Commands.runOnce(() -> arm.setShooterMotorVelocity(35.0))
+          arm.moveWristPositionCommand(-1.2),
+          Commands.runOnce(() -> arm.setShooterMotorVelocity(25.0))
         ));
         operator.rightTrigger().onTrue(Commands.sequence(
           Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
@@ -165,18 +185,19 @@ public class RobotContainer {
         operator.leftBumper().onTrue(Commands.runOnce(() -> climber.climbRetract(), climber));
 
         armBottomTrigger.onTrue(Commands.runOnce(() -> arm.resetArmMotorPosition(0.0))
+            .onlyIf(() -> arm.getArmPosition() < 1.0)
             .ignoringDisable(true));
         wristTopTrigger.onTrue(Commands.runOnce(() -> arm.resetWristMotorPosition(arm.getWristAbsPosition()))
             .ignoringDisable(true));
         lineBreakTrigger.onTrue(Commands.runOnce(() -> {
             for (int i = 0; i < ledData.getLength(); i++) {
-                ledData.setRGB(i, 0, 128, 0);
+                ledData.setRGB(i, 0, 255, 0);
             }
             leds.setData(ledData);
         }).ignoringDisable(true));
         lineBreakTrigger.onFalse(Commands.runOnce(() -> {
             for (int i = 0; i < ledData.getLength(); i++) {
-                ledData.setRGB(i, 128, 0, 0);
+                ledData.setRGB(i, 255, 0, 0);
             }
             leds.setData(ledData);
         }).ignoringDisable(true));
@@ -200,19 +221,19 @@ public class RobotContainer {
         ).until(() -> arm.getLineBreak()));
 
         NamedCommands.registerCommand("LiftWrist5.5", arm.moveWristPositionCommand(5.5));
-        NamedCommands.registerCommand("LiftWrist3.5", arm.moveWristPositionCommand(3.5));
+        NamedCommands.registerCommand("LiftWrist3.8", arm.moveWristPositionCommand(3.8));
 
         if (Utils.isSimulation()) {
             drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
         }
 
-        drivetrain.registerTelemetry(logger::telemeterize);
+        //drivetrain.registerTelemetry(logger::telemeterize);
     }
 
     public RobotContainer() {
         leds.setLength(ledData.getLength());
         for (int i = 0; i < ledData.getLength(); i++) {
-            ledData.setRGB(i, 128, 0, 0);
+            ledData.setRGB(i, 255, 0, 0);
         }
         leds.setData(ledData);
         leds.start();

@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.84,
-      "y": 4.43
+      "x": 1.38,
+      "y": 5.54
     },
-    "rotation": -60.0
+    "rotation": 0
   },
   "command": {
     "type": "sequential",
@@ -26,25 +26,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BottomToBottom"
+            "pathName": "MiddleToMiddle"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "LiftWrist3.8"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "BottomToFar"
           }
         },
         {

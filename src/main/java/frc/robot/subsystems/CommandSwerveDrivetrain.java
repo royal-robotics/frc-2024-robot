@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
@@ -29,6 +30,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
 
+    CurrentLimitsConfigs currentLimit = new CurrentLimitsConfigs()
+        .withStatorCurrentLimitEnable(true)
+        .withStatorCurrentLimit(30);
     SwerveRequest.ApplyChassisSpeeds chassisSpeedsRequest = new SwerveRequest.ApplyChassisSpeeds();
 
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
@@ -63,6 +67,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             },
             this // Reference to this subsystem to set requirements
         );
+        this.Modules[0].getSteerMotor().getConfigurator().apply(currentLimit);
+        this.Modules[1].getSteerMotor().getConfigurator().apply(currentLimit);
+        this.Modules[2].getSteerMotor().getConfigurator().apply(currentLimit);
+        this.Modules[3].getSteerMotor().getConfigurator().apply(currentLimit);
     }
 
     public Pose2d getPose() {

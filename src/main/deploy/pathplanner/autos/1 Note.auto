@@ -5,7 +5,7 @@
       "x": 0.84,
       "y": 4.43
     },
-    "rotation": -58.07068723030463
+    "rotation": -60.0
   },
   "command": {
     "type": "sequential",
@@ -26,25 +26,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BottomToBottom"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "LiftWrist3.8"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "MoveWristToPickup"
+            "pathName": "BottomToAway"
           }
         }
       ]
