@@ -131,6 +131,11 @@ public class RobotContainer {
 
                     if (currentTag != null) {
                         double distance = vision.getAprilTagDistance(currentTag);
+                        if (distance > 3.9) {
+                            arm.setShooterMotorVelocity(75.0);
+                        } else {
+                            arm.setShooterMotorVelocity(65.0);
+                        }
                         arm.setWristPosition(vision.getShootingAngle(distance));
                         if (currentTag.getYaw() < 0.5 && currentTag.getYaw() > -0.5) {
                             for (int i = 0; i < ledData.getLength(); i++) {
@@ -160,7 +165,7 @@ public class RobotContainer {
         ));
 
         // Note tracking
-        driver.leftBumper().whileTrue(drivetrain.applyRequest(() -> {
+        driver.rightBumper().whileTrue(Commands.sequence(Commands.waitSeconds(0.5), drivetrain.applyRequest(() -> {
             vision.refresh();
             if(vision.hasNote()) {
                 PhotonTrackedTarget bestNote = vision.bestNote();
@@ -173,7 +178,7 @@ public class RobotContainer {
                     .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
                     .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate);
             }
-        }));
+        })));
 
 
         operator.leftTrigger().onTrue(Commands.sequence(
@@ -226,13 +231,18 @@ public class RobotContainer {
         NamedCommands.registerCommand("MoveWristToPickup", arm.moveWristPositionCommand(0.5));
 
         NamedCommands.registerCommand("Shoot", Commands.sequence(
-            arm.spinWheelsCommand(90.0),
+            arm.spinWheelsCommand(65.0),
             Commands.runOnce(() -> arm.setIntakePercent(0.6), arm),
             Commands.waitSeconds(0.5),
             Commands.runOnce(() -> {
                 arm.setIntakePercent(0.0);
                 arm.setShooterMotorVelocity(0.0); // Kevin action
             }, arm)
+        ));
+
+        NamedCommands.registerCommand("DorpWristAndShoot", Commands.sequence(
+            arm.moveWristPositionCommand(5.5),
+            arm.spinWheelsCommand(65.0)
         ));
 
         NamedCommands.registerCommand("Intake", Commands.startEnd(
