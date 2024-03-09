@@ -325,7 +325,7 @@ public class Arm extends SubsystemBase {
         armMotorFollowReverseBack.getConfigurator().apply(armMotorConfigsReversed);
         wristMotor.getConfigurator().apply(armMotorConfigsReversed);
         wristMotorFollow.getConfigurator().apply(armMotorConfigsReversed);
-        shooterMotor.getConfigurator().apply(motorConfigs);
+        // shooterMotor.getConfigurator().apply(motorConfigs);
         intakeMotor.getConfigurator().apply(motorConfigsReversed);
     }
 

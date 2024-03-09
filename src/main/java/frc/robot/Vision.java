@@ -9,7 +9,9 @@ import edu.wpi.first.math.util.Units;
 
 public class Vision {
     private PhotonCamera aprilTagCam = new PhotonCamera("AprilTag");
+    private PhotonCamera noteCamera = new PhotonCamera("Notes");
     private PhotonPipelineResult aprilTagResult;
+    private PhotonPipelineResult notesCamResult;
 
     public Vision() {
         refresh();
@@ -17,10 +19,19 @@ public class Vision {
 
     public void refresh() {
         this.aprilTagResult = aprilTagCam.getLatestResult();
+        this.notesCamResult = noteCamera.getLatestResult();
     }
 
     public boolean hasAprilTag() {
         return aprilTagResult.hasTargets();
+    }
+
+    public boolean hasNote() {
+        return notesCamResult.hasTargets();
+    }
+
+    public PhotonTrackedTarget bestNote() {
+        return this.notesCamResult.getBestTarget();
     }
 
     public PhotonTrackedTarget getAprilTag(int id) {
@@ -46,6 +57,6 @@ public class Vision {
     }
 
     public double getShootingAngle(double distance) {
-        return (distance * 1.230) - 12.587;
+        return (distance * 0.7) - 10.987; // (distance * 1.230) - 12.587;
     }
 }

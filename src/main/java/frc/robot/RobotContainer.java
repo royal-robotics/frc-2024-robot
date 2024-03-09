@@ -101,7 +101,9 @@ public class RobotContainer {
                 arm.setShooterMotorVelocity(0.0);
             })
         ));
-        driver.leftBumper().whileTrue(Commands.startEnd(
+
+        // Outtake
+        driver.b().whileTrue(Commands.startEnd(
             () -> arm.setIntakePercent(-0.5), 
             () -> arm.setIntakePercent(0.0))
         );
@@ -113,7 +115,9 @@ public class RobotContainer {
                 () -> arm.setIntakePercent(0.0))
                 .until(() -> arm.getLineBreak())
         ));
-        driver.a().whileTrue(Commands.repeatingSequence(
+
+        // Tracking shot
+        driver.leftTrigger().whileTrue(Commands.repeatingSequence(
             Commands.runOnce(() -> arm.setShooterMotorVelocity(65.0)),
             arm.moveArmPositionCommand(19.0),
             arm.moveWristPositionCommand(-8.8),
@@ -155,15 +159,32 @@ public class RobotContainer {
             })
         ));
 
+        // Note tracking
+        driver.leftBumper().whileTrue(drivetrain.applyRequest(() -> {
+            vision.refresh();
+            if(vision.hasNote()) {
+                PhotonTrackedTarget bestNote = vision.bestNote();
+                double bestNoteYaw = bestNote.getYaw();
+                return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
+                            .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
+                            .withRotationalRate(-Units.degreesToRadians(bestNoteYaw) * MaxAngularRate * 0.50);
+            } else {
+                return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
+                    .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
+                    .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate);
+            }
+        }));
+
 
         operator.leftTrigger().onTrue(Commands.sequence(
           Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
           arm.moveArmPositionCommand(19.0),
+          Commands.waitSeconds(0.2).onlyIf(() -> arm.getArmPosition() > 25.0),
           arm.moveWristPositionCommand(-20.5)
         ));
         operator.a().onTrue(Commands.sequence(
           arm.moveArmPositionCommand(19.0),
-          arm.moveWristPositionCommand(-13.0),
+          arm.moveWristPositionCommand(-13.5),
           Commands.runOnce(() -> arm.setShooterMotorVelocity(60.0))
         ));
         operator.x().onTrue(Commands.sequence(
