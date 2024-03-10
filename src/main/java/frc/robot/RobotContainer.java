@@ -90,7 +90,21 @@ public class RobotContainer {
             Commands.startEnd(
                 () -> arm.setIntakePercent(0.6),
                 () -> arm.setIntakePercent(0.0))
-                .until(() -> arm.getLineBreak()),
+            /*drivetrain.applyRequest(() -> {
+                arm.setIntakePercent(1.0);
+                vision.refresh();
+                if(vision.hasNote()) {
+                    PhotonTrackedTarget bestNote = vision.bestNote();
+                    double bestNoteYaw = bestNote.getYaw();
+                    return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
+                                .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
+                                .withRotationalRate(-Units.degreesToRadians(bestNoteYaw) * MaxAngularRate * 0.50);
+                } else {
+                    return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
+                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
+                        .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate);
+                }
+            })*/.until(() -> arm.getLineBreak()),
             () -> arm.getLineBreak()));
         driver.rightTrigger().onTrue(Commands.sequence(
             arm.spinWheelsCommand(65.0),
@@ -165,7 +179,7 @@ public class RobotContainer {
         ));
 
         // Note tracking
-        driver.rightBumper().whileTrue(Commands.sequence(Commands.waitSeconds(0.5), drivetrain.applyRequest(() -> {
+        /*driver.leftBumper().whileTrue(Commands.sequence(Commands.waitSeconds(0.5), drivetrain.applyRequest(() -> {
             vision.refresh();
             if(vision.hasNote()) {
                 PhotonTrackedTarget bestNote = vision.bestNote();
@@ -178,8 +192,32 @@ public class RobotContainer {
                     .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
                     .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate);
             }
-        })));
-
+        })));*/
+        driver.leftBumper().whileTrue(Commands.either(
+            Commands.startEnd(
+                () -> arm.setIntakePercent(1.0),
+                () -> arm.setIntakePercent(0.0))
+                .onlyIf(() -> arm.getShooterMotorVelocity() > 15.0),
+            drivetrain.applyRequest(() -> {
+                if (arm.getLineBreak()) {
+                    arm.setIntakePercent(0.0);
+                } else {
+                    arm.setIntakePercent(0.6);
+                }
+                vision.refresh();
+                if(vision.hasNote()) {
+                    PhotonTrackedTarget bestNote = vision.bestNote();
+                    double bestNoteYaw = bestNote.getYaw();
+                    return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
+                                .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
+                                .withRotationalRate(-Units.degreesToRadians(bestNoteYaw) * MaxAngularRate * 0.50);
+                } else {
+                    return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
+                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
+                        .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate);
+                }
+            }).finallyDo(() -> arm.setIntakePercent(0.0)),
+            () -> arm.getLineBreak()));
 
         operator.leftTrigger().onTrue(Commands.sequence(
           Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
@@ -253,6 +291,8 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("LiftWrist5.5", arm.moveWristPositionCommand(5.5));
         NamedCommands.registerCommand("LiftWrist3.8", arm.moveWristPositionCommand(3.8));
+        NamedCommands.registerCommand("LiftWrist4.2", arm.moveWristPositionCommand(4.2));
+        NamedCommands.registerCommand("LiftWrist6.7", arm.moveWristPositionCommand(6.7));
 
         if (Utils.isSimulation()) {
             drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));

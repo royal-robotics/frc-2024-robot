@@ -3,43 +3,37 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.81,
-        "y": 6.67
+        "x": 8.09,
+        "y": 0.76
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.9227158155437518,
-        "y": 6.860599781147475
+        "x": 5.690599158976097,
+        "y": 1.282702565405131
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.9,
-        "y": 7.15
+        "x": 3.32,
+        "y": 2.82
       },
       "prevControl": {
-        "x": 1.9520301897746657,
-        "y": 6.8933506295584035
+        "x": 4.317684859505942,
+        "y": 1.936391288233216
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": 22.5,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Intake Begin",
-      "waypointRelativePos": 0.0,
+      "name": "Lift Wrist",
+      "waypointRelativePos": 0.4,
       "command": {
         "type": "parallel",
         "data": {
@@ -47,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake"
+                "name": "LiftWrist4.2"
               }
             }
           ]
@@ -63,13 +57,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 30.0,
+    "rotation": -36.25383773744471,
     "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": 59.62087398863165,
+    "rotation": 0,
     "velocity": 0
   },
   "useDefaultConstraints": true

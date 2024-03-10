@@ -17,11 +17,11 @@ public class OurShuffleboard {
         ShuffleboardTab competitionTab = Shuffleboard.getTab("Competition");
         competitionTab.addBoolean("Arm Bottom", () -> arm.getArmBottomLimit()).withPosition(0, 0);
         competitionTab.addBoolean("Wrist Top", () -> arm.getWristTopLimit()).withPosition(1, 0);
-        competitionTab.addCamera("AprilTag", "cam1", "mjpg:http://10.25.22.32:1182/?action=stream")
+        competitionTab.addCamera("AprilTag", "cam1", "mjpg:http://10.25.22.32:1184/?action=stream")
             .withProperties(Map.of("showControls", false))
             .withPosition(2, 0)
             .withSize(4, 4);
-        competitionTab.addCamera("Notes", "cam2", "mjpg:http://10.25.22.32:1184/?action=stream")
+        competitionTab.addCamera("Notes", "cam2", "mjpg:http://10.25.22.32:1182/?action=stream")
             .withProperties(Map.of("showControls", false))
             .withPosition(6, 0)
             .withSize(3, 3);

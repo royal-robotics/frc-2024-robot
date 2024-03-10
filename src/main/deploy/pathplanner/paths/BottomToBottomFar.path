@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.81,
-        "y": 6.67
+        "x": 0.84,
+        "y": 4.43
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.9227158155437518,
-        "y": 6.860599781147475
+        "x": 1.2296446815115856,
+        "y": 2.950215900431801
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.9,
-        "y": 7.15
+        "x": 8.09,
+        "y": 0.76
       },
       "prevControl": {
-        "x": 1.9520301897746657,
-        "y": 6.8933506295584035
+        "x": 6.67400445912003,
+        "y": 0.42756752180170954
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,16 +30,33 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": 22.5,
-      "rotateFast": false
+      "waypointRelativePos": 0.7,
+      "rotationDegrees": -5.228930446863586,
+      "rotateFast": true
     }
   ],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Intake Begin",
-      "waypointRelativePos": 0.0,
+      "name": "Wrist To Pickup",
+      "waypointRelativePos": 0.7,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "MoveWristToPickup"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Intake",
+      "waypointRelativePos": 0.9,
       "command": {
         "type": "parallel",
         "data": {
@@ -56,21 +73,21 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 5.0,
+    "maxAcceleration": 5.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 30.0,
+    "rotation": 0,
     "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": 59.62087398863165,
+    "rotation": -59.47108122922634,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }
