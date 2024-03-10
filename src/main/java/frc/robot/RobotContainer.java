@@ -82,6 +82,8 @@ public class RobotContainer {
             MaxAngularRate = 3.0 * Math.PI;
           }
         ));*/
+
+        // Intake command
         driver.rightBumper().whileTrue(Commands.either(
             Commands.startEnd(
                 () -> arm.setIntakePercent(1.0),
@@ -270,30 +272,36 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("Shoot", Commands.sequence(
             arm.spinWheelsCommand(65.0),
-            Commands.runOnce(() -> arm.setIntakePercent(0.6), arm),
+            Commands.runOnce(() -> arm.setIntakePercent(1.0), arm),
             Commands.waitSeconds(0.5),
             Commands.runOnce(() -> {
                 arm.setIntakePercent(0.0);
-                arm.setShooterMotorVelocity(0.0); // Kevin action
+                // arm.setShooterMotorVelocity(0.0); // Kevin action
             }, arm)
         ));
 
-        NamedCommands.registerCommand("DorpWristAndShoot", Commands.sequence(
-            arm.moveWristPositionCommand(5.5),
+        NamedCommands.registerCommand("DropWristAndShoot", Commands.sequence(
+            arm.moveWristPositionCommand(0.5),
             arm.spinWheelsCommand(65.0)
         ));
 
         NamedCommands.registerCommand("Intake", Commands.startEnd(
-            () -> arm.setIntakePercent(0.6),
+            () -> arm.setIntakePercent(0.5),
             () -> arm.setIntakePercent(0.0),
             arm
         ).until(() -> arm.getLineBreak()));
 
         NamedCommands.registerCommand("LiftWrist5.5", arm.moveWristPositionCommand(5.5));
+        NamedCommands.registerCommand("LiftWrist6.5", arm.moveWristPositionCommand(6.5));
+        NamedCommands.registerCommand("LiftWrist5.8", arm.moveWristPositionCommand(5.8));
+        NamedCommands.registerCommand("LiftWrist4.8", arm.moveWristPositionCommand(4.8));
+        NamedCommands.registerCommand("LiftWrist4.3", arm.moveWristPositionCommand(4.3));
+        NamedCommands.registerCommand("LiftWrist4.4", arm.moveWristPositionCommand(4.4));
         NamedCommands.registerCommand("LiftWrist3.8", arm.moveWristPositionCommand(3.8));
         NamedCommands.registerCommand("LiftWrist4.2", arm.moveWristPositionCommand(4.2));
         NamedCommands.registerCommand("LiftWrist6.7", arm.moveWristPositionCommand(6.7));
 
+        NamedCommands.registerCommand("Stop Wheels", arm.spinWheelsCommand(0));
         if (Utils.isSimulation()) {
             drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
         }

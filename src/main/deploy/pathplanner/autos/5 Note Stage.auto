@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.81,
-      "y": 6.67
+      "x": 0.84,
+      "y": 4.43
     },
-    "rotation": 60.0
+    "rotation": -60.0
   },
   "command": {
     "type": "sequential",
@@ -14,7 +14,7 @@
         {
           "type": "named",
           "data": {
-            "name": "MoveWristToPickup"
+            "name": "DropWristAndShoot"
           }
         },
         {
@@ -26,13 +26,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TopToTop"
+            "pathName": "BottomToBottom"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist4.8"
+            "name": "LiftWrist4.2"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.33
           }
         },
         {
@@ -50,7 +56,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TopToMiddle"
+            "pathName": "BottomToMiddle"
           }
         },
         {
@@ -60,6 +66,12 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.33
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "Shoot"
@@ -74,13 +86,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "MiddleToBottom"
+            "pathName": "MiddleToTop"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist4.8"
+            "name": "LiftWrist4.4"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.33
           }
         },
         {
@@ -90,9 +108,21 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "midToTopToFar"
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "MoveWristToPickup"
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "GrabMidTop"
           }
         }
       ]

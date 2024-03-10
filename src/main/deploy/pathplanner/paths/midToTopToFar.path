@@ -3,41 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.8,
-        "y": 6.86
+        "x": 2.6,
+        "y": 6.8
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.724259300582153,
-        "y": 6.4782346986859745
+        "x": 3.211894396635447,
+        "y": 7.216155316397787
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.25,
-        "y": 6.25
+        "x": 8.1,
+        "y": 7.75
       },
       "prevControl": {
-        "x": 9.096887082663056,
-        "y": 6.306035334292892
+        "x": 6.5,
+        "y": 7.75
       },
       "nextControl": {
-        "x": 7.3341026295936365,
-        "y": 6.189398514419047
+        "x": 9.7,
+        "y": 7.75
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.2,
-        "y": 5.86
+        "x": 3.5,
+        "y": 6.86
       },
       "prevControl": {
-        "x": 4.991546190744791,
-        "y": 6.856894381784655
+        "x": 5.074459096851181,
+        "y": 7.281875043517109
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,16 +46,16 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.3,
-      "rotationDegrees": -45.0,
+      "waypointRelativePos": 0.8,
+      "rotationDegrees": 0,
       "rotateFast": true
     }
   ],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Wrist to Pickup",
-      "waypointRelativePos": 0.15,
+      "name": "Move wrist intake",
+      "waypointRelativePos": 0.2,
       "command": {
         "type": "parallel",
         "data": {
@@ -72,7 +72,7 @@
     },
     {
       "name": "Intake",
-      "waypointRelativePos": 0.55,
+      "waypointRelativePos": 0.6,
       "command": {
         "type": "parallel",
         "data": {
@@ -88,8 +88,8 @@
       }
     },
     {
-      "name": "Lift Wrist",
-      "waypointRelativePos": 1.35,
+      "name": "Lift wrist",
+      "waypointRelativePos": 1.55,
       "command": {
         "type": "parallel",
         "data": {
@@ -97,7 +97,7 @@
             {
               "type": "named",
               "data": {
-                "name": "LiftWrist5.8"
+                "name": "LiftWrist5.5"
               }
             }
           ]
@@ -106,20 +106,20 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 5.0,
-    "maxAcceleration": 5.0,
+    "maxVelocity": 6.0,
+    "maxAcceleration": 6.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0,
+    "rotation": 20.213461406776503,
     "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": 29.85066348457122,
+    "rotation": 25.981723993347117,
     "velocity": 0
   },
   "useDefaultConstraints": false

@@ -32,7 +32,7 @@
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist5.5"
+            "name": "LiftWrist4.8"
           }
         },
         {
@@ -57,18 +57,6 @@
           "type": "path",
           "data": {
             "pathName": "Top to TopMid"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Top to Mid"
           }
         },
         {
