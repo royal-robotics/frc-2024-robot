@@ -57,6 +57,6 @@ public class Vision {
     }
 
     public double getShootingAngle(double distance) {
-        return (distance * 0.9) - 11.187; // (distance * 1.230) - 12.587;
+        return (distance * 0.9) - 11.3; // (distance * 1.230) - 12.587;
     }
 }

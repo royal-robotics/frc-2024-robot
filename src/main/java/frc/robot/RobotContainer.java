@@ -234,14 +234,14 @@ public class RobotContainer {
         ));
         operator.b().onTrue(Commands.sequence(
            arm.moveArmPositionCommand(19.0),
-           arm.moveWristPositionCommand(4.6),
+           arm.moveWristPositionCommand(4.5),
            Commands.startEnd(() -> arm.setIntakePercent(0.5), () -> arm.setIntakePercent(0.0)).until(() -> arm.getLineBreak())
         ));
-        operator.x().onTrue(Commands.sequence(
+        /*operator.x().onTrue(Commands.sequence(
           Commands.runOnce(() -> arm.setShooterMotorVelocity(60.0)),
           arm.moveArmPositionCommand(19.0),
           arm.moveWristPositionCommand(-10.5)
-        ));
+        ));*/
         operator.y().onTrue(Commands.sequence(
           arm.moveArmPositionCommand(30.25),
           arm.moveWristPositionCommand(-1.2),
@@ -256,7 +256,7 @@ public class RobotContainer {
         operator.leftBumper().onTrue(Commands.runOnce(() -> climber.climbRetract(), climber));
 
         armBottomTrigger.onTrue(Commands.runOnce(() -> arm.resetArmMotorPosition(0.0))
-            .onlyIf(() -> arm.getArmPosition() < 1.0)
+            .onlyIf(() -> arm.getArmPosition() < 0.0)
             .ignoringDisable(true));
         wristTopTrigger.onTrue(Commands.runOnce(() -> arm.resetWristMotorPosition(arm.getWristAbsPosition()))
             .ignoringDisable(true));
