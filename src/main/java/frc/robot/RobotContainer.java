@@ -232,6 +232,11 @@ public class RobotContainer {
           arm.moveWristPositionCommand(-13.5),
           Commands.runOnce(() -> arm.setShooterMotorVelocity(60.0))
         ));
+        operator.b().onTrue(Commands.sequence(
+           arm.moveArmPositionCommand(19.0),
+           arm.moveWristPositionCommand(4.6),
+           Commands.startEnd(() -> arm.setIntakePercent(0.5), () -> arm.setIntakePercent(0.0)).until(() -> arm.getLineBreak())
+        ));
         operator.x().onTrue(Commands.sequence(
           Commands.runOnce(() -> arm.setShooterMotorVelocity(60.0)),
           arm.moveArmPositionCommand(19.0),

@@ -30,12 +30,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "Bottom To Bottom Mid"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Shoot"

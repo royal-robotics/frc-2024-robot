@@ -16,12 +16,28 @@
     },
     {
       "anchor": {
-        "x": 8.09,
-        "y": 0.76
+        "x": 8.25,
+        "y": 0.85
       },
       "prevControl": {
-        "x": 6.67400445912003,
-        "y": 0.42756752180170954
+        "x": 7.763234535328583,
+        "y": 0.7357223451272307
+      },
+      "nextControl": {
+        "x": 8.736765464671416,
+        "y": 0.9642776548727695
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.75,
+        "y": 3.0
+      },
+      "prevControl": {
+        "x": 5.1965866128021485,
+        "y": 0.8331582116676501
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,7 +46,7 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.7,
+      "waypointRelativePos": 0.65,
       "rotationDegrees": -5.228930446863586,
       "rotateFast": true
     }
@@ -39,7 +55,7 @@
   "eventMarkers": [
     {
       "name": "Wrist To Pickup",
-      "waypointRelativePos": 0.7,
+      "waypointRelativePos": 0.35,
       "command": {
         "type": "parallel",
         "data": {
@@ -56,7 +72,7 @@
     },
     {
       "name": "Intake",
-      "waypointRelativePos": 0.9,
+      "waypointRelativePos": 0.55,
       "command": {
         "type": "parallel",
         "data": {
@@ -70,17 +86,34 @@
           ]
         }
       }
+    },
+    {
+      "name": "LiftWrist",
+      "waypointRelativePos": 1.5,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "LiftWrist5.5"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 5.0,
-    "maxAcceleration": 5.0,
+    "maxVelocity": 6.0,
+    "maxAcceleration": 6.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": -36.08106938419528,
     "rotateFast": false
   },
   "reversed": false,

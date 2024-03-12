@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.09,
-        "y": 0.76
+        "x": 8.25,
+        "y": 0.85
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.690599158976097,
-        "y": 1.282702565405131
+        "x": 5.850599158976097,
+        "y": 1.372702565405131
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.32,
-        "y": 2.82
+        "x": 2.75,
+        "y": 3.0
       },
       "prevControl": {
-        "x": 4.317684859505942,
-        "y": 1.936391288233216
+        "x": 3.747684859505942,
+        "y": 2.1163912882332165
       },
       "nextControl": null,
       "isLocked": false,
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "LiftWrist4.2"
+                "name": "LiftWrist5.5"
               }
             }
           ]
@@ -50,14 +50,14 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 6.0,
+    "maxAcceleration": 6.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -36.25383773744471,
+    "rotation": -34.926535930233655,
     "rotateFast": false
   },
   "reversed": false,
@@ -66,5 +66,5 @@
     "rotation": 0,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }
