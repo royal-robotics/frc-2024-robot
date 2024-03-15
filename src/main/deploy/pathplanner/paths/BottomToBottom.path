@@ -17,18 +17,24 @@
     {
       "anchor": {
         "x": 2.55,
-        "y": 4.3
+        "y": 4.25
       },
       "prevControl": {
         "x": 2.0191199089194845,
-        "y": 4.3
+        "y": 4.25
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": -25.0,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [
     {
@@ -57,7 +63,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -25.0,
+    "rotation": -28.57247798693784,
     "rotateFast": false
   },
   "reversed": false,

@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.2296446815115856,
-        "y": 2.950215900431801
+        "x": 1.1604194636960707,
+        "y": 1.14343771544686
       },
       "isLocked": false,
       "linkedName": null
@@ -17,15 +17,15 @@
     {
       "anchor": {
         "x": 8.25,
-        "y": 0.85
+        "y": 0.15
       },
       "prevControl": {
         "x": 7.763234535328583,
-        "y": 0.7357223451272307
+        "y": 0.03572234512723069
       },
       "nextControl": {
         "x": 8.736765464671416,
-        "y": 0.9642776548727695
+        "y": 0.26427765487276955
       },
       "isLocked": false,
       "linkedName": null
@@ -33,11 +33,11 @@
     {
       "anchor": {
         "x": 2.75,
-        "y": 3.0
+        "y": 2.75
       },
       "prevControl": {
-        "x": 5.1965866128021485,
-        "y": 0.8331582116676501
+        "x": 3.4912732682608225,
+        "y": 0.40967560506549605
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,7 +46,7 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.65,
+      "waypointRelativePos": 0.8,
       "rotationDegrees": -5.228930446863586,
       "rotateFast": true
     }
@@ -97,7 +97,7 @@
             {
               "type": "named",
               "data": {
-                "name": "LiftWrist5.5"
+                "name": "LiftWrist6.0"
               }
             }
           ]
@@ -113,7 +113,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -36.08106938419528,
+    "rotation": -45.03157703254123,
     "rotateFast": false
   },
   "reversed": false,

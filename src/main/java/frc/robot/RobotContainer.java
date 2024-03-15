@@ -109,7 +109,7 @@ public class RobotContainer {
             })*/.until(() -> arm.getLineBreak()),
             () -> arm.getLineBreak()));
         driver.rightTrigger().onTrue(Commands.sequence(
-            arm.spinWheelsCommand(65.0),
+            arm.spinWheelsCommand(60.0),
             Commands.runOnce(() -> arm.setIntakePercent(1.0)),
             Commands.waitSeconds(0.5),
             Commands.runOnce(() -> {
@@ -141,8 +141,10 @@ public class RobotContainer {
                 vision.refresh();
                 if (vision.hasAprilTag()) {
                     PhotonTrackedTarget currentTag = vision.getAprilTag(4);
+                    double targetYaw = -3.0;
                     if (currentTag == null) {
                         currentTag = vision.getAprilTag(7);
+                        targetYaw = -3.0;
                     }
 
                     if (currentTag != null) {
@@ -153,7 +155,7 @@ public class RobotContainer {
                             arm.setShooterMotorVelocity(65.0);
                         }
                         arm.setWristPosition(vision.getShootingAngle(distance));
-                        if (currentTag.getYaw() < 0.5 && currentTag.getYaw() > -0.5) {
+                        if (currentTag.getYaw() < targetYaw + 0.5 && currentTag.getYaw() > targetYaw - 0.5) {
                             for (int i = 0; i < ledData.getLength(); i++) {
                                 ledData.setRGB(i, 0, 0, 255);
                             }
@@ -161,7 +163,7 @@ public class RobotContainer {
                         }
                         return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
                             .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
-                            .withRotationalRate(-Units.degreesToRadians(currentTag.getYaw()) * MaxAngularRate * 1.9);
+                            .withRotationalRate(-Units.degreesToRadians(currentTag.getYaw() - targetYaw) * MaxAngularRate * 1.9);
                     }
                 }
 
@@ -230,18 +232,18 @@ public class RobotContainer {
         operator.a().onTrue(Commands.sequence(
           arm.moveArmPositionCommand(19.0),
           arm.moveWristPositionCommand(-13.5),
-          Commands.runOnce(() -> arm.setShooterMotorVelocity(60.0))
+          Commands.runOnce(() -> arm.setShooterMotorVelocity(55.0))
         ));
         operator.b().onTrue(Commands.sequence(
            arm.moveArmPositionCommand(19.0),
            arm.moveWristPositionCommand(4.5),
            Commands.startEnd(() -> arm.setIntakePercent(0.5), () -> arm.setIntakePercent(0.0)).until(() -> arm.getLineBreak())
         ));
-        /*operator.x().onTrue(Commands.sequence(
-          Commands.runOnce(() -> arm.setShooterMotorVelocity(60.0)),
+        operator.x().onTrue(Commands.sequence(
+          Commands.runOnce(() -> arm.setShooterMotorVelocity(70.0)),
           arm.moveArmPositionCommand(19.0),
-          arm.moveWristPositionCommand(-10.5)
-        ));*/
+          arm.moveWristPositionCommand(-2.0)
+        ));
         operator.y().onTrue(Commands.sequence(
           arm.moveArmPositionCommand(30.25),
           arm.moveWristPositionCommand(-1.2),
@@ -298,6 +300,8 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("LiftWrist5.5", arm.moveWristPositionCommand(5.5));
         NamedCommands.registerCommand("LiftWrist6.5", arm.moveWristPositionCommand(6.5));
+        NamedCommands.registerCommand("LiftWrist6.4", arm.moveWristPositionCommand(6.4));
+        NamedCommands.registerCommand("LiftWrist6.0", arm.moveWristPositionCommand(6.0));
         NamedCommands.registerCommand("LiftWrist5.8", arm.moveWristPositionCommand(5.8));
         NamedCommands.registerCommand("LiftWrist4.8", arm.moveWristPositionCommand(4.8));
         NamedCommands.registerCommand("LiftWrist4.3", arm.moveWristPositionCommand(4.3));

@@ -53,7 +53,7 @@ public class Arm extends SubsystemBase {
     private final TalonFX intakeMotor = new TalonFX(6); // Intake motor ID 6
     
     private final CANcoder armEncoder = new CANcoder(5); 
-    private final double encoderOffset = 17.5;
+    private final double encoderOffset = 73.0;
 
     private final MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
     private final MotorOutputConfigs armMotorConfigs = new MotorOutputConfigs();

@@ -31,6 +31,8 @@ public class OurShuffleboard {
         armTab.addDouble("Arm Angle", () -> arm.getArmAngle()).withPosition(1, 2);
         armTab.addDouble("Wrist Position", () -> arm.getWristPosition()).withPosition(3, 2);
         armTab.addDouble("Wrist Angle", () -> arm.getWristAngle()).withPosition(4, 2);
+        armTab.addDouble("Wrist Abs Position", () -> arm.getWristAbsPosition()).withPosition(3, 3);
+        armTab.addDouble("Wrist Abs Angle", () -> arm.getWristAbsAngle()).withPosition(4, 3);
         armTab.addDouble("ShooterRPS", () -> arm.getShooterMotorVelocity()).withPosition(6, 2);
         armTab.addDouble("ShooterRPM", () -> arm.getShooterWheelRPM()).withPosition(7, 2);
 
