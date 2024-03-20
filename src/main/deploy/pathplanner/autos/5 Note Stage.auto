@@ -32,13 +32,7 @@
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist4.8"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.33
+            "name": "LiftWrist4.5"
           }
         },
         {
@@ -62,13 +56,7 @@
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist3.8"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.33
+            "name": "LiftWrist4.2"
           }
         },
         {
@@ -92,13 +80,7 @@
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist4.8"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.33
+            "name": "LiftWrist4.5"
           }
         },
         {
