@@ -30,9 +30,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
 
-    CurrentLimitsConfigs currentLimit = new CurrentLimitsConfigs()
-        .withStatorCurrentLimitEnable(true)
-        .withStatorCurrentLimit(30);
+    // Current limit config
+    CurrentLimitsConfigs currentLimit = new CurrentLimitsConfigs();
+
+    // Swerve chassis speed request
     SwerveRequest.ApplyChassisSpeeds chassisSpeedsRequest = new SwerveRequest.ApplyChassisSpeeds();
 
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
@@ -41,7 +42,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             startSimThread();
         }
 
-        // Configure AutoBuilder last
+        // Configure PathPlanner AutoBuilder
         AutoBuilder.configureHolonomic(
             this::getPose, // Robot pose supplier
             this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
@@ -55,52 +56,65 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     new ReplanningConfig() // Default path replanning config. See the API for the options here
             ),
             () -> {
-              // Boolean supplier that controls when the path will be mirrored for the red alliance
-              // This will flip the path being followed to the red side of the field.
-              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-              var alliance = DriverStation.getAlliance();
-              if (alliance.isPresent()) {
-                return alliance.get() == DriverStation.Alliance.Red;
-              }
-              return false;
+                // Boolean supplier that controls when the path will be mirrored for the red alliance
+                // This will flip the path being followed to the red side of the field.
+                // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+                var alliance = DriverStation.getAlliance();
+                if (alliance.isPresent()) {
+                    return alliance.get() == DriverStation.Alliance.Red;
+                }
+                return false;
             },
             this // Reference to this subsystem to set requirements
         );
+
+        // Configure the current limit to 30 amps
+        currentLimit.StatorCurrentLimitEnable = true;
+        currentLimit.StatorCurrentLimit = 30.0;
+
+        // Apply the current limit to the steer motors
         this.Modules[0].getSteerMotor().getConfigurator().apply(currentLimit);
         this.Modules[1].getSteerMotor().getConfigurator().apply(currentLimit);
         this.Modules[2].getSteerMotor().getConfigurator().apply(currentLimit);
         this.Modules[3].getSteerMotor().getConfigurator().apply(currentLimit);
     }
 
+    // Return the current pose of the robot
     public Pose2d getPose() {
         return this.getState().Pose;
     }
 
+    // Reset the robot pose to the given pose
     public void resetPose(Pose2d pose) {
         this.m_odometry.resetPosition(m_pigeon2.getRotation2d(), m_modulePositions, pose);
     }
 
+    // Return the current chassis speeds of the robot
     public ChassisSpeeds getChassisSpeeds() {
         return this.m_kinematics.toChassisSpeeds(this.getState().ModuleStates);
     }
 
+    // Apply the given chassis speeds to the robot
     public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
         this.setControl(chassisSpeedsRequest.withSpeeds(chassisSpeeds));
     }
 
+    // Return the X value of the robot pose
     public double odometryX() {
         return this.getState().Pose.getX();
     }
 
+    // Return the Y value of the robot pose
     public double odometryY() {
         return this.getState().Pose.getY();
     }
 
+    // Return the angle of the robot pose
     public double getAngle() {
         return this.getState().Pose.getRotation().getDegrees();
     }
 
+    // Apply the swerve request to the robot
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
         return run(() -> this.setControl(requestSupplier.get()));
     }

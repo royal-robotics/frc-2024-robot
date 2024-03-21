@@ -4,10 +4,6 @@
 
 package frc.robot;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix6.Utils;
@@ -15,7 +11,6 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest.ForwardReference;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,8 +18,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -109,7 +102,7 @@ public class RobotContainer {
             })*/.until(() -> arm.getLineBreak()),
             () -> arm.getLineBreak()));
         driver.rightTrigger().onTrue(Commands.sequence(
-            arm.spinWheelsCommand(60.0),
+            arm.spinShooterMotorCommand(60.0),
             Commands.runOnce(() -> arm.setIntakePercent(1.0)),
             Commands.waitSeconds(0.5),
             Commands.runOnce(() -> {
@@ -278,7 +271,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("MoveWristToPickup", arm.moveWristPositionCommand(0.5));
 
         NamedCommands.registerCommand("Shoot", Commands.sequence(
-            arm.spinWheelsCommand(65.0),
+            arm.spinShooterMotorCommand(65.0),
             Commands.waitSeconds(0.33),
             Commands.runOnce(() -> arm.setIntakePercent(1.0), arm),
             Commands.waitSeconds(0.5),
@@ -290,7 +283,7 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("DropWristAndShoot", Commands.sequence(
             arm.moveWristPositionCommand(0.5),
-            arm.spinWheelsCommand(65.0)
+            arm.spinShooterMotorCommand(65.0)
         ));
 
         NamedCommands.registerCommand("Intake", Commands.startEnd(
@@ -314,7 +307,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("LiftWrist4.2", arm.moveWristPositionCommand(4.2));
         NamedCommands.registerCommand("LiftWrist6.7", arm.moveWristPositionCommand(6.7));
 
-        NamedCommands.registerCommand("Stop Wheels", arm.spinWheelsCommand(0));
+        NamedCommands.registerCommand("Stop Wheels", arm.spinShooterMotorCommand(0));
         if (Utils.isSimulation()) {
             drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
         }
@@ -342,21 +335,10 @@ public class RobotContainer {
     }
 
     public void setArmCoast() {
-        arm.setMotorCoast();
+        arm.configureMotorsCoast();
     }
 
     public void setArmBrake() {
-        arm.setMotorBrake();
-    }
-
-    public void setDriveDirection() {
-        Optional<Alliance> alliance = DriverStation.getAlliance();
-        if (alliance.isPresent()) {
-            Alliance allianceValue = alliance.get();
-            if (allianceValue == Alliance.Red) {
-                drivetrain.seedFieldRelative(new Pose2d(drivetrain.getPose().getTranslation(), Rotation2d.fromDegrees(180.0)));
-                drivetrain.seedFieldRelative();
-            }
-        }
+        arm.configureMotorsBrake();
     }
 }
