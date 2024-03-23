@@ -7,10 +7,10 @@ package frc.robot;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -190,6 +190,8 @@ public class RobotContainer {
                     .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate);
             }
         })));*/
+
+        // Note Tracking
         driver.leftBumper().whileTrue(Commands.either(
             Commands.startEnd(
                 () -> arm.setIntakePercent(1.0),
@@ -247,14 +249,21 @@ public class RobotContainer {
           arm.moveWristPositionCommand(0.5),
           arm.moveArmPositionCommand(0.0)
         ));
+        
+        // Extend Climber
         operator.rightBumper().onTrue(Commands.runOnce(() -> climber.climbExtend(), climber));
+        // Retract Climber
         operator.leftBumper().onTrue(Commands.runOnce(() -> climber.climbRetract(), climber));
 
+        // Set arm position to zero
         armBottomTrigger.onTrue(Commands.runOnce(() -> arm.resetArmMotorPosition(0.0))
             .onlyIf(() -> arm.getArmPosition() < 0.0)
             .ignoringDisable(true));
+        
         wristTopTrigger.onTrue(Commands.runOnce(() -> arm.resetWristMotorPosition(arm.getWristAbsPosition()))
             .ignoringDisable(true));
+        
+        // Set LEDs to Green when Note triggers linebreak
         lineBreakTrigger.onTrue(Commands.runOnce(() -> {
             for (int i = 0; i < ledData.getLength(); i++) {
                 ledData.setRGB(i, 0, 255, 0);
