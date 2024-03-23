@@ -3,41 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.9,
-        "y": 7.15
+        "x": 4.75,
+        "y": 2.25
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.9,
-        "y": 7.15
+        "x": 4.75,
+        "y": 1.25
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.1,
-        "y": 7.65
+        "x": 8.25,
+        "y": 4.0
       },
       "prevControl": {
-        "x": 7.1,
-        "y": 7.65
+        "x": 8.25,
+        "y": 0.9999999999999996
       },
       "nextControl": {
-        "x": 9.1,
-        "y": 7.65
+        "x": 8.25,
+        "y": 4.1
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.8,
-        "y": 6.86
+        "x": 4.75,
+        "y": 2.25
       },
       "prevControl": {
-        "x": 6.374459096851181,
-        "y": 7.281875043517109
+        "x": 6.871320343559643,
+        "y": 0.12867965644035717
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,33 +46,21 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1.0,
+      "waypointRelativePos": 0.5,
       "rotationDegrees": 0.0,
+      "rotateFast": true
+    },
+    {
+      "waypointRelativePos": 2.0,
+      "rotationDegrees": 135.0,
       "rotateFast": false
     }
   ],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "New Event Marker",
-      "waypointRelativePos": 0.35,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "MoveWristToPickup"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "New Event Marker",
-      "waypointRelativePos": 0.55,
+      "name": "intake",
+      "waypointRelativePos": 0.45,
       "command": {
         "type": "parallel",
         "data": {
@@ -81,23 +69,6 @@
               "type": "named",
               "data": {
                 "name": "Intake"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "New Event Marker",
-      "waypointRelativePos": 1.35,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "LiftWrist6.4"
               }
             }
           ]
@@ -113,13 +84,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 14.22564223794781,
+    "rotation": 142.05679168507666,
     "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": 29.85066348457122,
+    "rotation": 142.63546195159876,
     "velocity": 0
   },
   "useDefaultConstraints": false

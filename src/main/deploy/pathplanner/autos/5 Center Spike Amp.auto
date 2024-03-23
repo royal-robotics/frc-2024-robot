@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.84,
-      "y": 4.43
+      "x": 1.38,
+      "y": 5.54
     },
-    "rotation": -60.0
+    "rotation": 0.0
   },
   "command": {
     "type": "sequential",
@@ -14,19 +14,13 @@
         {
           "type": "named",
           "data": {
-            "name": "MoveWristToPickup"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
+            "name": "DropWristAndShoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "BottomToBottom"
+            "pathName": "MiddleToBot"
           }
         },
         {
@@ -50,7 +44,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BottomToMiddleSlow"
+            "pathName": "BottomToMiddle"
           }
         },
         {
@@ -74,7 +68,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "MiddleToTopSlow"
+            "pathName": "MiddleToTop"
           }
         },
         {
@@ -93,6 +87,48 @@
           "type": "named",
           "data": {
             "name": "MoveWristToPickup"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TopToFar"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LiftWrist4.2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "MoveWristToPickup"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Top to TopMid"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LiftWrist4.2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
           }
         }
       ]

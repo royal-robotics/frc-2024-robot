@@ -58,6 +58,24 @@
           "data": {
             "name": "MoveWristToPickup"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BottomMid To BottomMid"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LiftWrist6.4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
         }
       ]
     }

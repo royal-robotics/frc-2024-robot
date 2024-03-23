@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.generated.TunerConstants;
@@ -101,9 +102,13 @@ public class RobotContainer {
                 }
             })*/.until(() -> arm.getLineBreak()),
             () -> arm.getLineBreak()));
+
+        // Speaker Shot
         driver.rightTrigger().onTrue(Commands.sequence(
-            arm.spinShooterMotorCommand(60.0),
+            // Start intake and shooter motors simultaneously
+            arm.spinShooterMotorCommand(65.0),
             Commands.runOnce(() -> arm.setIntakePercent(1.0)),
+            // Wait half a second to end intake
             Commands.waitSeconds(0.5),
             Commands.runOnce(() -> {
                 arm.setIntakePercent(0.0);
@@ -116,6 +121,7 @@ public class RobotContainer {
             () -> arm.setIntakePercent(-0.5), 
             () -> arm.setIntakePercent(0.0))
         );
+        // Nickey's Favorite Button
         driver.y().onTrue(Commands.sequence(
             Commands.runOnce(() -> arm.setIntakePercent(-0.3)),
             Commands.waitSeconds(0.1),
@@ -128,18 +134,23 @@ public class RobotContainer {
         // Tracking shot
         driver.leftTrigger().whileTrue(Commands.repeatingSequence(
             Commands.runOnce(() -> arm.setShooterMotorVelocity(65.0)),
+            // Clamshot
             arm.moveArmPositionCommand(19.0),
             arm.moveWristPositionCommand(-8.8),
             drivetrain.applyRequest(() -> {
                 vision.refresh();
                 if (vision.hasAprilTag()) {
+                    // Find AprilTag ID 4 first
                     PhotonTrackedTarget currentTag = vision.getAprilTag(4);
                     double targetYaw = -3.0;
+
+                    // Now find AprilTag ID 7
                     if (currentTag == null) {
                         currentTag = vision.getAprilTag(7);
                         targetYaw = -3.0;
                     }
 
+                    // if AprilTag found, run tracking code
                     if (currentTag != null) {
                         double distance = vision.getAprilTagDistance(currentTag);
                         if (distance > 3.9) {
@@ -148,6 +159,8 @@ public class RobotContainer {
                             arm.setShooterMotorVelocity(65.0);
                         }
                         arm.setWristPosition(vision.getShootingAngle(distance));
+                        
+                        // Set LEDs to blue when AprilTag is bieng tracked
                         if (currentTag.getYaw() < targetYaw + 0.5 && currentTag.getYaw() > targetYaw - 0.5) {
                             for (int i = 0; i < ledData.getLength(); i++) {
                                 ledData.setRGB(i, 0, 0, 255);
@@ -224,26 +237,36 @@ public class RobotContainer {
           Commands.waitSeconds(0.2).onlyIf(() -> arm.getArmPosition() > 25.0),
           arm.moveWristPositionCommand(-20.5)
         ));
+
+        // Clamshot
         operator.a().onTrue(Commands.sequence(
           arm.moveArmPositionCommand(19.0),
           arm.moveWristPositionCommand(-13.5),
           Commands.runOnce(() -> arm.setShooterMotorVelocity(55.0))
         ));
+
+        // Source intake
         operator.b().onTrue(Commands.sequence(
            arm.moveArmPositionCommand(19.0),
            arm.moveWristPositionCommand(4.5),
            Commands.startEnd(() -> arm.setIntakePercent(0.5), () -> arm.setIntakePercent(0.0)).until(() -> arm.getLineBreak())
         ));
+
+        // Passing
         operator.x().onTrue(Commands.sequence(
           Commands.runOnce(() -> arm.setShooterMotorVelocity(70.0)),
           arm.moveArmPositionCommand(19.0),
           arm.moveWristPositionCommand(-2.0)
         ));
+
+        // Amp
         operator.y().onTrue(Commands.sequence(
           arm.moveArmPositionCommand(30.25),
           arm.moveWristPositionCommand(-1.2),
           Commands.runOnce(() -> arm.setShooterMotorVelocity(25.0))
         ));
+
+        // Stop shooter motors, reset to ground
         operator.rightTrigger().onTrue(Commands.sequence(
           Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
           arm.moveWristPositionCommand(0.5),
@@ -270,6 +293,8 @@ public class RobotContainer {
             }
             leds.setData(ledData);
         }).ignoringDisable(true));
+
+        // Set LEDs to Red when no note in Line Break
         lineBreakTrigger.onFalse(Commands.runOnce(() -> {
             for (int i = 0; i < ledData.getLength(); i++) {
                 ledData.setRGB(i, 255, 0, 0);
@@ -301,22 +326,25 @@ public class RobotContainer {
             arm
         ).until(() -> arm.getLineBreak()));
 
-        NamedCommands.registerCommand("LiftWrist5.5", arm.moveWristPositionCommand(5.5));
-        NamedCommands.registerCommand("LiftWrist5.0", arm.moveWristPositionCommand(5.0));
-        NamedCommands.registerCommand("LiftWrist5.3", arm.moveWristPositionCommand(5.3));
-        NamedCommands.registerCommand("LiftWrist6.5", arm.moveWristPositionCommand(6.5));
-        NamedCommands.registerCommand("LiftWrist6.4", arm.moveWristPositionCommand(6.4));
-        NamedCommands.registerCommand("LiftWrist6.0", arm.moveWristPositionCommand(6.0));
-        NamedCommands.registerCommand("LiftWrist5.8", arm.moveWristPositionCommand(5.8));
-        NamedCommands.registerCommand("LiftWrist4.8", arm.moveWristPositionCommand(4.8));
+        
+        
+        NamedCommands.registerCommand("LiftWrist3.8", arm.moveWristPositionCommand(3.8));
+        NamedCommands.registerCommand("LiftWrist4.2", arm.moveWristPositionCommand(4.2));
         NamedCommands.registerCommand("LiftWrist4.3", arm.moveWristPositionCommand(4.3));
         NamedCommands.registerCommand("LiftWrist4.4", arm.moveWristPositionCommand(4.4));
         NamedCommands.registerCommand("LiftWrist4.5", arm.moveWristPositionCommand(4.5));
-        NamedCommands.registerCommand("LiftWrist3.8", arm.moveWristPositionCommand(3.8));
-        NamedCommands.registerCommand("LiftWrist4.2", arm.moveWristPositionCommand(4.2));
+        NamedCommands.registerCommand("LiftWrist4.8", arm.moveWristPositionCommand(4.8));
+        NamedCommands.registerCommand("LiftWrist5.0", arm.moveWristPositionCommand(5.0));
+        NamedCommands.registerCommand("LiftWrist5.3", arm.moveWristPositionCommand(5.3));
+        NamedCommands.registerCommand("LiftWrist5.5", arm.moveWristPositionCommand(5.5));
+        NamedCommands.registerCommand("LiftWrist5.8", arm.moveWristPositionCommand(5.8));
+        NamedCommands.registerCommand("LiftWrist6.0", arm.moveWristPositionCommand(6.0));
+        NamedCommands.registerCommand("LiftWrist6.4", arm.moveWristPositionCommand(6.4));
+        NamedCommands.registerCommand("LiftWrist6.5", arm.moveWristPositionCommand(6.5));
         NamedCommands.registerCommand("LiftWrist6.7", arm.moveWristPositionCommand(6.7));
 
         NamedCommands.registerCommand("Stop Wheels", arm.spinShooterMotorCommand(0));
+
         if (Utils.isSimulation()) {
             drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
         }

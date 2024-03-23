@@ -5,7 +5,7 @@
       "x": 0.84,
       "y": 4.43
     },
-    "rotation": -60.0
+    "rotation": -59.25222829939525
   },
   "command": {
     "type": "sequential",
@@ -26,73 +26,55 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BottomToBottom"
+            "pathName": "Bottom to 2nd Far"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist3.8"
+            "name": "LiftWrist6.0"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "MoveWristToPickup"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "BottomToMiddleSlow"
+            "pathName": "B2F to MidFar"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist3.8"
+            "name": "LiftWrist5.8"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "MoveWristToPickup"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "MiddleToTopSlow"
+            "pathName": "B2F to BotFar"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist3.8"
+            "name": "LiftWrist5.3"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "MoveWristToPickup"
           }
         }
       ]

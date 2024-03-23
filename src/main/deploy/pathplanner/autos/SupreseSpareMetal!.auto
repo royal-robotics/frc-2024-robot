@@ -1,20 +1,20 @@
 {
   "version": 1.0,
-  "startingPose": {
-    "position": {
-      "x": 0.84,
-      "y": 4.43
-    },
-    "rotation": -60.0
-  },
+  "startingPose": null,
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "BearMiddle"
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "MoveWristToPickup"
+            "name": "LiftWrist5.8"
           }
         },
         {
@@ -26,73 +26,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BottomToBottom"
+            "pathName": "Spare BottomMid To BottomMid"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist3.8"
+            "name": "LiftWrist4.2"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "MoveWristToPickup"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "BottomToMiddleSlow"
+            "pathName": "Spare B2F to BotFar"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist3.8"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "MoveWristToPickup"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "MiddleToTopSlow"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "LiftWrist3.8"
+            "name": "LiftWrist4.8"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "MoveWristToPickup"
           }
         }
       ]
