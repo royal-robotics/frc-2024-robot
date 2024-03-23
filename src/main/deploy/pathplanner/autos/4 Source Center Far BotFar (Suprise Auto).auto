@@ -8,6 +8,24 @@
         {
           "type": "path",
           "data": {
+            "pathName": "StartBear"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LiftWrist4.5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
             "pathName": "BearMiddle"
           }
         },
