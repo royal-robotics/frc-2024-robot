@@ -106,6 +106,12 @@
           "data": {
             "pathName": "GrabMidTop"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
         }
       ]
     }

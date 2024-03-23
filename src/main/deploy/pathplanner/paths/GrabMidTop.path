@@ -51,7 +51,30 @@
       "rotateFast": true
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "To",
+      "minWaypointRelativePos": 0.05,
+      "maxWaypointRelativePos": 0.9,
+      "constraints": {
+        "maxVelocity": 10.0,
+        "maxAcceleration": 10.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    },
+    {
+      "name": "From",
+      "minWaypointRelativePos": 1.15,
+      "maxWaypointRelativePos": 1.9,
+      "constraints": {
+        "maxVelocity": 10.0,
+        "maxAcceleration": 10.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    }
+  ],
   "eventMarkers": [
     {
       "name": "MovetoIntake",
@@ -88,7 +111,7 @@
       }
     },
     {
-      "name": "StpoWheels",
+      "name": "Writs",
       "waypointRelativePos": 1.4,
       "command": {
         "type": "parallel",
@@ -97,7 +120,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Stop Wheels"
+                "name": "LiftWrist5.8"
               }
             }
           ]
@@ -106,14 +129,14 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 7.0,
-    "maxAcceleration": 9.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 20.316338124364613,
     "rotateFast": false
   },
   "reversed": false,
@@ -122,5 +145,5 @@
     "rotation": 0,
     "velocity": 0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.724259300582153,
-        "y": 6.4782346986859745
+        "x": 5.7659258262890685,
+        "y": 6.60118095489748
       },
       "isLocked": false,
       "linkedName": null
@@ -20,12 +20,12 @@
         "y": 6.25
       },
       "prevControl": {
-        "x": 9.096887082663056,
-        "y": 6.306035334292892
+        "x": 8.35,
+        "y": 6.25
       },
       "nextControl": {
-        "x": 7.3341026295936365,
-        "y": 6.189398514419047
+        "x": 7.25,
+        "y": 6.25
       },
       "isLocked": false,
       "linkedName": null
@@ -51,7 +51,30 @@
       "rotateFast": true
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "To",
+      "minWaypointRelativePos": 0.05,
+      "maxWaypointRelativePos": 0.8,
+      "constraints": {
+        "maxVelocity": 10.0,
+        "maxAcceleration": 10.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    },
+    {
+      "name": "From",
+      "minWaypointRelativePos": 1.1,
+      "maxWaypointRelativePos": 1.9,
+      "constraints": {
+        "maxVelocity": 10.0,
+        "maxAcceleration": 10.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    }
+  ],
   "eventMarkers": [
     {
       "name": "Wrist to Pickup",
@@ -106,8 +129,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 6.0,
-    "maxAcceleration": 6.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
@@ -122,5 +145,5 @@
     "rotation": 29.85066348457122,
     "velocity": 0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }
