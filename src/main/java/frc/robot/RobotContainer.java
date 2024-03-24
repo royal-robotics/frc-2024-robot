@@ -31,7 +31,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
-    private double MaxAngularRate = 3.0 * Math.PI; // 1.5 rotations per second max angular velocity
+    private double MaxAngularRate = 5.0 * Math.PI; // 1.5 rotations per second max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final CommandXboxController driver = new CommandXboxController(0); // My joystick for Driver
@@ -61,7 +61,7 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> drive
                 .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed) // Drive forward with negative Y (forward)
                 .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed) // Drive left with negative X (left)
-                .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate) // Drive counterclockwise with negative X (left)
         ));
 
         // reset the field-centric heading on left bumper press
@@ -169,7 +169,7 @@ public class RobotContainer {
                         }
                         return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
                             .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
-                            .withRotationalRate(-Units.degreesToRadians(currentTag.getYaw() - targetYaw) * MaxAngularRate * 1.9);
+                            .withRotationalRate(-Units.degreesToRadians(currentTag.getYaw() - targetYaw) * MaxAngularRate * 1.9 * (3.0 / 5.0));
                     }
                 }
 
@@ -179,7 +179,7 @@ public class RobotContainer {
                 leds.setData(ledData);
                 return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
                     .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
-                    .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate);
+                    .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate);
             }).finallyDo(() -> {
                 for (int i = 0; i < ledData.getLength(); i++) {
                     ledData.setRGB(i, 255, 0, 0);
@@ -222,14 +222,16 @@ public class RobotContainer {
                     double bestNoteYaw = bestNote.getYaw();
                     return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
                                 .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
-                                .withRotationalRate(-Units.degreesToRadians(bestNoteYaw) * MaxAngularRate * 0.50);
+                                .withRotationalRate(-Units.degreesToRadians(bestNoteYaw) * MaxAngularRate * 0.50 * (3.0 / 5.0));
                 } else {
                     return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
                         .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
-                        .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 2), -driver.getRightX()) * MaxAngularRate);
+                        .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate);
                 }
             }).finallyDo(() -> arm.setIntakePercent(0.0)),
             () -> arm.getLineBreak()));
+
+        // driver.rightStick().onTrue(Commands.startEnd(() -> MaxAngularRate = 5.0 * Math.PI, () -> MaxAngularRate = 3.0 * Math.PI));
 
         operator.leftTrigger().onTrue(Commands.sequence(
           Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
@@ -317,7 +319,14 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("DropWristAndShoot", Commands.sequence(
             arm.moveWristPositionCommand(0.5),
-            arm.spinShooterMotorCommand(65.0)
+            arm.spinShooterMotorCommand(65.0),
+            Commands.waitSeconds(0.33),
+            Commands.runOnce(() -> arm.setIntakePercent(1.0), arm),
+            Commands.waitSeconds(0.5),
+            Commands.runOnce(() -> {
+                arm.setIntakePercent(0.0);
+                // arm.setShooterMotorVelocity(0.0); // Kevin action
+            }, arm)
         ));
 
         NamedCommands.registerCommand("Intake", Commands.startEnd(

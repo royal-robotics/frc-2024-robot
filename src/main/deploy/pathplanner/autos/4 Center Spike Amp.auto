@@ -12,6 +12,12 @@
     "data": {
       "commands": [
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.99
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "DropWristAndShoot"
@@ -26,7 +32,7 @@
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist3.8"
+            "name": "LiftWrist4.5"
           }
         },
         {
@@ -44,55 +50,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BottomToMiddle"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "LiftWrist3.8"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "MoveWristToPickup"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "MiddleToTop"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "LiftWrist3.8"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "MoveWristToPickup"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "TopToFar"
+            "pathName": "BottomToMiddleSlow"
           }
         },
         {
@@ -116,19 +74,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Top to TopMid"
+            "pathName": "MiddleToTopSlow"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist4.2"
+            "name": "LiftWrist4.5"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Shoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Wheels"
           }
         }
       ]

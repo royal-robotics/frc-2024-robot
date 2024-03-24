@@ -16,15 +16,15 @@
     },
     {
       "anchor": {
-        "x": 8.25,
+        "x": 8.0,
         "y": 6.25
       },
       "prevControl": {
-        "x": 8.35,
+        "x": 8.1,
         "y": 6.25
       },
       "nextControl": {
-        "x": 7.25,
+        "x": 7.0,
         "y": 6.25
       },
       "isLocked": false,
@@ -55,7 +55,7 @@
     {
       "name": "To",
       "minWaypointRelativePos": 0.05,
-      "maxWaypointRelativePos": 0.8,
+      "maxWaypointRelativePos": 0.5,
       "constraints": {
         "maxVelocity": 10.0,
         "maxAcceleration": 10.0,
@@ -65,10 +65,10 @@
     },
     {
       "name": "From",
-      "minWaypointRelativePos": 1.1,
+      "minWaypointRelativePos": 0.5,
       "maxWaypointRelativePos": 1.9,
       "constraints": {
-        "maxVelocity": 10.0,
+        "maxVelocity": 3.0,
         "maxAcceleration": 10.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0

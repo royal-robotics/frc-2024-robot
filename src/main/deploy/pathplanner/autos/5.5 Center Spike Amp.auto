@@ -1,0 +1,139 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.38,
+      "y": 5.54
+    },
+    "rotation": 0.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "DropWristAndShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MiddleToBot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LiftWrist4.5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "MoveWristToPickup"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BottomToMiddle"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LiftWrist4.2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "MoveWristToPickup"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MiddleToTop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LiftWrist5.3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "MoveWristToPickup"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TopToFar"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LiftWrist6.0"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "MoveWristToPickup"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Top to TopMid"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LiftWrist4.2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
