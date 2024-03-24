@@ -338,6 +338,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("LiftWrist5.3", arm.moveWristPositionCommand(5.3));
         NamedCommands.registerCommand("LiftWrist5.5", arm.moveWristPositionCommand(5.5));
         NamedCommands.registerCommand("LiftWrist5.8", arm.moveWristPositionCommand(5.8));
+        NamedCommands.registerCommand("LiftWrist5.9", arm.moveWristPositionCommand(5.9));
         NamedCommands.registerCommand("LiftWrist6.0", arm.moveWristPositionCommand(6.0));
         NamedCommands.registerCommand("LiftWrist6.4", arm.moveWristPositionCommand(6.4));
         NamedCommands.registerCommand("LiftWrist6.5", arm.moveWristPositionCommand(6.5));

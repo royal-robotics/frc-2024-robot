@@ -49,7 +49,7 @@ public class Arm extends SubsystemBase {
     // Wrist Bottom motor (ID 7)
     private final TalonFX wristMotorFollow = new TalonFX(7);
     // Gear ratio between wrist motors and wrist output
-    private final double wristGearRatio = (12.0 / 84.0) * (18.0 / 84.0) * (24.0 / 64.0);
+    private final double wristGearRatio = (12.0 / 84.0) * (18.0 / 84.0) * (24.0 / 64.0); // 1 degree approximately 0.25 rotations
 
     // Shooter motor (ID 5)
     private final TalonFX shooterMotor = new TalonFX(5);
@@ -65,7 +65,7 @@ public class Arm extends SubsystemBase {
     private final double encoderOffset = 73.0;
 
     // Line Break sensor (RoboRIO Analog channel 3)
-    private final AnalogInput lineBreak = new AnalogInput(3);
+    private final AnalogInput lineBreak = new AnalogInput(0);
 
     // Limit Switch for wrist top (RoboRIO DIO channel 0)
     private final DigitalInput wristTopLimit = new DigitalInput(0);
@@ -553,6 +553,7 @@ public class Arm extends SubsystemBase {
 
         // Disable Arm Overrides since they cause loop overruns
         // Uncomment this and 2 other places to reenable
+
         /*
         if (armPositionOverride.getBoolean(false)) {
             armMotorFollow.setControl(new StrictFollower(armMotor.getDeviceID())); // Back right follows Front right
