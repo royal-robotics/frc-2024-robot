@@ -140,7 +140,7 @@ public class RobotContainer {
             () -> arm.setIntakePercent(-0.5), 
             () -> arm.setIntakePercent(0.0))
         );
-        
+
         // Nickey's Favorite Button
         driver.y().onTrue(Commands.sequence(
             Commands.runOnce(() -> arm.setIntakePercent(-0.3)),
@@ -174,6 +174,7 @@ public class RobotContainer {
                     if (currentTag != null) {
                         double distance = vision.getAprilTagDistance(currentTag);
                         if (distance > 3.9) {
+                            // Faster shooter motor further away
                             arm.setShooterMotorVelocity(75.0);
                         } else {
                             arm.setShooterMotorVelocity(65.0);

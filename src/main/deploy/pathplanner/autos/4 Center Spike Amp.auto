@@ -26,7 +26,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "MiddleToBot"
+            "pathName": "MiddleToBotSlow"
           }
         },
         {
@@ -80,7 +80,7 @@
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist4.5"
+            "name": "LiftWrist4.8"
           }
         },
         {
