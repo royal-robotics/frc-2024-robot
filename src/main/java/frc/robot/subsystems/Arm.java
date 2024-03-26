@@ -436,8 +436,7 @@ public class Arm extends SubsystemBase {
     }
 
     // Arm Command that moves the arm to the given angle
-    public Command moveArmAngleCommand(double angle)
-    {
+    public Command moveArmAngleCommand(double angle) {
         // Run the set arm angle function continuously
         return this.run(() -> this.setArmAngle(angle))
             // Move on to the next command when the arm gets "close enough" to the given angle
@@ -452,8 +451,7 @@ public class Arm extends SubsystemBase {
     }
 
     // Arm Command that moves the wrist to the given positions
-    public Command moveWristPositionCommand(double position)
-    {
+    public Command moveWristPositionCommand(double position) {
         // Run the set wrist position function continuously
         return this.run(() -> this.setWristPosition(position))
             // Move on to the next command when the wrist gets "close enough" to the given position
@@ -468,8 +466,7 @@ public class Arm extends SubsystemBase {
     }
 
     // Arm Command that moves the wrist to the given angle
-    public Command moveWristAngleCommand(double angle)
-    {
+    public Command moveWristAngleCommand(double angle) {
         // Run the set wrist angle function continuously
         return this.run(() -> this.setWristAngle(angle))
             // Move on to the next command when the wrist gets "close enough" to the given angle

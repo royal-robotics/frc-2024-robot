@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.Optional;
+
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix6.Utils;
@@ -18,6 +20,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -56,12 +60,27 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
+    private Alliance alliance;
+
     private void configureBindings() {
         drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() -> drive
-                .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed) // Drive forward with negative Y (forward)
-                .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed) // Drive left with negative X (left)
-                .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+            drivetrain.applyRequest(() -> {
+                Optional<Alliance> optionalAliance = DriverStation.getAlliance();
+                if (optionalAliance.isPresent()) {
+                    alliance = optionalAliance.get();
+                }
+                if (alliance == Alliance.Red) {
+                    return drive
+                    .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * -MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * -MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate); // Drive counterclockwise with negative X (left)
+                } else {
+                    return drive
+                    .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate); // Drive counterclockwise with negative X (left)
+                }
+            }
         ));
 
         // reset the field-centric heading on left bumper press
@@ -121,6 +140,7 @@ public class RobotContainer {
             () -> arm.setIntakePercent(-0.5), 
             () -> arm.setIntakePercent(0.0))
         );
+        
         // Nickey's Favorite Button
         driver.y().onTrue(Commands.sequence(
             Commands.runOnce(() -> arm.setIntakePercent(-0.3)),
@@ -167,9 +187,21 @@ public class RobotContainer {
                             }
                             leds.setData(ledData);
                         }
-                        return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
+                        Optional<Alliance> optionalAliance = DriverStation.getAlliance();
+                        if (optionalAliance.isPresent()) {
+                            alliance = optionalAliance.get();
+                        }
+                        if (alliance == Alliance.Red) {
+                            return drive
+                            .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * -MaxSpeed) // Drive forward with negative Y (forward)
+                            .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * -MaxSpeed) // Drive left with negative X (left)
+                            .withRotationalRate(-Units.degreesToRadians(currentTag.getYaw() - targetYaw) * MaxAngularRate * 1.9 * (3.0 / 5.0)); // Drive counterclockwise with negative X (left)
+                        } else {
+                            return drive
+                            .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
                             .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
                             .withRotationalRate(-Units.degreesToRadians(currentTag.getYaw() - targetYaw) * MaxAngularRate * 1.9 * (3.0 / 5.0));
+                        }
                     }
                 }
 
@@ -177,9 +209,21 @@ public class RobotContainer {
                     ledData.setRGB(i, 0, 255, 0);
                 }
                 leds.setData(ledData);
-                return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
+                Optional<Alliance> optionalAliance = DriverStation.getAlliance();
+                if (optionalAliance.isPresent()) {
+                    alliance = optionalAliance.get();
+                }
+                if (alliance == Alliance.Red) {
+                    return drive
+                    .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * -MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * -MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate); // Drive counterclockwise with negative X (left)
+                } else {
+                    return drive
+                    .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
                     .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
                     .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate);
+                }
             }).finallyDo(() -> {
                 for (int i = 0; i < ledData.getLength(); i++) {
                     ledData.setRGB(i, 255, 0, 0);
@@ -220,13 +264,37 @@ public class RobotContainer {
                 if(vision.hasNote()) {
                     PhotonTrackedTarget bestNote = vision.bestNote();
                     double bestNoteYaw = bestNote.getYaw();
-                    return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
-                                .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
-                                .withRotationalRate(-Units.degreesToRadians(bestNoteYaw) * MaxAngularRate * 0.50 * (3.0 / 5.0));
+                    Optional<Alliance> optionalAliance = DriverStation.getAlliance();
+                    if (optionalAliance.isPresent()) {
+                        alliance = optionalAliance.get();
+                    }
+                    if (alliance == Alliance.Red) {
+                        return drive
+                        .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * -MaxSpeed) // Drive forward with negative Y (forward)
+                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * -MaxSpeed) // Drive left with negative X (left)
+                        .withRotationalRate(-Units.degreesToRadians(bestNoteYaw) * MaxAngularRate * 0.50 * (3.0 / 5.0)); // Drive counterclockwise with negative X (left)
+                    } else { 
+                        return drive
+                        .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
+                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
+                        .withRotationalRate(-Units.degreesToRadians(bestNoteYaw) * MaxAngularRate * 0.50 * (3.0 / 5.0));
+                    }
                 } else {
-                    return drive.withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
+                    Optional<Alliance> optionalAliance = DriverStation.getAlliance();
+                    if (optionalAliance.isPresent()) {
+                        alliance = optionalAliance.get();
+                    }
+                    if (alliance == Alliance.Red) {
+                        return drive
+                        .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * -MaxSpeed) // Drive forward with negative Y (forward)
+                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * -MaxSpeed) // Drive left with negative X (left)
+                        .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate); // Drive counterclockwise with negative X (left)
+                    } else {
+                        return drive
+                        .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
                         .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
                         .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate);
+                    }
                 }
             }).finallyDo(() -> arm.setIntakePercent(0.0)),
             () -> arm.getLineBreak()));
@@ -234,45 +302,45 @@ public class RobotContainer {
         // driver.rightStick().onTrue(Commands.startEnd(() -> MaxAngularRate = 5.0 * Math.PI, () -> MaxAngularRate = 3.0 * Math.PI));
 
         operator.leftTrigger().onTrue(Commands.sequence(
-          Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
-          arm.moveArmPositionCommand(19.0),
-          Commands.waitSeconds(0.2).onlyIf(() -> arm.getArmPosition() > 25.0),
-          arm.moveWristPositionCommand(-20.5)
+            Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
+            arm.moveArmPositionCommand(19.0),
+            Commands.waitSeconds(0.2).onlyIf(() -> arm.getArmPosition() > 25.0),
+            arm.moveWristPositionCommand(-20.5)
         ));
 
         // Clamshot
         operator.a().onTrue(Commands.sequence(
-          arm.moveArmPositionCommand(19.0),
-          arm.moveWristPositionCommand(-13.5),
-          Commands.runOnce(() -> arm.setShooterMotorVelocity(55.0))
+            arm.moveArmPositionCommand(19.0),
+            arm.moveWristPositionCommand(-13.5),
+            Commands.runOnce(() -> arm.setShooterMotorVelocity(55.0))
         ));
 
         // Source intake
         operator.b().onTrue(Commands.sequence(
-           arm.moveArmPositionCommand(19.0),
-           arm.moveWristPositionCommand(4.5),
-           Commands.startEnd(() -> arm.setIntakePercent(0.5), () -> arm.setIntakePercent(0.0)).until(() -> arm.getLineBreak())
+            arm.moveArmPositionCommand(19.0),
+            arm.moveWristPositionCommand(4.5),
+            Commands.startEnd(() -> arm.setIntakePercent(0.5), () -> arm.setIntakePercent(0.0)).until(() -> arm.getLineBreak())
         ));
 
         // Passing
         operator.x().onTrue(Commands.sequence(
-          Commands.runOnce(() -> arm.setShooterMotorVelocity(70.0)),
-          arm.moveArmPositionCommand(19.0),
-          arm.moveWristPositionCommand(-2.0)
+            Commands.runOnce(() -> arm.setShooterMotorVelocity(70.0)),
+            arm.moveArmPositionCommand(19.0),
+            arm.moveWristPositionCommand(-2.0)
         ));
 
         // Amp
         operator.y().onTrue(Commands.sequence(
-          arm.moveArmPositionCommand(30.25),
-          arm.moveWristPositionCommand(-1.2),
-          Commands.runOnce(() -> arm.setShooterMotorVelocity(25.0))
+            arm.moveArmPositionCommand(30.25),
+            arm.moveWristPositionCommand(-1.2),
+            Commands.runOnce(() -> arm.setShooterMotorVelocity(25.0))
         ));
 
         // Stop shooter motors, reset to ground
         operator.rightTrigger().onTrue(Commands.sequence(
-          Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
-          arm.moveWristPositionCommand(0.5),
-          arm.moveArmPositionCommand(0.0)
+            Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
+            arm.moveWristPositionCommand(0.5),
+            arm.moveArmPositionCommand(0.0)
         ));
         
         // Extend Climber
