@@ -17,15 +17,15 @@
     {
       "anchor": {
         "x": 8.25,
-        "y": 0.05
+        "y": 0.4
       },
       "prevControl": {
-        "x": 7.763234535328583,
-        "y": -0.06427765487276933
+        "x": 7.7551567699180515,
+        "y": 0.47162525840835823
       },
       "nextControl": {
-        "x": 8.736765464671416,
-        "y": 0.16427765487276946
+        "x": 8.797997024565479,
+        "y": 0.32068108421931174
       },
       "isLocked": false,
       "linkedName": null
@@ -33,11 +33,11 @@
     {
       "anchor": {
         "x": 2.75,
-        "y": 2.75
+        "y": 3.0
       },
       "prevControl": {
         "x": 3.4914753157614493,
-        "y": 0.4097396110945062
+        "y": 0.6597396110945062
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,7 +47,7 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 1.0,
-      "rotationDegrees": -5.228930446863586,
+      "rotationDegrees": 0.0,
       "rotateFast": true
     }
   ],
@@ -58,18 +58,18 @@
       "maxWaypointRelativePos": 0.75,
       "constraints": {
         "maxVelocity": 7.0,
-        "maxAcceleration": 7.0,
+        "maxAcceleration": 4.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0
       }
     },
     {
       "name": "From",
-      "minWaypointRelativePos": 1.15,
+      "minWaypointRelativePos": 1.25,
       "maxWaypointRelativePos": 1.75,
       "constraints": {
         "maxVelocity": 7.0,
-        "maxAcceleration": 7.0,
+        "maxAcceleration": 4.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0
       }
@@ -126,6 +126,23 @@
           ]
         }
       }
+    },
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.45,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Reset Gyro"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "globalConstraints": {
@@ -136,7 +153,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -42.18565397229233,
+    "rotation": -45.0,
     "rotateFast": false
   },
   "reversed": false,

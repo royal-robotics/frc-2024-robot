@@ -20,6 +20,12 @@
         {
           "type": "named",
           "data": {
+            "name": "Reset Gyro"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "DropWristAndShoot"
           }
         },

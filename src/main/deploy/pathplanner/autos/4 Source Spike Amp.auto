@@ -26,7 +26,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BottomToBottom"
+            "pathName": "BottomToBottomSlow"
           }
         },
         {
@@ -51,6 +51,12 @@
           "type": "path",
           "data": {
             "pathName": "BottomToMiddleSlow"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Reset Gyro"
           }
         },
         {

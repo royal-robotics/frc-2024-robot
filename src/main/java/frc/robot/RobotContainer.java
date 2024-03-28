@@ -54,32 +54,19 @@ public class RobotContainer {
     private final Trigger lineBreakTrigger = new Trigger(() -> arm.getLineBreak());
 
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric() // I want field-centric
-        .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.05) // Add a 5% deadband
+        .withDeadband(MaxSpeed * 0.025).withRotationalDeadband(MaxAngularRate * 0.025) // Add a 2.5% deadband
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // driving in open loop
     //private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final SendableChooser<Command> autoChooser;
 
-    private Alliance alliance;
-
     private void configureBindings() {
         drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() -> {
-                Optional<Alliance> optionalAliance = DriverStation.getAlliance();
-                if (optionalAliance.isPresent()) {
-                    alliance = optionalAliance.get();
-                }
-                if (alliance == Alliance.Red) {
-                    return drive
-                    .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * -MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * -MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate); // Drive counterclockwise with negative X (left)
-                } else {
-                    return drive
-                    .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate); // Drive counterclockwise with negative X (left)
-                }
+                return drive
+                .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed) // Drive forward with negative Y (forward)
+                .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed) // Drive left with negative X (left)
+                .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate); // Drive counterclockwise with negative X (left)
             }
         ));
 
@@ -181,28 +168,17 @@ public class RobotContainer {
                         }
                         arm.setWristPosition(vision.getShootingAngle(distance));
                         
-                        // Set LEDs to blue when AprilTag is bieng tracked
-                        if (currentTag.getYaw() < targetYaw + 0.5 && currentTag.getYaw() > targetYaw - 0.5) {
+                        // Set LEDs to blue when AprilTag is being tracked
+                        if (currentTag.getYaw() < targetYaw + 0.75 && currentTag.getYaw() > targetYaw - 0.75) {
                             for (int i = 0; i < ledData.getLength(); i++) {
                                 ledData.setRGB(i, 0, 0, 255);
                             }
                             leds.setData(ledData);
                         }
-                        Optional<Alliance> optionalAliance = DriverStation.getAlliance();
-                        if (optionalAliance.isPresent()) {
-                            alliance = optionalAliance.get();
-                        }
-                        if (alliance == Alliance.Red) {
-                            return drive
-                            .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * -MaxSpeed) // Drive forward with negative Y (forward)
-                            .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * -MaxSpeed) // Drive left with negative X (left)
-                            .withRotationalRate(-Units.degreesToRadians(currentTag.getYaw() - targetYaw) * MaxAngularRate * 1.9 * (3.0 / 5.0)); // Drive counterclockwise with negative X (left)
-                        } else {
-                            return drive
+                        return drive
                             .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
                             .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
                             .withRotationalRate(-Units.degreesToRadians(currentTag.getYaw() - targetYaw) * MaxAngularRate * 1.9 * (3.0 / 5.0));
-                        }
                     }
                 }
 
@@ -210,21 +186,11 @@ public class RobotContainer {
                     ledData.setRGB(i, 0, 255, 0);
                 }
                 leds.setData(ledData);
-                Optional<Alliance> optionalAliance = DriverStation.getAlliance();
-                if (optionalAliance.isPresent()) {
-                    alliance = optionalAliance.get();
-                }
-                if (alliance == Alliance.Red) {
-                    return drive
-                    .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * -MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * -MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate); // Drive counterclockwise with negative X (left)
-                } else {
-                    return drive
+
+                return drive
                     .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
                     .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
                     .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate);
-                }
             }).finallyDo(() -> {
                 for (int i = 0; i < ledData.getLength(); i++) {
                     ledData.setRGB(i, 255, 0, 0);
@@ -265,37 +231,15 @@ public class RobotContainer {
                 if(vision.hasNote()) {
                     PhotonTrackedTarget bestNote = vision.bestNote();
                     double bestNoteYaw = bestNote.getYaw();
-                    Optional<Alliance> optionalAliance = DriverStation.getAlliance();
-                    if (optionalAliance.isPresent()) {
-                        alliance = optionalAliance.get();
-                    }
-                    if (alliance == Alliance.Red) {
-                        return drive
-                        .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * -MaxSpeed) // Drive forward with negative Y (forward)
-                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * -MaxSpeed) // Drive left with negative X (left)
-                        .withRotationalRate(-Units.degreesToRadians(bestNoteYaw) * MaxAngularRate * 0.50 * (3.0 / 5.0)); // Drive counterclockwise with negative X (left)
-                    } else { 
-                        return drive
+                    return drive
                         .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
                         .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
                         .withRotationalRate(-Units.degreesToRadians(bestNoteYaw) * MaxAngularRate * 0.50 * (3.0 / 5.0));
-                    }
                 } else {
-                    Optional<Alliance> optionalAliance = DriverStation.getAlliance();
-                    if (optionalAliance.isPresent()) {
-                        alliance = optionalAliance.get();
-                    }
-                    if (alliance == Alliance.Red) {
-                        return drive
-                        .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * -MaxSpeed) // Drive forward with negative Y (forward)
-                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * -MaxSpeed) // Drive left with negative X (left)
-                        .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate); // Drive counterclockwise with negative X (left)
-                    } else {
-                        return drive
+                    return drive
                         .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
                         .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
                         .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate);
-                    }
                 }
             }).finallyDo(() -> arm.setIntakePercent(0.0)),
             () -> arm.getLineBreak()));
@@ -423,6 +367,10 @@ public class RobotContainer {
         NamedCommands.registerCommand("LiftWrist6.7", arm.moveWristPositionCommand(6.7));
 
         NamedCommands.registerCommand("Stop Wheels", arm.spinShooterMotorCommand(0));
+
+        NamedCommands.registerCommand("Reset Gyro", Commands.runOnce(() -> {
+            drivetrain.seedFieldRelative();
+        }));
 
         if (Utils.isSimulation()) {
             drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
