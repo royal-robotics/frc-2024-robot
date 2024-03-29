@@ -229,6 +229,18 @@ public class RobotContainer {
                 }
                 vision.refresh();
                 if(vision.hasNote()) {
+                    if (arm.getLineBreak()) {
+                        for (int i = 0; i < ledData.getLength(); i++) {
+                            ledData.setRGB(i, 0, 255, 0);
+                        }
+                        leds.setData(ledData);
+                    } else {
+                        for (int i = 0; i < ledData.getLength(); i++) {
+                            ledData.setRGB(i, 255, 64, 0);
+                        }
+                        leds.setData(ledData);
+                    }
+
                     PhotonTrackedTarget bestNote = vision.bestNote();
                     double bestNoteYaw = bestNote.getYaw();
                     return drive
@@ -236,18 +248,47 @@ public class RobotContainer {
                         .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
                         .withRotationalRate(-Units.degreesToRadians(bestNoteYaw) * MaxAngularRate * 0.50 * (3.0 / 5.0));
                 } else {
+                    if (arm.getLineBreak()) {
+                        for (int i = 0; i < ledData.getLength(); i++) {
+                            ledData.setRGB(i, 0, 255, 0);
+                        }
+                        leds.setData(ledData);
+                    } else {
+                        for (int i = 0; i < ledData.getLength(); i++) {
+                            ledData.setRGB(i, 255, 0, 0);
+                        }
+                        leds.setData(ledData);
+                    }
+
                     return drive
                         .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
                         .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
                         .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate);
                 }
-            }).finallyDo(() -> arm.setIntakePercent(0.0)),
+            }).finallyDo(() -> {
+                arm.setIntakePercent(0.0);
+                if (arm.getLineBreak()) {
+                    for (int i = 0; i < ledData.getLength(); i++) {
+                        ledData.setRGB(i, 0, 255, 0);
+                    }
+                    leds.setData(ledData);
+                } else {
+                    for (int i = 0; i < ledData.getLength(); i++) {
+                        ledData.setRGB(i, 255, 0, 0);
+                    }
+                    leds.setData(ledData);
+                }
+            }),
             () -> arm.getLineBreak()));
 
         // driver.rightStick().onTrue(Commands.startEnd(() -> MaxAngularRate = 5.0 * Math.PI, () -> MaxAngularRate = 3.0 * Math.PI));
 
+        // Clamshell
         operator.leftTrigger().onTrue(Commands.sequence(
-            Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
+            Commands.either(
+                Commands.runOnce(() -> arm.setShooterMotorVelocity(30.0)),
+                Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
+                () -> arm.getLineBreak()),
             arm.moveArmPositionCommand(19.0),
             Commands.waitSeconds(0.2).onlyIf(() -> arm.getArmPosition() > 25.0),
             arm.moveWristPositionCommand(-20.5)
