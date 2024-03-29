@@ -128,7 +128,7 @@
       }
     },
     {
-      "name": "New Event Marker",
+      "name": "Reset Gyro",
       "waypointRelativePos": 0.45,
       "command": {
         "type": "parallel",
@@ -138,6 +138,23 @@
               "type": "named",
               "data": {
                 "name": "Reset Gyro"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Out-in",
+      "waypointRelativePos": 1.25,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Out-In Nickey"
               }
             }
           ]

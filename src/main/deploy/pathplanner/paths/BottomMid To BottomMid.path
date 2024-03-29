@@ -119,6 +119,23 @@
           ]
         }
       }
+    },
+    {
+      "name": "Outin",
+      "waypointRelativePos": 1.25,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Out-In Nickey"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "globalConstraints": {

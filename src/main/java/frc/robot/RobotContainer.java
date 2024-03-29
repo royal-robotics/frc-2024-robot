@@ -278,7 +278,7 @@ public class RobotContainer {
         operator.y().onTrue(Commands.sequence(
             arm.moveArmPositionCommand(30.25),
             arm.moveWristPositionCommand(-1.2),
-            Commands.runOnce(() -> arm.setShooterMotorVelocity(25.0))
+            Commands.runOnce(() -> arm.setShooterMotorVelocity(35.0))
         ));
 
         // Stop shooter motors, reset to ground
@@ -348,7 +348,14 @@ public class RobotContainer {
             arm
         ).until(() -> arm.getLineBreak()));
 
-        
+        NamedCommands.registerCommand("Out-In Nickey", Commands.sequence(
+            Commands.runOnce(() -> arm.setIntakePercent(-0.3)),
+            Commands.waitSeconds(0.1),
+            Commands.startEnd(
+                () -> arm.setIntakePercent(0.3), 
+                () -> arm.setIntakePercent(0.0))
+                .until(() -> arm.getLineBreak())
+        ));
         
         NamedCommands.registerCommand("LiftWrist3.8", arm.moveWristPositionCommand(3.8));
         NamedCommands.registerCommand("LiftWrist4.2", arm.moveWristPositionCommand(4.2));

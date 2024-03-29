@@ -1,0 +1,85 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "StartBear"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LiftWrist4.5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BearMiddle"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LiftWrist5.8"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Spare BottomMid To BottomMid"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LiftWrist4.2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Spare B2F to BotFar"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LiftWrist4.8"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
