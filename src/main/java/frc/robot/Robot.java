@@ -7,14 +7,14 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.Climber;
+// import edu.wpi.first.wpilibj2.command.Commands;
+// import frc.robot.subsystems.Climber;
 
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
-  private final Climber climber = new Climber(); // Climber subsystem
+  // private final Climber climber = new Climber(); // Climber subsystem
 
 
   @Override
@@ -30,7 +30,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     m_robotContainer.setArmCoast();
-    Commands.runOnce(() -> climber.climbRetract(), climber);
+    m_robotContainer.retractClimber();
   }
 
   @Override

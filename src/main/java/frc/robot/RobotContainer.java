@@ -70,6 +70,17 @@ public class RobotContainer {
             }
         ));
 
+
+        // Driver Nickey Controls
+        // Driver Controls
+        // Left Trigger -- Tracking Shot
+        // Right Trigger -- Speaker Shot
+        // Left Bumper -- Note Tracking
+        // Right Bumper -- Intake
+        // Back -- Reset Gyro
+        // b -- Outtake
+        // y -- Nickey's favorite out-in button
+
         // reset the field-centric heading on left bumper press
         driver.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
         /*driver.leftBumper().whileTrue(Commands.startEnd(
@@ -283,6 +294,16 @@ public class RobotContainer {
 
         // driver.rightStick().onTrue(Commands.startEnd(() -> MaxAngularRate = 5.0 * Math.PI, () -> MaxAngularRate = 3.0 * Math.PI));
 
+        // Operator Controls
+        // Left Trigger -- Clamshell
+        // Right Trigger -- Stop shooter motors, reset to ground
+        // Left Bumper -- Retract Climber
+        // Right Bumper -- Extend Climber
+        // a -- Clamshot
+        // b -- Source Intake 
+        // x -- Passing shot
+        // y -- Amp button
+
         // Clamshell
         operator.leftTrigger().onTrue(Commands.sequence(
             Commands.either(
@@ -454,5 +475,9 @@ public class RobotContainer {
 
     public void setArmBrake() {
         arm.configureMotorsBrake();
+    }
+
+    public void retractClimber() {
+        Commands.runOnce(() -> climber.climbRetract(), climber);
     }
 }
