@@ -247,7 +247,7 @@ public class RobotContainer {
                         leds.setData(ledData);
                     } else {
                         for (int i = 0; i < ledData.getLength(); i++) {
-                            ledData.setRGB(i, 255, 64, 0);
+                            ledData.setRGB(i, 255, 255, 0);
                         }
                         leds.setData(ledData);
                     }
