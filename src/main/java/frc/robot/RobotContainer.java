@@ -360,6 +360,8 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("MoveWristToPickup", arm.moveWristPositionCommand(0.5));
 
+        NamedCommands.registerCommand("retractArm", Commands.runOnce(() -> climber.climbRetract(), climber));
+
         NamedCommands.registerCommand("Shoot", Commands.sequence(
             arm.spinShooterMotorCommand(65.0),
             Commands.waitSeconds(0.33),

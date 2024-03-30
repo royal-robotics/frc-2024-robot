@@ -112,7 +112,7 @@
     },
     {
       "name": "Lift Wrist",
-      "waypointRelativePos": 1.35,
+      "waypointRelativePos": 1.15,
       "command": {
         "type": "parallel",
         "data": {
@@ -121,6 +121,23 @@
               "type": "named",
               "data": {
                 "name": "LiftWrist6.0"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "OutiN",
+      "waypointRelativePos": 1.5,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Out-In Nickey"
               }
             }
           ]
@@ -136,7 +153,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 14.089192255653789,
+    "rotation": 6.879605442815149,
     "rotateFast": false
   },
   "reversed": false,

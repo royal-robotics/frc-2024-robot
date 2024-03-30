@@ -33,15 +33,15 @@
     {
       "anchor": {
         "x": 8.25,
-        "y": 7.9
+        "y": 7.7
       },
       "prevControl": {
         "x": 7.25,
-        "y": 7.9
+        "y": 7.7
       },
       "nextControl": {
         "x": 8.35,
-        "y": 7.9
+        "y": 7.7
       },
       "isLocked": false,
       "linkedName": null
@@ -110,7 +110,7 @@
       }
     },
     {
-      "name": "New Event Marker",
+      "name": "Reset Gyro",
       "waypointRelativePos": 1.45,
       "command": {
         "type": "parallel",
@@ -120,6 +120,23 @@
               "type": "named",
               "data": {
                 "name": "Reset Gyro"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "OutIn",
+      "waypointRelativePos": 2.5,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Out-In Nickey"
               }
             }
           ]
