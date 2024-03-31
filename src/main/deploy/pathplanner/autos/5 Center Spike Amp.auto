@@ -74,7 +74,13 @@
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist5.3"
+            "name": "LiftWrist5.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Out-In Nickey"
           }
         },
         {
@@ -98,12 +104,6 @@
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist6.0"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "Shoot"
           }
         },
@@ -114,21 +114,9 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "Top to TopMid"
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "LiftWrist4.2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
+            "name": "Stop Wheels"
           }
         }
       ]

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.75,
-        "y": 6.6
+        "x": 0.7792735585471178,
+        "y": 6.670053340106681
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.750000000000003,
-        "y": 6.6
+        "x": 1.4829275372836466,
+        "y": 7.564280271417686
       },
       "isLocked": false,
       "linkedName": null
@@ -20,11 +20,11 @@
         "y": 7.9
       },
       "prevControl": {
-        "x": 1.75,
+        "x": 1.1149746302881312,
         "y": 7.9
       },
       "nextControl": {
-        "x": 3.75,
+        "x": 3.7499999999999964,
         "y": 7.9
       },
       "isLocked": false,
@@ -32,28 +32,28 @@
     },
     {
       "anchor": {
-        "x": 8.25,
-        "y": 7.7
+        "x": 8.5,
+        "y": 7.9
       },
       "prevControl": {
-        "x": 7.25,
-        "y": 7.7
+        "x": 7.5,
+        "y": 7.9
       },
       "nextControl": {
-        "x": 8.35,
-        "y": 7.7
+        "x": 8.6,
+        "y": 7.9
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.8,
-        "y": 6.85
+        "x": 4.0,
+        "y": 6.75
       },
       "prevControl": {
-        "x": 7.580051536255224,
-        "y": 7.594912564056489
+        "x": 4.5,
+        "y": 7.616025403784438
       },
       "nextControl": null,
       "isLocked": false,
@@ -128,7 +128,7 @@
     },
     {
       "name": "OutIn",
-      "waypointRelativePos": 2.5,
+      "waypointRelativePos": 2.6,
       "command": {
         "type": "parallel",
         "data": {
@@ -142,17 +142,34 @@
           ]
         }
       }
+    },
+    {
+      "name": "LiftWRist",
+      "waypointRelativePos": 2.35,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "LiftWrist6.2"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 6.0,
-    "maxAcceleration": 8.0,
+    "maxVelocity": 9.0,
+    "maxAcceleration": 9.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 12.823016436929931,
+    "rotation": 15.0,
     "rotateFast": false
   },
   "reversed": false,

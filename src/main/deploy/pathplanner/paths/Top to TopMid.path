@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.8,
-        "y": 6.86
+        "x": 4.0,
+        "y": 6.75
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.7659258262890685,
-        "y": 6.60118095489748
+        "x": 5.0,
+        "y": 8.482050807568877
       },
       "isLocked": false,
       "linkedName": null
@@ -20,24 +20,24 @@
         "y": 6.25
       },
       "prevControl": {
-        "x": 8.1,
-        "y": 6.25
+        "x": 8.086602540378442,
+        "y": 6.200000000000022
       },
       "nextControl": {
-        "x": 7.0,
-        "y": 6.25
+        "x": 6.267949192431122,
+        "y": 7.249999999999977
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.2,
+        "x": 3.5,
         "y": 6.5
       },
       "prevControl": {
-        "x": 4.991546190744791,
-        "y": 7.496894381784655
+        "x": 4.25,
+        "y": 7.799038105676658
       },
       "nextControl": null,
       "isLocked": false,
@@ -57,19 +57,19 @@
       "minWaypointRelativePos": 0.05,
       "maxWaypointRelativePos": 0.5,
       "constraints": {
-        "maxVelocity": 10.0,
-        "maxAcceleration": 10.0,
+        "maxVelocity": 8.0,
+        "maxAcceleration": 8.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0
       }
     },
     {
       "name": "From",
-      "minWaypointRelativePos": 0.5,
-      "maxWaypointRelativePos": 1.9,
+      "minWaypointRelativePos": 1.2,
+      "maxWaypointRelativePos": 1.75,
       "constraints": {
-        "maxVelocity": 3.0,
-        "maxAcceleration": 10.0,
+        "maxVelocity": 8.0,
+        "maxAcceleration": 8.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0
       }
@@ -120,7 +120,7 @@
             {
               "type": "named",
               "data": {
-                "name": "LiftWrist6.0"
+                "name": "LiftWrist5.7"
               }
             }
           ]
@@ -153,14 +153,14 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 1.0,
+    "rotation": 11.25,
     "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": 29.85066348457122,
-    "velocity": 0
+    "rotation": 15.0,
+    "velocity": 0.0
   },
   "useDefaultConstraints": true
 }

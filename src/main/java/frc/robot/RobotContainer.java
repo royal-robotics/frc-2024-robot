@@ -385,7 +385,7 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("Shoot", Commands.sequence(
             arm.spinShooterMotorCommand(65.0),
-            Commands.waitSeconds(0.33),
+            Commands.waitSeconds(0.5),
             Commands.runOnce(() -> arm.setIntakePercent(1.0), arm),
             Commands.waitSeconds(0.5),
             Commands.runOnce(() -> {
@@ -407,7 +407,7 @@ public class RobotContainer {
         ));
 
         NamedCommands.registerCommand("Intake", Commands.startEnd(
-            () -> arm.setIntakePercent(0.5),
+            () -> arm.setIntakePercent(0.4),
             () -> arm.setIntakePercent(0.0),
             arm
         ).until(() -> arm.getLineBreak()));
@@ -420,6 +420,16 @@ public class RobotContainer {
                 () -> arm.setIntakePercent(0.0))
                 .until(() -> arm.getLineBreak())
         ));
+
+        NamedCommands.registerCommand("Clamshell", Commands.sequence(
+            Commands.either(
+                Commands.runOnce(() -> arm.setShooterMotorVelocity(30.0)),
+                Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
+                () -> arm.getLineBreak()),
+            arm.moveArmPositionCommand(19.0),
+            Commands.waitSeconds(0.2).onlyIf(() -> arm.getArmPosition() > 25.0),
+            arm.moveWristPositionCommand(-20.5)
+        ));
         
         NamedCommands.registerCommand("LiftWrist3.8", arm.moveWristPositionCommand(3.8));
         NamedCommands.registerCommand("LiftWrist4.2", arm.moveWristPositionCommand(4.2));
@@ -428,14 +438,24 @@ public class RobotContainer {
         NamedCommands.registerCommand("LiftWrist4.5", arm.moveWristPositionCommand(4.5));
         NamedCommands.registerCommand("LiftWrist4.8", arm.moveWristPositionCommand(4.8));
         NamedCommands.registerCommand("LiftWrist5.0", arm.moveWristPositionCommand(5.0));
+        NamedCommands.registerCommand("LiftWrist5.1", arm.moveWristPositionCommand(5.1));
+        NamedCommands.registerCommand("LiftWrist5.2", arm.moveWristPositionCommand(5.2));
         NamedCommands.registerCommand("LiftWrist5.3", arm.moveWristPositionCommand(5.3));
+        NamedCommands.registerCommand("LiftWrist5.4", arm.moveWristPositionCommand(5.4));
         NamedCommands.registerCommand("LiftWrist5.5", arm.moveWristPositionCommand(5.5));
+        NamedCommands.registerCommand("LiftWrist5.6", arm.moveWristPositionCommand(5.6));
+        NamedCommands.registerCommand("LiftWrist5.7", arm.moveWristPositionCommand(5.7));
         NamedCommands.registerCommand("LiftWrist5.8", arm.moveWristPositionCommand(5.8));
         NamedCommands.registerCommand("LiftWrist5.9", arm.moveWristPositionCommand(5.9));
         NamedCommands.registerCommand("LiftWrist6.0", arm.moveWristPositionCommand(6.0));
+        NamedCommands.registerCommand("LiftWrist6.1", arm.moveWristPositionCommand(6.1));
+        NamedCommands.registerCommand("LiftWrist6.2", arm.moveWristPositionCommand(6.2));
         NamedCommands.registerCommand("LiftWrist6.4", arm.moveWristPositionCommand(6.4));
         NamedCommands.registerCommand("LiftWrist6.5", arm.moveWristPositionCommand(6.5));
         NamedCommands.registerCommand("LiftWrist6.7", arm.moveWristPositionCommand(6.7));
+        NamedCommands.registerCommand("LiftWrist6.8", arm.moveWristPositionCommand(6.8));
+        NamedCommands.registerCommand("LiftWrist6.9", arm.moveWristPositionCommand(6.9));
+        NamedCommands.registerCommand("LiftWrist7.0", arm.moveWristPositionCommand(7.0));
 
         NamedCommands.registerCommand("Stop Wheels", arm.spinShooterMotorCommand(0));
 

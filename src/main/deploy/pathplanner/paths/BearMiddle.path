@@ -3,57 +3,73 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.0,
-        "y": 3.0
+        "x": 3.25,
+        "y": 2.75
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.866025403784439,
-        "y": 2.5
+        "x": 4.116025403784439,
+        "y": 2.25
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.75,
-        "y": 4.0
+        "x": 4.9,
+        "y": 4.25
       },
       "prevControl": {
-        "x": 3.335786437626904,
-        "y": 2.585786437626905
+        "x": 3.4857864376269045,
+        "y": 2.835786437626905
       },
       "nextControl": {
-        "x": 4.820710678118655,
-        "y": 4.070710678118655
+        "x": 4.970710678118655,
+        "y": 4.320710678118655
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.0,
-        "y": 4.0
+        "x": 8.25,
+        "y": 4.25
       },
       "prevControl": {
+        "x": 8.29084708691208,
+        "y": 4.272097086912083
+      },
+      "nextControl": {
+        "x": 8.20915291308792,
+        "y": 4.227902913087917
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.9,
+        "y": 4.25
+      },
+      "prevControl": {
+        "x": 4.800000000000001,
+        "y": 4.25
+      },
+      "nextControl": {
         "x": 5.0,
-        "y": 4.0
-      },
-      "nextControl": {
-        "x": 8.1,
-        "y": 4.0
+        "y": 4.25
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.0,
-        "y": 3.0
+        "x": 3.25,
+        "y": 2.75
       },
       "prevControl": {
-        "x": 4.732050807568877,
-        "y": 4.0
+        "x": 4.116025403784438,
+        "y": 2.25
       },
       "nextControl": null,
       "isLocked": false,
@@ -62,7 +78,7 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 2.05,
+      "waypointRelativePos": 2.1,
       "rotationDegrees": 0,
       "rotateFast": false
     }
@@ -70,7 +86,7 @@
   "constraintZones": [
     {
       "name": "2nd Stop",
-      "minWaypointRelativePos": 0.75,
+      "minWaypointRelativePos": 0.65,
       "maxWaypointRelativePos": 0.85,
       "constraints": {
         "maxVelocity": 3.0,
@@ -81,8 +97,19 @@
     },
     {
       "name": "Back",
-      "minWaypointRelativePos": 2.5,
-      "maxWaypointRelativePos": 2.6,
+      "minWaypointRelativePos": 2.9,
+      "maxWaypointRelativePos": 3.05,
+      "constraints": {
+        "maxVelocity": 3.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    },
+    {
+      "name": "NotePick",
+      "minWaypointRelativePos": 1.75,
+      "maxWaypointRelativePos": 2.25,
       "constraints": {
         "maxVelocity": 3.0,
         "maxAcceleration": 3.0,
@@ -94,7 +121,7 @@
   "eventMarkers": [
     {
       "name": "Intake",
-      "waypointRelativePos": 1.0,
+      "waypointRelativePos": 1.8,
       "command": {
         "type": "parallel",
         "data": {
@@ -103,6 +130,57 @@
               "type": "named",
               "data": {
                 "name": "Intake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "WristToPickup",
+      "waypointRelativePos": 1.3,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "MoveWristToPickup"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "LiftWrist",
+      "waypointRelativePos": 3.5,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "LiftWrist6.1"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "oUTiN",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Out-In Nickey"
               }
             }
           ]
@@ -118,7 +196,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -43.67489760660212,
+    "rotation": -35.0,
     "rotateFast": false
   },
   "reversed": false,

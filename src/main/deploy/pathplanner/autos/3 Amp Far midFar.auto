@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.81,
-      "y": 6.67
+      "x": 0.7792735585471178,
+      "y": 6.670053340106681
     },
     "rotation": 60.0
   },
@@ -26,12 +26,6 @@
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist6.4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "Shoot"
           }
         },
@@ -39,12 +33,6 @@
           "type": "path",
           "data": {
             "pathName": "Top to TopMid"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "LiftWrist6.4"
           }
         },
         {
@@ -63,6 +51,12 @@
           "type": "named",
           "data": {
             "name": "Stop Wheels"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "MoveWristToPickup"
           }
         }
       ]
