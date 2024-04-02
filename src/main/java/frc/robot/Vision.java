@@ -72,7 +72,7 @@ public class Vision {
     public double getShootingAngle(double distance) {
         // Use this magic formula to convert distance to shooting angle
         // Hopefully we never have to change this :)
-        return (distance * 0.9) - 11.1;
+        return (distance * 0.9) - 11.1; // distance * 0.9 - 11.1
     }
 
     // Return whether the note camera has a target

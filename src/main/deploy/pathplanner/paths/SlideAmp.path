@@ -82,9 +82,9 @@
     {
       "name": "Close to Pick",
       "minWaypointRelativePos": 1.6,
-      "maxWaypointRelativePos": 2.0,
+      "maxWaypointRelativePos": 2.25,
       "constraints": {
-        "maxVelocity": 6.0,
+        "maxVelocity": 3.0,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0

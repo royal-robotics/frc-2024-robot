@@ -106,6 +106,12 @@
           "data": {
             "name": "Stop Wheels"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "MoveWristToPickup"
+          }
         }
       ]
     }

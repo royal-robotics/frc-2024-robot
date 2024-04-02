@@ -154,7 +154,7 @@ public class RobotContainer {
             Commands.runOnce(() -> arm.setShooterMotorVelocity(65.0)),
             // Clamshot
             arm.moveArmPositionCommand(19.0),
-            arm.moveWristPositionCommand(-8.8),
+            arm.moveWristPositionCommand(-8.7),
             drivetrain.applyRequest(() -> {
                 vision.refresh();
                 if (vision.hasAprilTag()) {
@@ -247,7 +247,7 @@ public class RobotContainer {
                         leds.setData(ledData);
                     } else {
                         for (int i = 0; i < ledData.getLength(); i++) {
-                            ledData.setRGB(i, 255, 255, 0);
+                            ledData.setRGB(i, 255, 55, 0);
                         }
                         leds.setData(ledData);
                     }
@@ -333,7 +333,7 @@ public class RobotContainer {
         operator.x().onTrue(Commands.sequence(
             Commands.runOnce(() -> arm.setShooterMotorVelocity(70.0)),
             arm.moveArmPositionCommand(19.0),
-            arm.moveWristPositionCommand(-2.0)
+            arm.moveWristPositionCommand(-1.0)
         ));
 
         // Amp
