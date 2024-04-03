@@ -17,15 +17,15 @@
     {
       "anchor": {
         "x": 8.0,
-        "y": 6.15
+        "y": 6.05
       },
       "prevControl": {
         "x": 8.086602540378442,
-        "y": 6.100000000000023
+        "y": 6.000000000000022
       },
       "nextControl": {
         "x": 6.267949192431122,
-        "y": 7.149999999999977
+        "y": 7.049999999999977
       },
       "isLocked": false,
       "linkedName": null
@@ -120,7 +120,7 @@
             {
               "type": "named",
               "data": {
-                "name": "LiftWrist5.8"
+                "name": "LiftWrist6.0"
               }
             }
           ]

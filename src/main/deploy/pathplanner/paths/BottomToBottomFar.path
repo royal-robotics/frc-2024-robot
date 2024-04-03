@@ -17,15 +17,15 @@
     {
       "anchor": {
         "x": 8.25,
-        "y": 0.85
+        "y": 0.8
       },
       "prevControl": {
         "x": 7.7551567699180515,
-        "y": 0.9216252584083582
+        "y": 0.8716252584083582
       },
       "nextControl": {
         "x": 8.797997024565479,
-        "y": 0.7706810842193117
+        "y": 0.7206810842193118
       },
       "isLocked": false,
       "linkedName": null
@@ -120,7 +120,7 @@
             {
               "type": "named",
               "data": {
-                "name": "LiftWrist5.5"
+                "name": "LiftWrist5.7"
               }
             }
           ]
@@ -170,7 +170,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -45.0,
+    "rotation": -42.0,
     "rotateFast": false
   },
   "reversed": false,

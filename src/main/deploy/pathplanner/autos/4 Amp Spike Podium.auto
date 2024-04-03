@@ -32,7 +32,7 @@
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist5.3"
+            "name": "LiftWrist5.7"
           }
         },
         {
@@ -62,7 +62,7 @@
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist3.8"
+            "name": "LiftWrist4.5"
           }
         },
         {
@@ -86,7 +86,7 @@
         {
           "type": "named",
           "data": {
-            "name": "LiftWrist4.8"
+            "name": "LiftWrist5.0"
           }
         },
         {
@@ -99,6 +99,12 @@
           "type": "named",
           "data": {
             "name": "MoveWristToPickup"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Wheels"
           }
         }
       ]
