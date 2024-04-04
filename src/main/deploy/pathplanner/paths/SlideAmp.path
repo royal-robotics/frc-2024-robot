@@ -17,15 +17,15 @@
     {
       "anchor": {
         "x": 2.75,
-        "y": 7.9
+        "y": 7.85
       },
       "prevControl": {
         "x": 1.1149746302881312,
-        "y": 7.9
+        "y": 7.85
       },
       "nextControl": {
         "x": 3.7499999999999964,
-        "y": 7.9
+        "y": 7.85
       },
       "isLocked": false,
       "linkedName": null
@@ -33,15 +33,15 @@
     {
       "anchor": {
         "x": 8.5,
-        "y": 7.8
+        "y": 7.4
       },
       "prevControl": {
         "x": 7.5,
-        "y": 7.8
+        "y": 7.4
       },
       "nextControl": {
         "x": 8.6,
-        "y": 7.8
+        "y": 7.4
       },
       "isLocked": false,
       "linkedName": null
@@ -70,8 +70,8 @@
   "constraintZones": [
     {
       "name": "Slow to Amp",
-      "minWaypointRelativePos": 0.5499999999999999,
-      "maxWaypointRelativePos": 1.0,
+      "minWaypointRelativePos": 0.25,
+      "maxWaypointRelativePos": 0.8999999999999999,
       "constraints": {
         "maxVelocity": 3.0,
         "maxAcceleration": 3.0,
