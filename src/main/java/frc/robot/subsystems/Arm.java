@@ -80,6 +80,7 @@ public class Arm extends SubsystemBase {
 
     // Motor configs for current
     private final CurrentLimitsConfigs currentLimit = new CurrentLimitsConfigs();
+    private final CurrentLimitsConfigs currentLimit60 = new CurrentLimitsConfigs();
     private final CurrentLimitsConfigs currentLimitDisable = new CurrentLimitsConfigs();
 
     // Motor configs for PID
@@ -110,14 +111,14 @@ public class Arm extends SubsystemBase {
 
     // Disable Arm Overrides since they cause loop overruns
     // Uncomment this and 2 other places to reenable
-    /*
+    
     private final GenericEntry armPositionOverride;
     private final GenericEntry armPositionOverrideValue;
     private final GenericEntry wristPositionOverride;
     private final GenericEntry wristPositionOverrideValue;
     private final GenericEntry shooterRPMOverride;
     private final GenericEntry shooterRPMOverrideValue;
-    */
+    
 
     // :)
     private final Orchestra music = new Orchestra();
@@ -159,6 +160,10 @@ public class Arm extends SubsystemBase {
         currentLimit.StatorCurrentLimitEnable = true;
         currentLimit.StatorCurrentLimit = 30.0;
         
+        // Set 60 Amp current limit setting
+        currentLimit60.StatorCurrentLimitEnable = true;
+        currentLimit60.StatorCurrentLimit = 60.0;
+
         // Set disabled current limit setting
         currentLimitDisable.StatorCurrentLimitEnable = false;
 
@@ -170,8 +175,8 @@ public class Arm extends SubsystemBase {
         wristMotor.getConfigurator().apply(currentLimit);
         wristMotorFollow.getConfigurator().apply(currentLimit);
         // Disable current limit to intake and shooter
-        intakeMotor.getConfigurator().apply(currentLimitDisable);
-        shooterMotor.getConfigurator().apply(currentLimitDisable);
+        intakeMotor.getConfigurator().apply(currentLimit60);
+        shooterMotor.getConfigurator().apply(currentLimit60);
 
         // Set reversed motor setting
         motorConfigsReversed.Inverted = InvertedValue.Clockwise_Positive;
@@ -231,7 +236,7 @@ public class Arm extends SubsystemBase {
 
         // Disable Arm Overrides since they cause loop overruns
         // Uncomment this and 2 other places to reenable
-        /*
+        
         ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
         armPositionOverride = armTab.add("Arm Override", false)
             .withWidget(BuiltInWidgets.kToggleButton)
@@ -266,7 +271,7 @@ public class Arm extends SubsystemBase {
             .withPosition(6, 1)
             .withSize(2, 1)
             .getEntry();
-        */
+        
 
         // :)
         music.loadMusic("Kevins Great File.chrp");
@@ -551,7 +556,7 @@ public class Arm extends SubsystemBase {
         // Disable Arm Overrides since they cause loop overruns
         // Uncomment this and 2 other places to reenable
 
-        /*
+        
         if (armPositionOverride.getBoolean(false)) {
             armMotorFollow.setControl(new StrictFollower(armMotor.getDeviceID())); // Back right follows Front right
             armMotorFollowReverseFront.setControl(new StrictFollower(armMotor.getDeviceID())); // Front left follows and opposes Front Right
@@ -572,6 +577,6 @@ public class Arm extends SubsystemBase {
             double shooterRPM = shooterRPMOverrideValue.getDouble(0.0);
             shooterMotor.setControl(motorVelocityRequest.withVelocity(shooterRPM));
         }
-        */
+        
     }
 }

@@ -60,6 +60,8 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
+    private final double passingWheelSpeed = 47.5; // RPS of shooter wheels for passing shots 
+
     private void configureBindings() {
         drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() -> {
@@ -123,7 +125,7 @@ public class RobotContainer {
         // Speaker Shot
         driver.rightTrigger().onTrue(Commands.sequence(
             // Start intake and shooter motors simultaneously
-            arm.spinShooterMotorCommand(65.0),
+            arm.spinShooterMotorCommand(75.0),
             Commands.runOnce(() -> arm.setIntakePercent(1.0)),
             // Wait half a second to end intake
             Commands.waitSeconds(0.5),
@@ -151,7 +153,7 @@ public class RobotContainer {
 
         // Tracking shot
         driver.leftTrigger().whileTrue(Commands.repeatingSequence(
-            Commands.runOnce(() -> arm.setShooterMotorVelocity(65.0)),
+            Commands.runOnce(() -> arm.setShooterMotorVelocity(85.0)),
             // Clamshot
             arm.moveArmPositionCommand(19.0),
             arm.moveWristPositionCommand(-8.7),
@@ -283,6 +285,7 @@ public class RobotContainer {
                         ledData.setRGB(i, 0, 255, 0);
                     }
                     leds.setData(ledData);
+                    arm.setShooterMotorVelocity(passingWheelSpeed);
                 } else {
                     for (int i = 0; i < ledData.getLength(); i++) {
                         ledData.setRGB(i, 255, 0, 0);
@@ -323,18 +326,34 @@ public class RobotContainer {
         ));
 
         // Source intake
+        // operator.b().onTrue(Commands.sequence(
+        //     arm.moveArmPositionCommand(19.0),
+        //     arm.moveWristPositionCommand(4.5),
+        //     Commands.startEnd(() -> arm.setIntakePercent(0.5), () -> arm.setIntakePercent(0.0)).until(() -> arm.getLineBreak())
+        // ));
+
+        // Passing Overstage
         operator.b().onTrue(Commands.sequence(
             arm.moveArmPositionCommand(19.0),
-            arm.moveWristPositionCommand(4.5),
-            Commands.startEnd(() -> arm.setIntakePercent(0.5), () -> arm.setIntakePercent(0.0)).until(() -> arm.getLineBreak())
+            arm.moveWristPositionCommand(-13.5),
+            Commands.runOnce(() -> arm.setShooterMotorVelocity(passingWheelSpeed))
         ));
 
-        // Passing
+        // Passing Floor
         operator.x().onTrue(Commands.sequence(
-            Commands.runOnce(() -> arm.setShooterMotorVelocity(70.0)),
+            Commands.runOnce(() -> arm.setShooterMotorVelocity(85.0)),
             arm.moveArmPositionCommand(19.0),
             arm.moveWristPositionCommand(-1.0)
         ));
+
+        // Passing Overstage
+
+        operator.povUp().onTrue(Commands.sequence(
+            Commands.runOnce(() -> arm.setShooterMotorVelocity(80.0)),
+            arm.moveArmPositionCommand(19.0),
+            arm.moveWristPositionCommand(2.2)
+        ));
+        
 
         // Amp
         operator.y().onTrue(Commands.sequence(
@@ -453,8 +472,10 @@ public class RobotContainer {
         NamedCommands.registerCommand("LiftWrist6.0", arm.moveWristPositionCommand(6.0));
         NamedCommands.registerCommand("LiftWrist6.1", arm.moveWristPositionCommand(6.1));
         NamedCommands.registerCommand("LiftWrist6.2", arm.moveWristPositionCommand(6.2));
+        NamedCommands.registerCommand("LiftWrist6.3", arm.moveWristPositionCommand(6.3));
         NamedCommands.registerCommand("LiftWrist6.4", arm.moveWristPositionCommand(6.4));
         NamedCommands.registerCommand("LiftWrist6.5", arm.moveWristPositionCommand(6.5));
+        NamedCommands.registerCommand("LiftWrist6.6", arm.moveWristPositionCommand(6.6));
         NamedCommands.registerCommand("LiftWrist6.7", arm.moveWristPositionCommand(6.7));
         NamedCommands.registerCommand("LiftWrist6.8", arm.moveWristPositionCommand(6.8));
         NamedCommands.registerCommand("LiftWrist6.9", arm.moveWristPositionCommand(6.9));
