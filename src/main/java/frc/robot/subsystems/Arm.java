@@ -111,14 +111,14 @@ public class Arm extends SubsystemBase {
 
     // Disable Arm Overrides since they cause loop overruns
     // Uncomment this and 2 other places to reenable
-    
+    /*
     private final GenericEntry armPositionOverride;
     private final GenericEntry armPositionOverrideValue;
     private final GenericEntry wristPositionOverride;
     private final GenericEntry wristPositionOverrideValue;
     private final GenericEntry shooterRPMOverride;
     private final GenericEntry shooterRPMOverrideValue;
-    
+    */
 
     // :)
     private final Orchestra music = new Orchestra();
@@ -236,7 +236,7 @@ public class Arm extends SubsystemBase {
 
         // Disable Arm Overrides since they cause loop overruns
         // Uncomment this and 2 other places to reenable
-        
+        /*
         ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
         armPositionOverride = armTab.add("Arm Override", false)
             .withWidget(BuiltInWidgets.kToggleButton)
@@ -271,7 +271,7 @@ public class Arm extends SubsystemBase {
             .withPosition(6, 1)
             .withSize(2, 1)
             .getEntry();
-        
+        */
 
         // :)
         music.loadMusic("Kevins Great File.chrp");
@@ -555,8 +555,7 @@ public class Arm extends SubsystemBase {
 
         // Disable Arm Overrides since they cause loop overruns
         // Uncomment this and 2 other places to reenable
-
-        
+        /*
         if (armPositionOverride.getBoolean(false)) {
             armMotorFollow.setControl(new StrictFollower(armMotor.getDeviceID())); // Back right follows Front right
             armMotorFollowReverseFront.setControl(new StrictFollower(armMotor.getDeviceID())); // Front left follows and opposes Front Right
@@ -577,6 +576,6 @@ public class Arm extends SubsystemBase {
             double shooterRPM = shooterRPMOverrideValue.getDouble(0.0);
             shooterMotor.setControl(motorVelocityRequest.withVelocity(shooterRPM));
         }
-        
+        */
     }
 }

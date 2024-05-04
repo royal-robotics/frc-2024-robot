@@ -18,10 +18,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -60,15 +64,23 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
+    private final GenericEntry demoMode;
+
     private final double passingWheelSpeed = 47.5; // RPS of shooter wheels for passing shots 
 
     private void configureBindings() {
         drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() -> {
+                double TopSpin = MaxAngularRate;
+                double TopSpeed = MaxSpeed;
+                if(demoMode.getBoolean(false)){
+                    TopSpeed = MaxSpeed/4;
+                    TopSpin = MaxAngularRate/2;
+                }
                 return drive
-                .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed) // Drive forward with negative Y (forward)
-                .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed) // Drive left with negative X (left)
-                .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate); // Drive counterclockwise with negative X (left)
+                .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * TopSpeed) // Drive forward with negative Y (forward)
+                .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * TopSpeed) // Drive left with negative X (left)
+                .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * TopSpin); // Drive counterclockwise with negative X (left)
             }
         ));
 
@@ -136,19 +148,55 @@ public class RobotContainer {
         ));
 
         // Outtake
-        driver.b().whileTrue(Commands.startEnd(
+        
+        /*driver.b().whileTrue(Commands.startEnd(
             () -> arm.setIntakePercent(-0.5), 
             () -> arm.setIntakePercent(0.0))
-        );
-
+        );*/
+    
+        driver.b().onTrue(Commands.either(
+            Commands.sequence(
+            Commands.either(
+                Commands.runOnce(() -> arm.setShooterMotorVelocity(25.0)),
+                Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
+                () -> arm.getLineBreak()),
+            arm.moveArmPositionCommand(19.0),
+            Commands.waitSeconds(0.2).onlyIf(() -> arm.getArmPosition() > 25.0),
+            arm.moveWristPositionCommand(-20.5)
+        ),
+            Commands.sequence(
+                Commands.runOnce(() -> arm.setIntakePercent(-0.5)),
+                Commands.waitSeconds(1),
+                Commands.runOnce(() -> arm.setIntakePercent(0.0))
+        ),
+        () -> demoMode.getBoolean(false)
+        ));
+    
         // Nickey's Favorite Button
-        driver.y().onTrue(Commands.sequence(
+        /*driver.y().onTrue(Commands.sequence(
             Commands.runOnce(() -> arm.setIntakePercent(-0.3)),
             Commands.waitSeconds(0.1),
             Commands.startEnd(
                 () -> arm.setIntakePercent(0.3), 
                 () -> arm.setIntakePercent(0.0))
                 .until(() -> arm.getLineBreak())
+        ));*/
+
+        driver.y().onTrue(Commands.either(
+            Commands.sequence(
+            arm.moveArmPositionCommand(30.25),
+            arm.moveWristPositionCommand(-1.2),
+            Commands.runOnce(() -> arm.setShooterMotorVelocity(20.0))
+        ),
+            Commands.sequence(
+            Commands.runOnce(() -> arm.setIntakePercent(-0.3)),
+            Commands.waitSeconds(0.1),
+            Commands.startEnd(
+                () -> arm.setIntakePercent(0.3), 
+                () -> arm.setIntakePercent(0.0))
+                .until(() -> arm.getLineBreak())
+        ),
+        () -> demoMode.getBoolean(false)
         ));
 
         // Tracking shot
@@ -188,10 +236,16 @@ public class RobotContainer {
                             }
                             leds.setData(ledData);
                         }
+                            double TopSpeed = MaxSpeed;
+                            double TopSpin = MaxAngularRate;
+                        if(demoMode.getBoolean(false)){
+                         TopSpeed = MaxSpeed/4;
+                         TopSpin = MaxAngularRate/2;
+                        }
                         return drive
-                            .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
-                            .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
-                            .withRotationalRate(-Units.degreesToRadians(currentTag.getYaw() - targetYaw) * MaxAngularRate * 1.9 * (3.0 / 5.0));
+                            .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * TopSpeed)
+                            .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * TopSpeed)
+                            .withRotationalRate(-Units.degreesToRadians(currentTag.getYaw() - targetYaw) * TopSpin * 1.9 * (3.0 / 5.0));
                     }
                 }
 
@@ -199,11 +253,16 @@ public class RobotContainer {
                     ledData.setRGB(i, 0, 255, 0);
                 }
                 leds.setData(ledData);
-
+                double TopSpeed = MaxSpeed;
+                double TopSpin = MaxAngularRate;
+                if(demoMode.getBoolean(false)){
+                    TopSpeed = MaxSpeed/4;
+                    TopSpin = MaxAngularRate/2;
+                }
                 return drive
-                    .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
-                    .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
-                    .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate);
+                    .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * TopSpeed)
+                    .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * TopSpeed)
+                    .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * TopSpin);
             }).finallyDo(() -> {
                 for (int i = 0; i < ledData.getLength(); i++) {
                     ledData.setRGB(i, 255, 0, 0);
@@ -256,10 +315,16 @@ public class RobotContainer {
 
                     PhotonTrackedTarget bestNote = vision.bestNote();
                     double bestNoteYaw = bestNote.getYaw();
+                     double TopSpeed = MaxSpeed;
+                     double TopSpin = MaxAngularRate;
+                    if(demoMode.getBoolean(false)){
+                    TopSpeed = MaxSpeed/4;
+                    TopSpin = MaxAngularRate/2;
+                    }
                     return drive
-                        .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
-                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
-                        .withRotationalRate(-Units.degreesToRadians(bestNoteYaw) * MaxAngularRate * 0.50 * (3.0 / 5.0));
+                        .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * TopSpeed)
+                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * TopSpeed)
+                        .withRotationalRate(-Units.degreesToRadians(bestNoteYaw) * TopSpin * 0.50 * (3.0 / 5.0));
                 } else {
                     if (arm.getLineBreak()) {
                         for (int i = 0; i < ledData.getLength(); i++) {
@@ -272,11 +337,16 @@ public class RobotContainer {
                         }
                         leds.setData(ledData);
                     }
-
+                     double TopSpeed = MaxSpeed;
+                     double TopSpin = MaxAngularRate;
+                    if(demoMode.getBoolean(false)){
+                    TopSpeed = MaxSpeed/4;
+                    TopSpin = MaxAngularRate/2;
+                    }
                     return drive
-                        .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * MaxSpeed)
-                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * MaxSpeed)
-                        .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * MaxAngularRate);
+                        .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * TopSpeed)
+                        .withVelocityY(Math.copySign(Math.pow(-driver.getLeftX(), 2), -driver.getLeftX()) * TopSpeed)
+                        .withRotationalRate(Math.copySign(Math.pow(-driver.getRightX(), 3), -driver.getRightX()) * TopSpin);
                 }
             }).finallyDo(() -> {
                 arm.setIntakePercent(0.0);
@@ -285,7 +355,7 @@ public class RobotContainer {
                         ledData.setRGB(i, 0, 255, 0);
                     }
                     leds.setData(ledData);
-                    arm.setShooterMotorVelocity(passingWheelSpeed);
+                    //arm.setShooterMotorVelocity(passingWheelSpeed);
                 } else {
                     for (int i = 0; i < ledData.getLength(); i++) {
                         ledData.setRGB(i, 255, 0, 0);
@@ -318,6 +388,20 @@ public class RobotContainer {
             arm.moveWristPositionCommand(-20.5)
         ));
 
+        //Demo Clamshell
+        /*if(demoMode.getBoolean(false)){
+            driver.b().onTrue(Commands.sequence(
+            Commands.either(
+                Commands.runOnce(() -> arm.setShooterMotorVelocity(25.0)),
+                Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
+                () -> arm.getLineBreak()),
+            arm.moveArmPositionCommand(19.0),
+            Commands.waitSeconds(0.2).onlyIf(() -> arm.getArmPosition() > 25.0),
+            arm.moveWristPositionCommand(-20.5)
+        ));
+        }*/
+    
+
         // Clamshot
         operator.a().onTrue(Commands.sequence(
             arm.moveArmPositionCommand(19.0),
@@ -343,7 +427,7 @@ public class RobotContainer {
         operator.x().onTrue(Commands.sequence(
             Commands.runOnce(() -> arm.setShooterMotorVelocity(85.0)),
             arm.moveArmPositionCommand(19.0),
-            arm.moveWristPositionCommand(-1.0)
+            arm.moveWristPositionCommand(0.0)
         ));
 
         // Passing Overstage
@@ -354,7 +438,17 @@ public class RobotContainer {
             arm.moveWristPositionCommand(2.2)
         ));
         
-
+        //Demo Pass
+            driver.x().onTrue(Commands.either(
+            Commands.sequence(
+            Commands.runOnce(() -> arm.setShooterMotorVelocity(30.0)),
+            arm.moveArmPositionCommand(19.0),
+            arm.moveWristPositionCommand(2.2)
+        ),
+        Commands.none(),
+        () -> demoMode.getBoolean(false)
+        ));
+        
         // Amp
         operator.y().onTrue(Commands.sequence(
             arm.moveArmPositionCommand(30.25),
@@ -362,11 +456,31 @@ public class RobotContainer {
             Commands.runOnce(() -> arm.setShooterMotorVelocity(35.0))
         ));
 
+        //Demo Amp
+        /*if(demoMode.getBoolean(false)){
+            driver.y().onTrue(Commands.sequence(
+            arm.moveArmPositionCommand(30.25),
+            arm.moveWristPositionCommand(-1.2),
+            Commands.runOnce(() -> arm.setShooterMotorVelocity(20.0))
+        ));
+        }*/
+
         // Stop shooter motors, reset to ground
         operator.rightTrigger().onTrue(Commands.sequence(
             Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
             arm.moveWristPositionCommand(0.5),
             arm.moveArmPositionCommand(0.0)
+        ));
+
+        //Demo Intake mode
+            driver.a().onTrue(Commands.either(
+            Commands.sequence(
+            Commands.runOnce(() -> arm.setShooterMotorVelocity(0.0)),
+            arm.moveWristPositionCommand(0.5),
+            arm.moveArmPositionCommand(0.0)
+        ),
+        Commands.none(),
+        () -> demoMode.getBoolean(false)
         ));
         
         // Extend Climber
@@ -501,6 +615,12 @@ public class RobotContainer {
         }
         leds.setData(ledData);
         leds.start();
+
+        demoMode = Shuffleboard.getTab("Competition")
+            .add("Demo Mode", false)
+            .withWidget(BuiltInWidgets.kToggleSwitch)
+            .withPosition(0, 1)
+            .getEntry();
 
         configureBindings();
 
