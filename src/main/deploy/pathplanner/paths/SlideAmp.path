@@ -164,7 +164,7 @@
             {
               "type": "named",
               "data": {
-                "name": "LiftWrist6.3"
+                "name": "LiftWrist6.0"
               }
             }
           ]
@@ -180,7 +180,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 14.0,
+    "rotation": 11.814244269788658,
     "rotateFast": false
   },
   "reversed": false,
