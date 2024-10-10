@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.generated.TunerConstants;
@@ -75,7 +76,7 @@ public class RobotContainer {
                 double TopSpeed = MaxSpeed;
                 if(demoMode.getBoolean(false)){
                     TopSpeed = MaxSpeed/4;
-                    TopSpin = MaxAngularRate/2;
+                    TopSpin = MaxAngularRate/4;
                 }
                 return drive
                 .withVelocityX(Math.copySign(Math.pow(-driver.getLeftY(), 2), -driver.getLeftY()) * TopSpeed) // Drive forward with negative Y (forward)
@@ -146,6 +147,9 @@ public class RobotContainer {
                 arm.setShooterMotorVelocity(0.0);
             })
         ));
+        
+        //Stop Shooter
+        driver.povUp().onTrue(arm.runOnce(() ->arm.setShooterMotorVelocity(0.0)));
 
         // Outtake
         
@@ -239,7 +243,7 @@ public class RobotContainer {
                             double TopSpeed = MaxSpeed;
                             double TopSpin = MaxAngularRate;
                         if(demoMode.getBoolean(false)){
-                         TopSpeed = MaxSpeed/4;
+                         TopSpeed = MaxSpeed;
                          TopSpin = MaxAngularRate/2;
                         }
                         return drive
@@ -256,7 +260,7 @@ public class RobotContainer {
                 double TopSpeed = MaxSpeed;
                 double TopSpin = MaxAngularRate;
                 if(demoMode.getBoolean(false)){
-                    TopSpeed = MaxSpeed/4;
+                    TopSpeed = MaxSpeed/3.5;
                     TopSpin = MaxAngularRate/2;
                 }
                 return drive
@@ -355,7 +359,8 @@ public class RobotContainer {
                         ledData.setRGB(i, 0, 255, 0);
                     }
                     leds.setData(ledData);
-                    //arm.setShooterMotorVelocity(passingWheelSpeed);
+                    //spin up after intake
+                    arm.setShooterMotorVelocity(40.0);
                 } else {
                     for (int i = 0; i < ledData.getLength(); i++) {
                         ledData.setRGB(i, 255, 0, 0);
@@ -366,7 +371,7 @@ public class RobotContainer {
             () -> arm.getLineBreak()));
 
         // driver.rightStick().onTrue(Commands.startEnd(() -> MaxAngularRate = 5.0 * Math.PI, () -> MaxAngularRate = 3.0 * Math.PI));
-
+// 
         // Operator Controls
         // Left Trigger -- Clamshell
         // Right Trigger -- Stop shooter motors, reset to ground
@@ -441,7 +446,7 @@ public class RobotContainer {
         //Demo Pass
             driver.x().onTrue(Commands.either(
             Commands.sequence(
-            Commands.runOnce(() -> arm.setShooterMotorVelocity(30.0)),
+            Commands.runOnce(() -> arm.setShooterMotorVelocity(40.0)),
             arm.moveArmPositionCommand(19.0),
             arm.moveWristPositionCommand(2.2)
         ),
@@ -453,7 +458,7 @@ public class RobotContainer {
         operator.y().onTrue(Commands.sequence(
             arm.moveArmPositionCommand(30.25),
             arm.moveWristPositionCommand(-1.2),
-            Commands.runOnce(() -> arm.setShooterMotorVelocity(35.0))
+            Commands.runOnce(() -> arm.setShooterMotorVelocity(25.0))
         ));
 
         //Demo Amp
